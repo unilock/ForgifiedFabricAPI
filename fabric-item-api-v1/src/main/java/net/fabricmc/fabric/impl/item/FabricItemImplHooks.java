@@ -16,10 +16,8 @@
 
 package net.fabricmc.fabric.impl.item;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import net.fabricmc.fabric.api.item.v1.FabricItem;
-import net.fabricmc.fabric.impl.client.item.ItemApiClientEventHooks;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -27,6 +25,9 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+
+import net.fabricmc.fabric.api.item.v1.FabricItem;
+import net.fabricmc.fabric.impl.client.item.ItemApiClientEventHooks;
 
 @SuppressWarnings("unused")
 public final class FabricItemImplHooks {
@@ -55,10 +56,6 @@ public final class FabricItemImplHooks {
         PlayerEntity player = ItemApiClientEventHooks.getClientPlayerSafely();
         Hand hand = oldStack == player.getMainHandStack() ? Hand.MAIN_HAND : Hand.OFF_HAND;
         return FabricItemInternals.nonRecursiveApiCall(() -> item.allowNbtUpdateAnimation(player, hand, oldStack, newStack));
-    }
-
-    public static boolean shouldCauseBlockBreakReset(boolean original, FabricItem item, ItemStack oldStack, ItemStack newStack) {
-        return original && FabricItemInternals.nonRecursiveApiCall(() -> !item.allowContinuingBlockBreaking(ItemApiClientEventHooks.getClientPlayerSafely(), oldStack, newStack));
     }
 
     private FabricItemImplHooks() {}

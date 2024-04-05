@@ -137,30 +137,6 @@ function initializeCoreMod() {
                 return node;
             }
         },
-        'implementShouldCauseBlockBreakReset': {
-            'target': {
-                'type': 'METHOD',
-                'class': 'net.minecraftforge.common.extensions.IForgeItem',
-                'methodName': 'shouldCauseBlockBreakReset',
-                'methodDesc': yarn ? '(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z' : '(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z'
-            },
-            'transformer': function (node) {
-                for (var i = node.instructions.size() - 1; i >= 0; i--) {
-                    var insn = node.instructions.get(i);
-                    if (insn.opcode === Opcodes.IRETURN) {
-                        var callDesc = yarn ? '(ZLnet/fabricmc/fabric/api/item/v1/FabricItem;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z' : '(ZLnet/fabricmc/fabric/api/item/v1/FabricItem;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z';
-                        var list = ASMAPI.listOf(
-                            new VarInsnNode(Opcodes.ALOAD, 0),
-                            new VarInsnNode(Opcodes.ALOAD, 1),
-                            new VarInsnNode(Opcodes.ALOAD, 2),
-                            new MethodInsnNode(Opcodes.INVOKESTATIC, 'net/fabricmc/fabric/impl/item/FabricItemImplHooks', 'shouldCauseBlockBreakReset', callDesc)
-                        );
-                        node.instructions.insertBefore(insn, list);
-                    }
-                }
-                return node;
-            }
-        },
         'implementGetEquipmentSlot': {
             'target': {
                 'type': 'METHOD',

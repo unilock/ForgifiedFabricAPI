@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.api.item.v1;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.fabricmc.fabric.impl.item.FabricItemInternals;
 import net.minecraft.block.BlockState;
@@ -65,7 +64,7 @@ public interface FabricItem {
 	 * @return true to allow continuing block breaking, false to reset the progress.
 	 */
 	default boolean allowContinuingBlockBreaking(PlayerEntity player, ItemStack oldStack, ItemStack newStack) {
-		return FabricItemInternals.allowForgeCall() && !((IForgeItem) this).shouldCauseBlockBreakReset(oldStack, newStack);
+		return false;
 	}
 
 	/**
