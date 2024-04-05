@@ -38,7 +38,7 @@ public class ClientPlayerInteractionManagerMixin {
 	private ItemStack selectedStack;
 	
 	@Unique
-	private boolean fabric_allowContinueBlockBreaking; 
+	private Boolean fabric_allowContinueBlockBreaking; 
 
 	/**
 	 * Allows a FabricItem to continue block breaking progress even if the count or nbt changed.
@@ -50,7 +50,8 @@ public class ClientPlayerInteractionManagerMixin {
 					value = "INVOKE",
 					target = "Lnet/minecraft/item/ItemStack;canCombine(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z"
 			),
-			method = "isCurrentlyBreaking"
+			method = "isCurrentlyBreaking",
+			require = 0 // Optional on NeoForge
 	)
 	private boolean fabricItemContinueBlockBreakingInject(ItemStack stack, ItemStack otherStack) {
 		this.fabric_allowContinueBlockBreaking = false;
@@ -78,7 +79,20 @@ public class ClientPlayerInteractionManagerMixin {
 				),
 			method = "isCurrentlyBreaking"
 	)
-	private boolean fabricItemContinueBlockBreakingInjectForge(ItemStack instance, ItemStack newStack, Operation<Boolean> original) {
-		return !this.fabric_allowContinueBlockBreaking && original.call(instance, newStack);
+	private boolean fabricItemContinueBlockBreakingInjectForge(ItemStack stack, ItemStack otherStack, Operation<Boolean> original) {
+		if (this.fabric_allowContinueBlockBreaking == null) {
+			boolean stackChanged = original.call(stack, otherStack);
+			if (stackChanged) {
+				// The stack changed and vanilla is about to cancel block breaking progress. Check if the item wants to continue block breaking instead.
+				ItemStack oldStack = this.selectedStack;
+				ItemStack newStack = this.client.player.getMainHandStack();
+
+				if (oldStack.isOf(newStack.getItem()) && oldStack.getItem().allowContinuingBlockBreaking(this.client.player, oldStack, newStack)) {
+					return false; // Allow continue block breaking
+				}
+			}
+			return stackChanged;
+		}
+		return !this.fabric_allowContinueBlockBreaking && original.call(stack, otherStack);
 	}
 }
