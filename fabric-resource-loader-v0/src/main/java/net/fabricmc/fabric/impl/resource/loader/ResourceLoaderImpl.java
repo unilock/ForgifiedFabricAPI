@@ -16,13 +16,22 @@
 
 package net.fabricmc.fabric.impl.resource.loader;
 
+import java.util.Set;
+
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceType;
 
 @Mod("fabric_resource_loader_v0")
 public class ResourceLoaderImpl {
+	private static final String DUMMY_CLIENT_NAMESPACE = "fabric-resource-loader-v0-client";
+	private static final String DUMMY_SERVER_NAMESPACE = "fabric-resource-loader-v0-server";
+
 	public ResourceLoaderImpl() {
 		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 		bus.addListener(ResourceLoaderImpl::addPackFinders);
@@ -30,5 +39,13 @@ public class ResourceLoaderImpl {
 
 	private static void addPackFinders(AddPackFindersEvent event) {
 		event.addRepositorySource(new ModResourcePackCreator(event.getPackType()));
+	}
+
+	@Nullable
+	public static ResourceType guessResourceType(ResourceManager manager) {
+		Set<String> namespaces = manager.getAllNamespaces();
+		return namespaces.contains(DUMMY_CLIENT_NAMESPACE) && !namespaces.contains(DUMMY_SERVER_NAMESPACE) ? ResourceType.CLIENT_RESOURCES
+				: namespaces.contains(DUMMY_SERVER_NAMESPACE) && !namespaces.contains(DUMMY_CLIENT_NAMESPACE) ? ResourceType.SERVER_DATA
+				: null;
 	}
 }

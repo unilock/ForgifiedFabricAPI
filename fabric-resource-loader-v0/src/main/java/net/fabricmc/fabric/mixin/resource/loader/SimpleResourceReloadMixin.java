@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import net.fabricmc.fabric.impl.resource.loader.ResourceLoaderImpl;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -48,6 +50,8 @@ public class SimpleResourceReloadMixin {
 	private static void method_40087(ResourceManager resourceManager, List<ResourceReloader> list, Executor executor, Executor executor2, CompletableFuture<Unit> completableFuture, boolean bl, CallbackInfoReturnable<ResourceReload> cir) {
 		if (resourceManager instanceof FabricLifecycledResourceManager flrm) {
 			fabric_resourceType.set(flrm.fabric_getResourceType());
+		} else {
+			fabric_resourceType.set(ResourceLoaderImpl.guessResourceType(resourceManager));
 		}
 	}
 
