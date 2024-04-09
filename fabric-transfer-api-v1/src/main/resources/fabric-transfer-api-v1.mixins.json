@@ -9,6 +9,7 @@
     "DoubleInventoryAccessor",
     "FluidMixin",
     "ItemMixin",
+    "JukeboxBlockEntityMixin",
     "LootableContainerBlockEntityMixin",
     "SimpleInventoryMixin"
   ],
