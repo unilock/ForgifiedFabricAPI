@@ -377,7 +377,8 @@ public class VanillaStorageTests {
 	/**
 	 * Regression test for <a href="https://github.com/FabricMC/fabric/issues/3485">jukeboxes having their state changed mid-transaction</a>.
 	 */
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = TransferApiTests.MODID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testJukeboxState(TestContext context) {
 		BlockPos pos = new BlockPos(2, 2, 2);
 		context.setBlockState(pos, Blocks.JUKEBOX.getDefaultState());
