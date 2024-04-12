@@ -29,7 +29,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.item.ItemStack;
 
-@Mixin(ClientPlayerInteractionManager.class)
+@Mixin(value = ClientPlayerInteractionManager.class, priority = 1500)
 public class ClientPlayerInteractionManagerMixin {
 	@Shadow
 	@Final
