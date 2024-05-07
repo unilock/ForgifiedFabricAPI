@@ -66,12 +66,23 @@ public class ModResourcePackCreator implements RepositorySource {
 		}
 	};
 	public static final ModResourcePackCreator CLIENT_RESOURCE_PACK_PROVIDER = new ModResourcePackCreator(PackType.CLIENT_RESOURCES);
-	private static final PackSelectionConfig ACTIVATION_INFO = new PackSelectionConfig(true, Pack.Position.TOP, false);
+	/**
+	 * The maximum ammount of known data packs requested from the client, including vanilla data packs.
+	 */
+	public static final int MAX_KNOWN_PACKS = Integer.getInteger("fabric-resource-loader-v0:maxKnownPacks", 1024);
 
 	private final PackType type;
+	private final PackSelectionConfig activationInfo;
+	private final boolean forClientDataPackManager;
 
 	public ModResourcePackCreator(PackType type) {
+		this(type, false);
+	}
+
+	protected ModResourcePackCreator(PackType type, boolean forClientDataPackManager) {
 		this.type = type;
+		this.activationInfo = new PackSelectionConfig(!forClientDataPackManager, Pack.Position.TOP, false);
+		this.forClientDataPackManager = forClientDataPackManager;
 	}
 
 	/**
@@ -104,7 +115,7 @@ public class ModResourcePackCreator implements RepositorySource {
 				metadata,
 				new PlaceholderResourcePack.Factory(this.type, metadata),
 				this.type,
-				ACTIVATION_INFO
+				this.activationInfo
 		));
 
 		// Build a list of mod resource packs.
@@ -129,11 +140,14 @@ public class ModResourcePackCreator implements RepositorySource {
 					pack.location(),
 					new ModResourcePackFactory(pack),
 					this.type,
-					ACTIVATION_INFO
+					this.activationInfo
 			);
 
 			if (profile != null) {
-				((FabricResourcePackProfile) profile).fabric_setParentsPredicate(parents);
+				if (!forClientDataPackManager) {
+					((FabricResourcePackProfile) profile).fabric_setParentsPredicate(parents);
+				}
+
 				consumer.accept(profile);
 			}
 		}

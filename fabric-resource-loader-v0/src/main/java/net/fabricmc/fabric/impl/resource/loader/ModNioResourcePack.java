@@ -53,6 +53,7 @@ import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.resources.IoSupplier;
 
 public class ModNioResourcePack implements PackResources, ModResourcePack {
@@ -104,7 +105,7 @@ public class ModNioResourcePack implements PackResources, ModResourcePack {
 				packId,
 				displayName,
 				ModResourcePackCreator.RESOURCE_PACK_SOURCE,
-				Optional.empty()
+				Optional.of(new KnownPack(ModResourcePackCreator.FABRIC, packId, mod.getMetadata().getVersion().getFriendlyString()))
 		);
 		ModNioResourcePack ret = new ModNioResourcePack(packId, mod, paths, type, activationType, modBundled, metadata);
 
