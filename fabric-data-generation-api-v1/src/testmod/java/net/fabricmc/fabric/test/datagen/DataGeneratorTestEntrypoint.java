@@ -24,6 +24,7 @@ import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.MOD_ID;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.SIMPLE_BLOCK;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.SIMPLE_ITEM_GROUP;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.TEST_DATAGEN_DYNAMIC_REGISTRY_KEY;
+import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.TEST_DYNAMIC_REGISTRY_EXTRA_ITEM_KEY;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.TEST_DYNAMIC_REGISTRY_ITEM_KEY;
 
 import java.io.IOException;
@@ -72,6 +73,7 @@ import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.registries.RegistryPatchGenerator;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.references.Blocks;
@@ -138,6 +140,14 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 				throw new RuntimeException(e);
 			}
 		}
+
+		FabricDataGenerator.Pack extraPack = dataGenerator.createBuiltinResourcePack(new ResourceLocation(MOD_ID, "extra"));
+		CompletableFuture<HolderLookup.Provider> extraRegistries = RegistryPatchGenerator.createLookup(dataGenerator.getRegistries(), new RegistrySetBuilder()
+				.add(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY, c ->
+						c.register(TEST_DYNAMIC_REGISTRY_EXTRA_ITEM_KEY, new DataGeneratorTestContent.TestDatagenObject(":tiny_potato:"))
+				)
+		).thenApply(RegistrySetBuilder.PatchedRegistries::full);
+		extraPack.addProvider((FabricDataOutput out) -> new TestExtraDynamicRegistryProvider(out, extraRegistries));
 	}
 
 	@Override
@@ -423,6 +433,25 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		@Override
 		protected void configure(HolderLookup.Provider registries, Entries entries) {
 			entries.add(registries.lookupOrThrow(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY), TEST_DYNAMIC_REGISTRY_ITEM_KEY);
+		}
+
+		@Override
+		public String getName() {
+			return "Test Dynamic Registry";
+		}
+	}
+
+	/**
+	 * Test generating files for a patched/extended dynamic registry.
+	 */
+	private static class TestExtraDynamicRegistryProvider extends FabricDynamicRegistryProvider {
+		TestExtraDynamicRegistryProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+			super(output, registriesFuture);
+		}
+
+		@Override
+		protected void configure(HolderLookup.Provider registries, Entries entries) {
+			entries.add(registries.lookupOrThrow(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY), TEST_DYNAMIC_REGISTRY_EXTRA_ITEM_KEY);
 		}
 
 		@Override
