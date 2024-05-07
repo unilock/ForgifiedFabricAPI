@@ -39,6 +39,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.StatType;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -224,6 +225,16 @@ public abstract class FabricLanguageProvider implements DataProvider {
 		 */
 		default void add(ResourceLocation identifier, String value) {
 			add(identifier.toLanguageKey(), value);
+		}
+
+		/**
+		 * Adds a translation for a {@link TagKey}.
+		 *
+		 * @param tagKey the {@link TagKey} to get the translation key from
+		 * @param value  the value of the entry
+		 */
+		default void add(TagKey<?> tagKey, String value) {
+			add(tagKey.getTranslationKey(), value);
 		}
 
 		/**
