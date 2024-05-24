@@ -18,13 +18,11 @@ package net.fabricmc.fabric.test.model.loading;
 
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
-
-import net.minecraft.client.render.model.ModelLoader;
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Tests that deep model resolution resolve each model a single time, depth-first.
@@ -32,17 +30,17 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 public class NestedModelLoadingTest implements ClientModInitializer {
 	private static final Logger LOGGER = LogUtils.getLogger();
 
-	private static Identifier id(String path) {
-		return new Identifier("fabric-model-loading-api-v1-testmod", path);
+	private static ResourceLocation id(String path) {
+		return new ResourceLocation("fabric-model-loading-api-v1-testmod", path);
 	}
 
-	private static final Identifier BASE_MODEL = id("nested_base");
-	private static final Identifier NESTED_MODEL_1 = id("nested_1");
-	private static final Identifier NESTED_MODEL_2 = id("nested_2");
-	private static final Identifier NESTED_MODEL_3 = id("nested_3");
-	private static final Identifier NESTED_MODEL_4 = id("nested_4");
-	private static final Identifier NESTED_MODEL_5 = id("nested_5");
-	private static final Identifier TARGET_MODEL = new Identifier("minecraft", "block/stone");
+	private static final ResourceLocation BASE_MODEL = id("nested_base");
+	private static final ResourceLocation NESTED_MODEL_1 = id("nested_1");
+	private static final ResourceLocation NESTED_MODEL_2 = id("nested_2");
+	private static final ResourceLocation NESTED_MODEL_3 = id("nested_3");
+	private static final ResourceLocation NESTED_MODEL_4 = id("nested_4");
+	private static final ResourceLocation NESTED_MODEL_5 = id("nested_5");
+	private static final ResourceLocation TARGET_MODEL = new ResourceLocation("minecraft", "block/stone");
 
 	@Override
 	public void onInitializeClient() {
@@ -50,7 +48,7 @@ public class NestedModelLoadingTest implements ClientModInitializer {
 			pluginContext.addModels(BASE_MODEL);
 
 			pluginContext.resolveModel().register(context -> {
-				Identifier id = context.id();
+				ResourceLocation id = context.id();
 				UnbakedModel ret = null;
 
 				if (id.equals(BASE_MODEL)) {
@@ -68,11 +66,11 @@ public class NestedModelLoadingTest implements ClientModInitializer {
 				} else if (id.equals(NESTED_MODEL_3)) {
 					// Will be overridden by the model modifier below anyway.
 					LOGGER.info("   Returning dummy model for nested model 3");
-					ret = context.getOrLoadModel(ModelLoader.MISSING_ID);
+					ret = context.getOrLoadModel(ModelBakery.MISSING_MODEL_LOCATION);
 				} else if (id.equals(NESTED_MODEL_4)) {
 					// Will be overridden by the model modifier below anyway.
 					LOGGER.info("    Returning dummy model for nested model 4");
-					ret = context.getOrLoadModel(ModelLoader.MISSING_ID);
+					ret = context.getOrLoadModel(ModelBakery.MISSING_MODEL_LOCATION);
 				} else if (id.equals(NESTED_MODEL_5)) {
 					LOGGER.info("     Target model started loading");
 					ret = context.getOrLoadModel(TARGET_MODEL);
@@ -86,7 +84,7 @@ public class NestedModelLoadingTest implements ClientModInitializer {
 				UnbakedModel ret = model;
 
 				if (context.id().equals(NESTED_MODEL_3)) {
-					Identifier id = context.id();
+					ResourceLocation id = context.id();
 
 					LOGGER.info("   Nested model 4 started loading");
 					ret = context.getOrLoadModel(NESTED_MODEL_4);

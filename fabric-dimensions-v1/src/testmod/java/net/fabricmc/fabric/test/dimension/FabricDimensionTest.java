@@ -16,51 +16,49 @@
 
 package net.fabricmc.fabric.test.dimension;
 
-import static net.minecraft.entity.EntityType.COW;
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.world.entity.EntityType.COW;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-
-import net.minecraft.block.Blocks;
-import net.minecraft.command.argument.DimensionArgumentType;
-import net.minecraft.entity.Entity;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.TeleportTarget;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionOptions;
-
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.DimensionArgument;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.phys.Vec3;
 
 public class FabricDimensionTest implements ModInitializer {
 	// The dimension options refer to the JSON-file in the dimension subfolder of the data pack,
 	// which will always share its ID with the world that is created from it
-	private static final RegistryKey<DimensionOptions> DIMENSION_KEY = RegistryKey.of(RegistryKeys.DIMENSION, new Identifier("fabric_dimension", "void"));
-	private static final SimpleCommandExceptionType FAILED_EXCEPTION = new SimpleCommandExceptionType(Text.literal("Teleportation failed!"));
+	private static final ResourceKey<LevelStem> DIMENSION_KEY = ResourceKey.create(Registries.LEVEL_STEM, new ResourceLocation("fabric_dimension", "void"));
+	private static final SimpleCommandExceptionType FAILED_EXCEPTION = new SimpleCommandExceptionType(Component.literal("Teleportation failed!"));
 
-	private static RegistryKey<World> WORLD_KEY = RegistryKey.of(RegistryKeys.WORLD, DIMENSION_KEY.getValue());
+	private static ResourceKey<Level> WORLD_KEY = ResourceKey.create(Registries.DIMENSION, DIMENSION_KEY.location());
 
 	@Override
 	public void onInitialize() {
-		Registry.register(Registries.CHUNK_GENERATOR, new Identifier("fabric_dimension", "void"), VoidChunkGenerator.CODEC);
+		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, new ResourceLocation("fabric_dimension", "void"), VoidChunkGenerator.CODEC);
 
-		WORLD_KEY = RegistryKey.of(RegistryKeys.WORLD, new Identifier("fabric_dimension", "void"));
+		WORLD_KEY = ResourceKey.create(Registries.DIMENSION, new ResourceLocation("fabric_dimension", "void"));
 
 		if (System.getProperty("fabric-api.gametest") != null) {
 			// The gametest server does not support custom worlds
@@ -68,25 +66,25 @@ public class FabricDimensionTest implements ModInitializer {
 		}
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			ServerWorld overworld = server.getWorld(World.OVERWORLD);
-			ServerWorld world = server.getWorld(WORLD_KEY);
+			ServerLevel overworld = server.getLevel(Level.OVERWORLD);
+			ServerLevel world = server.getLevel(WORLD_KEY);
 
 			if (world == null) throw new AssertionError("Test world doesn't exist.");
 
 			Entity entity = COW.create(overworld);
 
 			if (entity == null) throw new AssertionError("Could not create entity!");
-			if (!entity.getWorld().getRegistryKey().equals(World.OVERWORLD)) throw new AssertionError("Entity starting world isn't the overworld");
+			if (!entity.level().dimension().equals(Level.OVERWORLD)) throw new AssertionError("Entity starting world isn't the overworld");
 
-			TeleportTarget target = new TeleportTarget(Vec3d.ZERO, new Vec3d(1, 1, 1), 45f, 60f);
+			PortalInfo target = new PortalInfo(Vec3.ZERO, new Vec3(1, 1, 1), 45f, 60f);
 
 			Entity teleported = FabricDimensions.teleport(entity, world, target);
 
 			if (teleported == null) throw new AssertionError("Entity didn't teleport");
 
-			if (!teleported.getWorld().getRegistryKey().equals(WORLD_KEY)) throw new AssertionError("Target world not reached.");
+			if (!teleported.level().dimension().equals(WORLD_KEY)) throw new AssertionError("Target world not reached.");
 
-			if (!teleported.getPos().equals(target.position)) throw new AssertionError("Target Position not reached.");
+			if (!teleported.position().equals(target.pos)) throw new AssertionError("Target Position not reached.");
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -95,7 +93,7 @@ public class FabricDimensionTest implements ModInitializer {
 
 			// Used to test https://github.com/FabricMC/fabric/issues/2239
 			// Dedicated-only
-			if (environment != CommandManager.RegistrationEnvironment.INTEGRATED) {
+			if (environment != Commands.CommandSelection.INTEGRATED) {
 				dispatcher.register(literal("fabric_dimension_test_desync")
 						.executes(FabricDimensionTest.this::testDesync));
 			}
@@ -106,94 +104,94 @@ public class FabricDimensionTest implements ModInitializer {
 
 			// Used to test teleport to vanilla dimension
 			dispatcher.register(literal("fabric_dimension_test_tp")
-					.then(argument("target", DimensionArgumentType.dimension())
+					.then(argument("target", DimensionArgument.dimension())
 					.executes((context) ->
-							testVanillaTeleport(context, DimensionArgumentType.getDimensionArgument(context, "target")))));
+							testVanillaTeleport(context, DimensionArgument.getDimension(context, "target")))));
 		});
 	}
 
-	private int swapTargeted(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().getPlayer();
+	private int swapTargeted(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayer();
 
 		if (player == null) {
-			context.getSource().sendFeedback(() -> Text.literal("You must be a player to execute this command."), false);
+			context.getSource().sendSuccess(() -> Component.literal("You must be a player to execute this command."), false);
 			return 1;
 		}
 
-		ServerWorld serverWorld = player.getServerWorld();
-		ServerWorld modWorld = getModWorld(context);
+		ServerLevel serverWorld = player.serverLevel();
+		ServerLevel modWorld = getModWorld(context);
 
 		if (serverWorld != modWorld) {
-			TeleportTarget target = new TeleportTarget(new Vec3d(0.5, 101, 0.5), Vec3d.ZERO, 0, 0);
+			PortalInfo target = new PortalInfo(new Vec3(0.5, 101, 0.5), Vec3.ZERO, 0, 0);
 			FabricDimensions.teleport(player, modWorld, target);
 
-			if (player.getWorld() != modWorld) {
+			if (player.level() != modWorld) {
 				throw FAILED_EXCEPTION.create();
 			}
 
-			modWorld.setBlockState(new BlockPos(0, 100, 0), Blocks.DIAMOND_BLOCK.getDefaultState());
-			modWorld.setBlockState(new BlockPos(0, 101, 0), Blocks.TORCH.getDefaultState());
+			modWorld.setBlockAndUpdate(new BlockPos(0, 100, 0), Blocks.DIAMOND_BLOCK.defaultBlockState());
+			modWorld.setBlockAndUpdate(new BlockPos(0, 101, 0), Blocks.TORCH.defaultBlockState());
 		} else {
-			TeleportTarget target = new TeleportTarget(new Vec3d(0, 100, 0), Vec3d.ZERO,
+			PortalInfo target = new PortalInfo(new Vec3(0, 100, 0), Vec3.ZERO,
 					(float) Math.random() * 360 - 180, (float) Math.random() * 360 - 180);
-			FabricDimensions.teleport(player, getWorld(context, World.OVERWORLD), target);
+			FabricDimensions.teleport(player, getWorld(context, Level.OVERWORLD), target);
 		}
 
 		return 1;
 	}
 
-	private int testDesync(CommandContext<ServerCommandSource> context) {
-		ServerPlayerEntity player = context.getSource().getPlayer();
+	private int testDesync(CommandContext<CommandSourceStack> context) {
+		ServerPlayer player = context.getSource().getPlayer();
 
 		if (player == null) {
-			context.getSource().sendFeedback(() -> Text.literal("You must be a player to execute this command."), false);
+			context.getSource().sendSuccess(() -> Component.literal("You must be a player to execute this command."), false);
 			return 1;
 		}
 
-		TeleportTarget target = new TeleportTarget(player.getPos().add(5, 0, 0), player.getVelocity(), player.getYaw(), player.getPitch());
-		FabricDimensions.teleport(player, (ServerWorld) player.getWorld(), target);
+		PortalInfo target = new PortalInfo(player.position().add(5, 0, 0), player.getDeltaMovement(), player.getYRot(), player.getXRot());
+		FabricDimensions.teleport(player, (ServerLevel) player.level(), target);
 
 		return 1;
 	}
 
-	private int testEntityTeleport(CommandContext<ServerCommandSource> context) {
-		ServerPlayerEntity player = context.getSource().getPlayer();
+	private int testEntityTeleport(CommandContext<CommandSourceStack> context) {
+		ServerPlayer player = context.getSource().getPlayer();
 
 		if (player == null) {
-			context.getSource().sendFeedback(() -> Text.literal("You must be a player to execute this command."), false);
+			context.getSource().sendSuccess(() -> Component.literal("You must be a player to execute this command."), false);
 			return 1;
 		}
 
-		Entity entity = player.getWorld()
-				.getOtherEntities(player, player.getBoundingBox().expand(100, 100, 100))
+		Entity entity = player.level()
+				.getEntities(player, player.getBoundingBox().inflate(100, 100, 100))
 				.stream()
 				.findFirst()
 				.orElse(null);
 
 		if (entity == null) {
-			context.getSource().sendFeedback(() -> Text.literal("No entities found."), false);
+			context.getSource().sendSuccess(() -> Component.literal("No entities found."), false);
 			return 1;
 		}
 
-		TeleportTarget target = new TeleportTarget(player.getPos(), player.getVelocity(), player.getYaw(), player.getPitch());
-		FabricDimensions.teleport(entity, (ServerWorld) entity.getWorld(), target);
+		PortalInfo target = new PortalInfo(player.position(), player.getDeltaMovement(), player.getYRot(), player.getXRot());
+		FabricDimensions.teleport(entity, (ServerLevel) entity.level(), target);
 
 		return 1;
 	}
 
-	private int testVanillaTeleport(CommandContext<ServerCommandSource> context, ServerWorld targetWorld) throws CommandSyntaxException {
-		Entity entity = context.getSource().getEntityOrThrow();
-		TeleportTarget target = new TeleportTarget(entity.getPos(), entity.getVelocity(), entity.getYaw(), entity.getPitch());
+	private int testVanillaTeleport(CommandContext<CommandSourceStack> context, ServerLevel targetWorld) throws CommandSyntaxException {
+		Entity entity = context.getSource().getEntityOrException();
+		PortalInfo target = new PortalInfo(entity.position(), entity.getDeltaMovement(), entity.getYRot(), entity.getXRot());
 		FabricDimensions.teleport(entity, targetWorld, target);
 
 		return 1;
 	}
 
-	private ServerWorld getModWorld(CommandContext<ServerCommandSource> context) {
+	private ServerLevel getModWorld(CommandContext<CommandSourceStack> context) {
 		return getWorld(context, WORLD_KEY);
 	}
 
-	private ServerWorld getWorld(CommandContext<ServerCommandSource> context, RegistryKey<World> dimensionRegistryKey) {
-		return context.getSource().getServer().getWorld(dimensionRegistryKey);
+	private ServerLevel getWorld(CommandContext<CommandSourceStack> context, ResourceKey<Level> dimensionRegistryKey) {
+		return context.getSource().getServer().getLevel(dimensionRegistryKey);
 	}
 }

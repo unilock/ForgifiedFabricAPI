@@ -16,12 +16,11 @@
 
 package net.fabricmc.fabric.api.item.v1;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.ItemStack;
-
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.util.TriState;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 /**
  * Events relating to enchantments, allowing for finer control of what enchantments can apply to different items.
@@ -36,7 +35,7 @@ public final class EnchantmentEvents {
 	 * where 'external' means either vanilla or from another mod. For instance, a mod might allow enchanting a pickaxe
 	 * with Sharpness (and only Sharpness) under certain specific conditions.</p>
 	 *
-	 * <p>To modify the behavior of your own modded <em>enchantments</em>, use {@link Enchantment#isAcceptableItem(ItemStack)} instead.
+	 * <p>To modify the behavior of your own modded <em>enchantments</em>, use {@link Enchantment#canEnchant(ItemStack)} instead.
 	 * To modify the behavior of your own modded <em>items</em>, use {@link FabricItem#canBeEnchantedWith(ItemStack, Enchantment, EnchantingContext)} instead.
 	 * Note that this event triggers <em>before</em> {@link FabricItem#canBeEnchantedWith(ItemStack, Enchantment, EnchantingContext)},
 	 * and that method will only be called if no listeners override it.</p>
@@ -45,7 +44,7 @@ public final class EnchantmentEvents {
 	 * only that it isn't forbidden from doing so.</p>
 	 *
 	 * @see AllowEnchanting#allowEnchanting(Enchantment, ItemStack, EnchantingContext)
-	 * @see Enchantment#isAcceptableItem(ItemStack)
+	 * @see Enchantment#canEnchant(ItemStack)
 	 * @see FabricItem#canBeEnchantedWith(ItemStack, Enchantment, EnchantingContext)
 	 */
 	public static final Event<AllowEnchanting> ALLOW_ENCHANTING = EventFactory.createArrayBacked(

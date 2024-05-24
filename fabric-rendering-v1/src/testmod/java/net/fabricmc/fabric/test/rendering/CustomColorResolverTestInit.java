@@ -16,23 +16,22 @@
 
 package net.fabricmc.fabric.test.rendering;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class CustomColorResolverTestInit implements ModInitializer {
-	public static final Block CUSTOM_COLOR_BLOCK = new Block(AbstractBlock.Settings.create());
-	public static final Item CUSTOM_COLOR_BLOCK_ITEM = new BlockItem(CUSTOM_COLOR_BLOCK, new Item.Settings());
+	public static final Block CUSTOM_COLOR_BLOCK = new Block(BlockBehaviour.Properties.of());
+	public static final Item CUSTOM_COLOR_BLOCK_ITEM = new BlockItem(CUSTOM_COLOR_BLOCK, new Item.Properties());
 
 	@Override
 	public void onInitialize() {
-		Registry.register(Registries.BLOCK, new Identifier("fabric-rendering-v1-testmod", "custom_color_block"), CUSTOM_COLOR_BLOCK);
-		Registry.register(Registries.ITEM, new Identifier("fabric-rendering-v1-testmod", "custom_color_block"), CUSTOM_COLOR_BLOCK_ITEM);
+		Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation("fabric-rendering-v1-testmod", "custom_color_block"), CUSTOM_COLOR_BLOCK);
+		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-rendering-v1-testmod", "custom_color_block"), CUSTOM_COLOR_BLOCK_ITEM);
 	}
 }

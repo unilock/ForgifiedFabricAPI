@@ -16,53 +16,51 @@
 
 package net.fabricmc.fabric.test.rendering.client;
 
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import org.joml.Matrix4f;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.Window;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Tests {@link HudRenderCallback} and {@link CoreShaderRegistrationCallback} by drawing a green rectangle
  * in the lower-right corner of the screen.
  */
 public class HudAndShaderTest implements ClientModInitializer {
-	private static ShaderProgram testShader;
+	private static ShaderInstance testShader;
 
 	@Override
 	public void onInitializeClient() {
 		CoreShaderRegistrationCallback.EVENT.register(context -> {
 			// Register a custom shader taking POSITION vertices.
-			Identifier id = new Identifier("fabric-rendering-v1-testmod", "test");
-			context.register(id, VertexFormats.POSITION, program -> testShader = program);
+			ResourceLocation id = new ResourceLocation("fabric-rendering-v1-testmod", "test");
+			context.register(id, DefaultVertexFormat.POSITION, program -> testShader = program);
 		});
 
 		HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
-			MinecraftClient client = MinecraftClient.getInstance();
+			Minecraft client = Minecraft.getInstance();
 			Window window = client.getWindow();
-			int x = window.getScaledWidth() - 15;
-			int y = window.getScaledHeight() - 15;
+			int x = window.getGuiScaledWidth() - 15;
+			int y = window.getGuiScaledHeight() - 15;
 			RenderSystem.setShader(() -> testShader);
 			RenderSystem.setShaderColor(0f, 1f, 0f, 1f);
-			Matrix4f positionMatrix = drawContext.getMatrices().peek().getPositionMatrix();
-			BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-			buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-			buffer.vertex(positionMatrix, x, y, 50).next();
-			buffer.vertex(positionMatrix, x, y + 10, 50).next();
-			buffer.vertex(positionMatrix, x + 10, y + 10, 50).next();
-			buffer.vertex(positionMatrix, x + 10, y, 50).next();
-			BufferRenderer.drawWithGlobalProgram(buffer.end());
+			Matrix4f positionMatrix = drawContext.pose().last().pose();
+			BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+			buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+			buffer.vertex(positionMatrix, x, y, 50).endVertex();
+			buffer.vertex(positionMatrix, x, y + 10, 50).endVertex();
+			buffer.vertex(positionMatrix, x + 10, y + 10, 50).endVertex();
+			buffer.vertex(positionMatrix, x + 10, y, 50).endVertex();
+			BufferUploader.drawWithShader(buffer.end());
 			// Reset shader color
 			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		});

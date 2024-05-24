@@ -18,10 +18,8 @@ package net.fabricmc.fabric.impl.networking;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.minecraft.resources.ResourceLocation;
 
 public final class NetworkingImpl {
 	public static final String MOD_ID = "fabric-networking-api-v1";
@@ -30,14 +28,14 @@ public final class NetworkingImpl {
 	/**
 	 * Id of packet used to register supported channels.
 	 */
-	public static final Identifier REGISTER_CHANNEL = new Identifier("minecraft", "register");
+	public static final ResourceLocation REGISTER_CHANNEL = new ResourceLocation("minecraft", "register");
 
 	/**
 	 * Id of packet used to unregister supported channels.
 	 */
-	public static final Identifier UNREGISTER_CHANNEL = new Identifier("minecraft", "unregister");
+	public static final ResourceLocation UNREGISTER_CHANNEL = new ResourceLocation("minecraft", "unregister");
 
-	public static boolean isReservedCommonChannel(Identifier channelName) {
+	public static boolean isReservedCommonChannel(ResourceLocation channelName) {
 		return channelName.equals(REGISTER_CHANNEL) || channelName.equals(UNREGISTER_CHANNEL);
 	}
 

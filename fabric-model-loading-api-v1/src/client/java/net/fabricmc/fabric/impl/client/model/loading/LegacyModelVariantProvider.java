@@ -16,15 +16,14 @@
 
 package net.fabricmc.fabric.impl.client.model.loading;
 
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.UnbakedModel;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.client.util.ModelIdentifier;
 
 /**
  * Legacy v0 bridge - remove if the legacy v0 module is removed.
  */
 public interface LegacyModelVariantProvider {
 	@Nullable
-	UnbakedModel loadModelVariant(ModelIdentifier modelId);
+	UnbakedModel loadModelVariant(ModelResourceLocation modelId);
 }

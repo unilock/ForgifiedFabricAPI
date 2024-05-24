@@ -20,18 +20,16 @@ import java.util.function.Function;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.Baker;
-import net.minecraft.client.render.model.ModelBakeSettings;
-import net.minecraft.client.render.model.ModelLoader;
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.ModelIdentifier;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Contains interfaces for the events that can be used to modify models at different points in the loading and baking
@@ -39,7 +37,7 @@ import net.fabricmc.fabric.api.event.Event;
  *
  * <p>Example use cases:
  * <ul>
- *     <li>Overriding a model for a particular block state - check if the given identifier is a {@link ModelIdentifier},
+ *     <li>Overriding a model for a particular block state - check if the given identifier is a {@link ModelResourceLocation},
  *     and then check if it has the appropriate variant for that block state. If so, return your desired model,
  *     otherwise return the given model.</li>
  *     <li>Wrapping a model to override certain behaviors - simply return a new model instance and delegate calls
@@ -57,20 +55,20 @@ public final class ModelModifier {
 	/**
 	 * Recommended phase to use when overriding models, e.g. replacing a model with another model.
 	 */
-	public static final Identifier OVERRIDE_PHASE = new Identifier("fabric", "override");
+	public static final ResourceLocation OVERRIDE_PHASE = new ResourceLocation("fabric", "override");
 	/**
 	 * Recommended phase to use for transformations that need to happen before wrapping, but after model overrides.
 	 */
-	public static final Identifier DEFAULT_PHASE = Event.DEFAULT_PHASE;
+	public static final ResourceLocation DEFAULT_PHASE = Event.DEFAULT_PHASE;
 	/**
 	 * Recommended phase to use when wrapping models.
 	 */
-	public static final Identifier WRAP_PHASE = new Identifier("fabric", "wrap");
+	public static final ResourceLocation WRAP_PHASE = new ResourceLocation("fabric", "wrap");
 	/**
 	 * Recommended phase to use when wrapping models with transformations that want to happen last,
 	 * e.g. for connected textures or other similar visual effects that should be the final processing step.
 	 */
-	public static final Identifier WRAP_LAST_PHASE = new Identifier("fabric", "wrap_last");
+	public static final ResourceLocation WRAP_LAST_PHASE = new ResourceLocation("fabric", "wrap_last");
 
 	@FunctionalInterface
 	public interface OnLoad {
@@ -91,29 +89,29 @@ public final class ModelModifier {
 		@ApiStatus.NonExtendable
 		interface Context {
 			/**
-			 * The identifier of this model (may be a {@link ModelIdentifier}).
+			 * The identifier of this model (may be a {@link ModelResourceLocation}).
 			 *
-			 * <p>For item models, only the {@link ModelIdentifier} with the {@code inventory} variant is passed, and
+			 * <p>For item models, only the {@link ModelResourceLocation} with the {@code inventory} variant is passed, and
 			 * not the corresponding plain identifier.
 			 */
-			Identifier id();
+			ResourceLocation id();
 
 			/**
-			 * Loads a model using an {@link Identifier} or {@link ModelIdentifier}, or gets it if it was already
+			 * Loads a model using an {@link ResourceLocation} or {@link ModelResourceLocation}, or gets it if it was already
 			 * loaded.
 			 *
 			 * @param id the model identifier
 			 * @return the unbaked model, or a missing model if it is not present
 			 */
-			UnbakedModel getOrLoadModel(Identifier id);
+			UnbakedModel getOrLoadModel(ResourceLocation id);
 
 			/**
 			 * The current model loader instance, which changes between resource reloads.
 			 *
-			 * <p>Do <b>not</b> call {@link ModelLoader#getOrLoadModel} as it does not supported nested model
+			 * <p>Do <b>not</b> call {@link ModelBakery#getModel} as it does not supported nested model
 			 * resolution; use {@link #getOrLoadModel} from the context instead.
 			 */
-			ModelLoader loader();
+			ModelBakery loader();
 		}
 	}
 
@@ -135,31 +133,31 @@ public final class ModelModifier {
 		@ApiStatus.NonExtendable
 		interface Context {
 			/**
-			 * The identifier of this model (may be a {@link ModelIdentifier}).
+			 * The identifier of this model (may be a {@link ModelResourceLocation}).
 			 */
-			Identifier id();
+			ResourceLocation id();
 
 			/**
 			 * The function that can be used to retrieve sprites.
 			 */
-			Function<SpriteIdentifier, Sprite> textureGetter();
+			Function<Material, TextureAtlasSprite> textureGetter();
 
 			/**
 			 * The settings this model is being baked with.
 			 */
-			ModelBakeSettings settings();
+			ModelState settings();
 
 			/**
 			 * The baker being used to bake this model.
-			 * It can be used to {@linkplain Baker#getOrLoadModel load unbaked models} and
-			 * {@linkplain Baker#bake load baked models}.
+			 * It can be used to {@linkplain ModelBaker#getModel load unbaked models} and
+			 * {@linkplain ModelBaker#bake load baked models}.
 			 */
-			Baker baker();
+			ModelBaker baker();
 
 			/**
 			 * The current model loader instance, which changes between resource reloads.
 			 */
-			ModelLoader loader();
+			ModelBakery loader();
 		}
 	}
 
@@ -170,7 +168,7 @@ public final class ModelModifier {
 		 * it is cached.
 		 *
 		 * <p>Note that the passed baked model may be null and that this handler may return a null baked model, since
-		 * {@link UnbakedModel#bake} and {@link Baker#bake} may also return null baked models. Null baked models are
+		 * {@link UnbakedModel#bake} and {@link ModelBaker#bake} may also return null baked models. Null baked models are
 		 * automatically mapped to the missing model during model retrieval.
 		 *
 		 * <p>For further information, see the docs of {@link ModelLoadingPlugin.Context#modifyModelAfterBake()}.
@@ -189,9 +187,9 @@ public final class ModelModifier {
 		@ApiStatus.NonExtendable
 		interface Context {
 			/**
-			 * The identifier of this model (may be a {@link ModelIdentifier}).
+			 * The identifier of this model (may be a {@link ModelResourceLocation}).
 			 */
-			Identifier id();
+			ResourceLocation id();
 
 			/**
 			 * The unbaked model that is being baked.
@@ -201,24 +199,24 @@ public final class ModelModifier {
 			/**
 			 * The function that can be used to retrieve sprites.
 			 */
-			Function<SpriteIdentifier, Sprite> textureGetter();
+			Function<Material, TextureAtlasSprite> textureGetter();
 
 			/**
 			 * The settings this model is being baked with.
 			 */
-			ModelBakeSettings settings();
+			ModelState settings();
 
 			/**
 			 * The baker being used to bake this model.
-			 * It can be used to {@linkplain Baker#getOrLoadModel load unbaked models} and
-			 * {@linkplain Baker#bake load baked models}.
+			 * It can be used to {@linkplain ModelBaker#getModel load unbaked models} and
+			 * {@linkplain ModelBaker#bake load baked models}.
 			 */
-			Baker baker();
+			ModelBaker baker();
 
 			/**
 			 * The current model loader instance, which changes between resource reloads.
 			 */
-			ModelLoader loader();
+			ModelBakery loader();
 		}
 	}
 

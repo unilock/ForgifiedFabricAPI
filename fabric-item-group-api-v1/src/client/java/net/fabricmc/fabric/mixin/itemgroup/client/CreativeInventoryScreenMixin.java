@@ -24,31 +24,29 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
-
 import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
 import net.fabricmc.fabric.impl.client.itemgroup.FabricCreativeGuiComponents;
 import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 
-@Mixin(CreativeInventoryScreen.class)
-public abstract class CreativeInventoryScreenMixin<T extends ScreenHandler> extends AbstractInventoryScreen<T> implements CreativeGuiExtensions {
-	public CreativeInventoryScreenMixin(T screenHandler, PlayerInventory playerInventory, Text text) {
+@Mixin(CreativeModeInventoryScreen.class)
+public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMenu> extends EffectRenderingInventoryScreen<T> implements CreativeGuiExtensions {
+	public CreativeInventoryScreenMixin(T screenHandler, Inventory playerInventory, Component text) {
 		super(screenHandler, playerInventory, text);
 	}
 
 	@Shadow
-	protected abstract void setSelectedTab(ItemGroup itemGroup_1);
+	protected abstract void selectTab(CreativeModeTab itemGroup_1);
 
 	@Shadow
-	private static ItemGroup selectedTab;
+	private static CreativeModeTab selectedTab;
 
 	// "static" matches selectedTab
 	private static int fabric_currentPage = 0;
@@ -75,7 +73,7 @@ public abstract class CreativeInventoryScreenMixin<T extends ScreenHandler> exte
 
 	@Override
 	public boolean fabric_isButtonVisible(FabricCreativeGuiComponents.Type type) {
-		return ItemGroups.getGroupsToDisplay().size() > (Objects.requireNonNull(ItemGroups.displayContext).hasPermissions() ? 14 : 13);
+		return CreativeModeTabs.tabs().size() > (Objects.requireNonNull(CreativeModeTabs.CACHED_PARAMETERS).hasPermissions() ? 14 : 13);
 	}
 
 	@Override
@@ -93,11 +91,11 @@ public abstract class CreativeInventoryScreenMixin<T extends ScreenHandler> exte
 
 	private void fabric_updateSelection() {
 		if (!fabric_isGroupVisible(selectedTab)) {
-			ItemGroups.getGroups()
+			CreativeModeTabs.allTabs()
 					.stream()
 					.filter(this::fabric_isGroupVisible)
-					.min((a, b) -> Boolean.compare(a.isSpecial(), b.isSpecial()))
-					.ifPresent(this::setSelectedTab);
+					.min((a, b) -> Boolean.compare(a.isAlignedRight(), b.isAlignedRight()))
+					.ifPresent(this::selectTab);
 		}
 	}
 
@@ -105,46 +103,46 @@ public abstract class CreativeInventoryScreenMixin<T extends ScreenHandler> exte
 	private void init(CallbackInfo info) {
 		fabric_currentPage = fabric_getPage(selectedTab);
 
-		int xpos = x + 170;
-		int ypos = y + 4;
+		int xpos = leftPos + 170;
+		int ypos = topPos + 4;
 
-		addDrawableChild(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos + 11, ypos, FabricCreativeGuiComponents.Type.NEXT, this));
-		addDrawableChild(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos, ypos, FabricCreativeGuiComponents.Type.PREVIOUS, this));
+		addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos + 11, ypos, FabricCreativeGuiComponents.Type.NEXT, this));
+		addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos, ypos, FabricCreativeGuiComponents.Type.PREVIOUS, this));
 	}
 
-	@Inject(method = "setSelectedTab", at = @At("HEAD"), cancellable = true)
-	private void setSelectedTab(ItemGroup itemGroup, CallbackInfo info) {
+	@Inject(method = "selectTab", at = @At("HEAD"), cancellable = true)
+	private void setSelectedTab(CreativeModeTab itemGroup, CallbackInfo info) {
 		if (!fabric_isGroupVisible(itemGroup)) {
 			info.cancel();
 		}
 	}
 
-	@Inject(method = "renderTabTooltipIfHovered", at = @At("HEAD"), cancellable = true)
-	private void renderTabTooltipIfHovered(DrawContext drawContext, ItemGroup itemGroup, int mx, int my, CallbackInfoReturnable<Boolean> info) {
+	@Inject(method = "checkTabHovering", at = @At("HEAD"), cancellable = true)
+	private void renderTabTooltipIfHovered(GuiGraphics drawContext, CreativeModeTab itemGroup, int mx, int my, CallbackInfoReturnable<Boolean> info) {
 		if (!fabric_isGroupVisible(itemGroup)) {
 			info.setReturnValue(false);
 		}
 	}
 
-	@Inject(method = "isClickInTab", at = @At("HEAD"), cancellable = true)
-	private void isClickInTab(ItemGroup itemGroup, double mx, double my, CallbackInfoReturnable<Boolean> info) {
+	@Inject(method = "checkTabClicked", at = @At("HEAD"), cancellable = true)
+	private void isClickInTab(CreativeModeTab itemGroup, double mx, double my, CallbackInfoReturnable<Boolean> info) {
 		if (!fabric_isGroupVisible(itemGroup)) {
 			info.setReturnValue(false);
 		}
 	}
 
-	@Inject(method = "renderTabIcon", at = @At("HEAD"), cancellable = true)
-	private void renderTabIcon(DrawContext drawContext, ItemGroup itemGroup, CallbackInfo info) {
+	@Inject(method = "renderTabButton", at = @At("HEAD"), cancellable = true)
+	private void renderTabIcon(GuiGraphics drawContext, CreativeModeTab itemGroup, CallbackInfo info) {
 		if (!fabric_isGroupVisible(itemGroup)) {
 			info.cancel();
 		}
 	}
 
-	private boolean fabric_isGroupVisible(ItemGroup itemGroup) {
+	private boolean fabric_isGroupVisible(CreativeModeTab itemGroup) {
 		return itemGroup.shouldDisplay() && fabric_currentPage == fabric_getPage(itemGroup);
 	}
 
-	private static int fabric_getPage(ItemGroup itemGroup) {
+	private static int fabric_getPage(CreativeModeTab itemGroup) {
 		if (FabricCreativeGuiComponents.COMMON_GROUPS.contains(itemGroup)) {
 			return fabric_currentPage;
 		}
@@ -154,7 +152,7 @@ public abstract class CreativeInventoryScreenMixin<T extends ScreenHandler> exte
 	}
 
 	private static boolean fabric_hasGroupForPage(int page) {
-		return ItemGroups.getGroupsToDisplay().stream()
+		return CreativeModeTabs.tabs().stream()
 				.anyMatch(itemGroup -> fabric_getPage(itemGroup) == page);
 	}
 

@@ -16,35 +16,34 @@
 
 package net.fabricmc.fabric.api.client.model.loading.v1;
 
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedModelManager;
-import net.minecraft.client.util.ModelIdentifier;
-import net.minecraft.util.Identifier;
-
 /**
- * Fabric-provided helper methods for {@link BakedModelManager}.
+ * Fabric-provided helper methods for {@link ModelManager}.
  *
- * <p>Note: This interface is automatically implemented on the {@link BakedModelManager} via Mixin and interface injection.
+ * <p>Note: This interface is automatically implemented on the {@link ModelManager} via Mixin and interface injection.
  */
 public interface FabricBakedModelManager {
 	/**
-	 * An alternative to {@link BakedModelManager#getModel(ModelIdentifier)} that accepts an
-	 * {@link Identifier} instead. Models loaded using {@link ModelLoadingPlugin.Context#addModels}
-	 * do not have a corresponding {@link ModelIdentifier}, so the vanilla method cannot be used to
-	 * retrieve them. The {@link Identifier} that was used to load them can be used in this method
+	 * An alternative to {@link ModelManager#getModel(ModelResourceLocation)} that accepts an
+	 * {@link ResourceLocation} instead. Models loaded using {@link ModelLoadingPlugin.Context#addModels}
+	 * do not have a corresponding {@link ModelResourceLocation}, so the vanilla method cannot be used to
+	 * retrieve them. The {@link ResourceLocation} that was used to load them can be used in this method
 	 * to retrieve them.
 	 *
 	 * <p><b>This method, as well as its vanilla counterpart, should only be used after the
-	 * {@link BakedModelManager} has completed reloading.</b> Otherwise, the result will be
+	 * {@link ModelManager} has completed reloading.</b> Otherwise, the result will be
 	 * outdated or null.
 	 *
 	 * @param id the id of the model
 	 * @return the model
 	 */
 	@Nullable
-	default BakedModel getModel(Identifier id) {
+	default BakedModel getModel(ResourceLocation id) {
 		throw new UnsupportedOperationException("Implemented via mixin.");
 	}
 }

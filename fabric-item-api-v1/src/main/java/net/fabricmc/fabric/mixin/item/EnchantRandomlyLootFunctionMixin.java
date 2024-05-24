@@ -19,18 +19,16 @@ package net.fabricmc.fabric.mixin.item;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.function.EnchantRandomlyLootFunction;
-
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.storage.loot.functions.EnchantRandomlyFunction;
 
-@Mixin(EnchantRandomlyLootFunction.class)
+@Mixin(EnchantRandomlyFunction.class)
 abstract class EnchantRandomlyLootFunctionMixin {
 	@Redirect(
-			method = "method_53327",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/Enchantment;isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z")
+			method = "lambda$run$6",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/enchantment/Enchantment;canEnchant(Lnet/minecraft/world/item/ItemStack;)Z")
 	)
 	private static boolean callAllowEnchantingEvent(Enchantment instance, ItemStack stack) {
 		return stack.canBeEnchantedWith(instance, EnchantingContext.LOOT_RANDOM_ENCHANTMENT);

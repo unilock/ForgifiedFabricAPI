@@ -16,17 +16,16 @@
 
 package net.fabricmc.fabric.impl.client.indigo.renderer.render;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoLuminanceFix;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Context for non-terrain block rendering.
@@ -50,14 +49,14 @@ public class BlockRenderContext extends AbstractBlockRenderContext {
 	}
 
 	@Override
-	protected VertexConsumer getVertexConsumer(RenderLayer layer) {
+	protected VertexConsumer getVertexConsumer(RenderType layer) {
 		return vertexConsumer;
 	}
 
-	public void render(BlockRenderView blockView, BakedModel model, BlockState state, BlockPos pos, MatrixStack matrixStack, VertexConsumer buffer, boolean cull, Random random, long seed, int overlay) {
+	public void render(BlockAndTintGetter blockView, BakedModel model, BlockState state, BlockPos pos, PoseStack matrixStack, VertexConsumer buffer, boolean cull, RandomSource random, long seed, int overlay) {
 		this.vertexConsumer = buffer;
-		this.matrix = matrixStack.peek().getPositionMatrix();
-		this.normalMatrix = matrixStack.peek().getNormalMatrix();
+		this.matrix = matrixStack.last().pose();
+		this.normalMatrix = matrixStack.last().normal();
 		this.overlay = overlay;
 
 		blockInfo.random = random;

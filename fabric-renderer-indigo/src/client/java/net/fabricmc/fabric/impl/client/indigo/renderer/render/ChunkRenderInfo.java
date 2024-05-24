@@ -17,23 +17,20 @@
 package net.fabricmc.fabric.impl.client.indigo.renderer.render;
 
 import java.util.Set;
-
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
-import net.minecraft.client.render.chunk.ChunkBuilder.BuiltChunk;
-import net.minecraft.client.render.chunk.ChunkRendererRegion;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
-
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoLuminanceFix;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SectionBufferBuilderPack;
+import net.minecraft.client.renderer.chunk.RenderChunkRegion;
+import net.minecraft.client.renderer.chunk.SectionRenderDispatcher.RenderSection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Holds, manages and provides access to the chunk-related state
@@ -68,14 +65,14 @@ public class ChunkRenderInfo {
 	private final Long2IntOpenHashMap brightnessCache;
 	private final Long2FloatOpenHashMap aoLevelCache;
 
-	private final BlockPos.Mutable chunkOrigin = new BlockPos.Mutable();
-	BuiltChunk.RebuildTask.RenderData renderData;
-	BuiltChunk chunkRenderer;
-	BlockBufferBuilderStorage builders;
-	Set<RenderLayer> initializedLayers;
-	BlockRenderView blockView;
+	private final BlockPos.MutableBlockPos chunkOrigin = new BlockPos.MutableBlockPos();
+	RenderSection.RebuildTask.CompileResults renderData;
+	RenderSection chunkRenderer;
+	SectionBufferBuilderPack builders;
+	Set<RenderType> initializedLayers;
+	BlockAndTintGetter blockView;
 
-	private final Object2ObjectOpenHashMap<RenderLayer, BufferBuilder> buffers = new Object2ObjectOpenHashMap<>();
+	private final Object2ObjectOpenHashMap<RenderType, BufferBuilder> buffers = new Object2ObjectOpenHashMap<>();
 
 	ChunkRenderInfo() {
 		brightnessCache = new Long2IntOpenHashMap();
@@ -84,7 +81,7 @@ public class ChunkRenderInfo {
 		aoLevelCache.defaultReturnValue(Float.MAX_VALUE);
 	}
 
-	void prepare(ChunkRendererRegion blockView, BuiltChunk chunkRenderer, BuiltChunk.RebuildTask.RenderData renderData, BlockBufferBuilderStorage builders, Set<RenderLayer> initializedLayers) {
+	void prepare(RenderChunkRegion blockView, RenderSection chunkRenderer, RenderSection.RebuildTask.CompileResults renderData, SectionBufferBuilderPack builders, Set<RenderType> initializedLayers) {
 		this.blockView = blockView;
 		this.chunkOrigin.set(chunkRenderer.getOrigin());
 		this.renderData = renderData;
@@ -103,14 +100,14 @@ public class ChunkRenderInfo {
 	}
 
 	/** Lazily retrieves output buffer for given layer, initializing as needed. */
-	public BufferBuilder getInitializedBuffer(RenderLayer renderLayer) {
+	public BufferBuilder getInitializedBuffer(RenderType renderLayer) {
 		BufferBuilder builder = buffers.get(renderLayer);
 
 		if (builder == null) {
-			builder = builders.get(renderLayer);
+			builder = builders.builder(renderLayer);
 
 			if (initializedLayers.add(renderLayer)) {
-				chunkRenderer.beginBufferBuilding(builder);
+				chunkRenderer.beginLayer(builder);
 			}
 
 			buffers.put(renderLayer, builder);
@@ -120,7 +117,7 @@ public class ChunkRenderInfo {
 	}
 
 	/**
-	 * Cached values for {@link WorldRenderer#getLightmapCoordinates(BlockRenderView, BlockState, BlockPos)}.
+	 * Cached values for {@link LevelRenderer#getLightColor(BlockAndTintGetter, BlockState, BlockPos)}.
 	 * See also the comments for {@link #brightnessCache}.
 	 */
 	int cachedBrightness(BlockPos pos, BlockState state) {

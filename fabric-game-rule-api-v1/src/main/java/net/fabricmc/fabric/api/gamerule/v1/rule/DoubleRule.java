@@ -19,14 +19,12 @@ package net.fabricmc.fabric.api.gamerule.v1.rule;
 import com.mojang.brigadier.context.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.world.GameRules;
-
+import net.minecraft.world.level.GameRules;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 
-public final class DoubleRule extends GameRules.Rule<DoubleRule> implements ValidateableRule {
+public final class DoubleRule extends GameRules.Value<DoubleRule> implements ValidateableRule {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GameRuleRegistry.class);
 
 	private final double minimumValue;
@@ -57,7 +55,7 @@ public final class DoubleRule extends GameRules.Rule<DoubleRule> implements Vali
 	}
 
 	@Override
-	protected void setFromArgument(CommandContext<ServerCommandSource> context, String name) {
+	protected void updateFromArgument(CommandContext<CommandSourceStack> context, String name) {
 		this.value = context.getArgument(name, Double.class);
 	}
 
@@ -89,7 +87,7 @@ public final class DoubleRule extends GameRules.Rule<DoubleRule> implements Vali
 	}
 
 	@Override
-	protected DoubleRule getThis() {
+	protected DoubleRule getSelf() {
 		return this;
 	}
 
@@ -105,7 +103,7 @@ public final class DoubleRule extends GameRules.Rule<DoubleRule> implements Vali
 		}
 
 		this.value = rule.value;
-		this.changed(minecraftServer);
+		this.onChanged(minecraftServer);
 	}
 
 	@Override

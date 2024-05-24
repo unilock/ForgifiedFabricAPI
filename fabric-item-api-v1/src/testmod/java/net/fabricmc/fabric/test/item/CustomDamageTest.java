@@ -16,23 +16,6 @@
 
 package net.fabricmc.fabric.test.item;
 
-import net.minecraft.component.DataComponentType;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.PickaxeItem;
-import net.minecraft.item.ToolMaterials;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.potion.Potions;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.Codecs;
-
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
@@ -40,13 +23,29 @@ import net.fabricmc.fabric.api.item.v1.EnchantmentEvents;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.util.TriState;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 public class CustomDamageTest implements ModInitializer {
-	public static final DataComponentType<Integer> WEIRD = Registry.register(Registries.DATA_COMPONENT_TYPE, new Identifier("fabric-item-api-v1-testmod", "weird"),
-																DataComponentType.<Integer>builder().codec(Codecs.NONNEGATIVE_INT).packetCodec(PacketCodecs.VAR_INT).build());
+	public static final DataComponentType<Integer> WEIRD = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, new ResourceLocation("fabric-item-api-v1-testmod", "weird"),
+																DataComponentType.<Integer>builder().persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
 	public static final CustomDamageHandler WEIRD_DAMAGE_HANDLER = (stack, amount, entity, slot, breakCallback) -> {
 		// If sneaking, apply all damage to vanilla. Otherwise, increment a tag on the stack by one and don't apply any damage
-		if (entity.isSneaking()) {
+		if (entity.isShiftKeyDown()) {
 			return amount;
 		} else {
 			stack.set(WEIRD, Math.max(0, stack.getOrDefault(WEIRD, 0) + 1));
@@ -58,11 +57,11 @@ public class CustomDamageTest implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		Registry.register(Registries.ITEM, new Identifier("fabric-item-api-v1-testmod", "weird_pickaxe"), WEIRD_PICK);
+		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-item-api-v1-testmod", "weird_pickaxe"), WEIRD_PICK);
 		FuelRegistry.INSTANCE.add(WEIRD_PICK, 200);
-		FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> builder.registerPotionRecipe(Potions.WATER, WEIRD_PICK, Potions.AWKWARD));
+		FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> builder.addMix(Potions.WATER, WEIRD_PICK, Potions.AWKWARD));
 		EnchantmentEvents.ALLOW_ENCHANTING.register(((enchantment, target, enchantingContext) -> {
-			if (target.isOf(Items.DIAMOND_PICKAXE)
+			if (target.is(Items.DIAMOND_PICKAXE)
 					&& enchantment == Enchantments.SHARPNESS
 					&& EnchantmentHelper.hasSilkTouch(target)) {
 				return TriState.TRUE;
@@ -74,21 +73,21 @@ public class CustomDamageTest implements ModInitializer {
 
 	public static class WeirdPick extends PickaxeItem {
 		protected WeirdPick() {
-			super(ToolMaterials.GOLD, new Item.Settings().customDamage(WEIRD_DAMAGE_HANDLER));
+			super(Tiers.GOLD, new Item.Properties().customDamage(WEIRD_DAMAGE_HANDLER));
 		}
 
 		@Override
-		public Text getName(ItemStack stack) {
+		public Component getName(ItemStack stack) {
 			int v = stack.getOrDefault(WEIRD, 0);
 			return super.getName(stack).copy().append(" (Weird Value: " + v + ")");
 		}
 
 		@Override
 		public ItemStack getRecipeRemainder(ItemStack stack) {
-			if (stack.getDamage() < stack.getMaxDamage() - 1) {
+			if (stack.getDamageValue() < stack.getMaxDamage() - 1) {
 				ItemStack moreDamaged = stack.copy();
 				moreDamaged.setCount(1);
-				moreDamaged.setDamage(stack.getDamage() + 1);
+				moreDamaged.setDamageValue(stack.getDamageValue() + 1);
 				return moreDamaged;
 			}
 

@@ -21,18 +21,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 
 /**
- * Mixin to {@link ClientPlayNetworkHandler} to listen for sending messages and commands.
+ * Mixin to {@link ClientPacketListener} to listen for sending messages and commands.
  * Priority set to 800 to inject before {@code fabric-command-api} so that this api will be called first.
  */
-@Mixin(value = ClientPlayNetworkHandler.class, priority = 800)
+@Mixin(value = ClientPacketListener.class, priority = 800)
 public abstract class ClientPlayNetworkHandlerMixin {
-	@Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "sendChat", at = @At("HEAD"), cancellable = true)
 	private void fabric_allowSendChatMessage(String content, CallbackInfo ci) {
 		if (!ClientSendMessageEvents.ALLOW_CHAT.invoker().allowSendChatMessage(content)) {
 			ClientSendMessageEvents.CHAT_CANCELED.invoker().onSendChatMessageCanceled(content);
@@ -40,14 +38,14 @@ public abstract class ClientPlayNetworkHandlerMixin {
 		}
 	}
 
-	@ModifyVariable(method = "sendChatMessage", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+	@ModifyVariable(method = "sendChat", at = @At("HEAD"), ordinal = 0, argsOnly = true)
 	private String fabric_modifySendChatMessage(String content) {
 		content = ClientSendMessageEvents.MODIFY_CHAT.invoker().modifySendChatMessage(content);
 		ClientSendMessageEvents.CHAT.invoker().onSendChatMessage(content);
 		return content;
 	}
 
-	@Inject(method = "sendChatCommand", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "sendCommand", at = @At("HEAD"), cancellable = true)
 	private void fabric_allowSendCommandMessage(String command, CallbackInfo ci) {
 		if (!ClientSendMessageEvents.ALLOW_COMMAND.invoker().allowSendCommandMessage(command)) {
 			ClientSendMessageEvents.COMMAND_CANCELED.invoker().onSendCommandMessageCanceled(command);
@@ -55,7 +53,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 		}
 	}
 
-	@ModifyVariable(method = "sendChatCommand", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+	@ModifyVariable(method = "sendCommand", at = @At("HEAD"), ordinal = 0, argsOnly = true)
 	private String fabric_modifySendCommandMessage(String command) {
 		command = ClientSendMessageEvents.MODIFY_COMMAND.invoker().modifySendCommandMessage(command);
 		ClientSendMessageEvents.COMMAND.invoker().onSendCommandMessage(command);

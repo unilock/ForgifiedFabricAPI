@@ -16,12 +16,11 @@
 
 package net.fabricmc.fabric.api.client.networking.v1;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientConfigurationNetworkHandler;
-import net.minecraft.network.packet.CustomPayload;
-
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /**
  * Offers access to events related to the configuration connection to a server on a logical client.
@@ -30,7 +29,7 @@ public final class ClientConfigurationConnectionEvents {
 	/**
 	 * Event indicating a connection entering the CONFIGURATION state, ready for registering channel handlers.
 	 *
-	 * @see ClientConfigurationNetworking#registerReceiver(CustomPayload.Id, ClientConfigurationNetworking.ConfigurationPayloadHandler)
+	 * @see ClientConfigurationNetworking#registerReceiver(CustomPacketPayload.Type, ClientConfigurationNetworking.ConfigurationPayloadHandler)
 	 */
 	public static final Event<ClientConfigurationConnectionEvents.Init> INIT = EventFactory.createArrayBacked(ClientConfigurationConnectionEvents.Init.class, callbacks -> (handler, client) -> {
 		for (ClientConfigurationConnectionEvents.Init callback : callbacks) {
@@ -65,16 +64,16 @@ public final class ClientConfigurationConnectionEvents {
 
 	@FunctionalInterface
 	public interface Init {
-		void onConfigurationInit(ClientConfigurationNetworkHandler handler, MinecraftClient client);
+		void onConfigurationInit(ClientConfigurationPacketListenerImpl handler, Minecraft client);
 	}
 
 	@FunctionalInterface
 	public interface Ready {
-		void onConfigurationReady(ClientConfigurationNetworkHandler handler, MinecraftClient client);
+		void onConfigurationReady(ClientConfigurationPacketListenerImpl handler, Minecraft client);
 	}
 
 	@FunctionalInterface
 	public interface Disconnect {
-		void onConfigurationDisconnect(ClientConfigurationNetworkHandler handler, MinecraftClient client);
+		void onConfigurationDisconnect(ClientConfigurationPacketListenerImpl handler, Minecraft client);
 	}
 }

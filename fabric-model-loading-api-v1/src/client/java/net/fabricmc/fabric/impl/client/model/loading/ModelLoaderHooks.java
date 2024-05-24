@@ -16,22 +16,22 @@
 
 package net.fabricmc.fabric.impl.client.model.loading;
 
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.resources.ResourceLocation;
 
 public interface ModelLoaderHooks {
 	ModelLoadingEventDispatcher fabric_getDispatcher();
 
 	UnbakedModel fabric_getMissingModel();
 
-	UnbakedModel fabric_getOrLoadModel(Identifier id);
+	UnbakedModel fabric_getOrLoadModel(ResourceLocation id);
 
-	void fabric_putModel(Identifier id, UnbakedModel model);
+	void fabric_putModel(ResourceLocation id, UnbakedModel model);
 
-	void fabric_putModelDirectly(Identifier id, UnbakedModel model);
+	void fabric_putModelDirectly(ResourceLocation id, UnbakedModel model);
 
 	void fabric_queueModelDependencies(UnbakedModel model);
 
-	JsonUnbakedModel fabric_loadModelFromJson(Identifier id);
+	BlockModel fabric_loadModelFromJson(ResourceLocation id);
 }

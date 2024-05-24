@@ -18,12 +18,10 @@ package net.fabricmc.fabric.api.dimension.v1;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.TeleportTarget;
-
 import net.fabricmc.fabric.impl.dimension.FabricDimensionInternals;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.portal.PortalInfo;
 
 /**
  * This class consists exclusively of static methods that operate on world dimensions.
@@ -53,9 +51,9 @@ public final class FabricDimensions {
 	 * @apiNote this method must be called from the main server thread
 	 */
 	@Nullable
-	public static <E extends Entity> E teleport(E teleported, ServerWorld destination, TeleportTarget target) {
+	public static <E extends Entity> E teleport(E teleported, ServerLevel destination, PortalInfo target) {
 		Preconditions.checkNotNull(target, "A target must be provided");
-		Preconditions.checkState(!teleported.getWorld().isClient, "Entities can only be teleported on the server side");
+		Preconditions.checkState(!teleported.level().isClientSide, "Entities can only be teleported on the server side");
 
 		return FabricDimensionInternals.changeDimension(teleported, destination, target);
 	}

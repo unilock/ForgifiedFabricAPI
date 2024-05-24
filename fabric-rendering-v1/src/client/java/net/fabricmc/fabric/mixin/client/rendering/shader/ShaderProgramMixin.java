@@ -22,22 +22,20 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.ShaderStage;
-import net.minecraft.resource.ResourceFactory;
-import net.minecraft.util.Identifier;
-
+import com.mojang.blaze3d.shaders.Program;
 import net.fabricmc.fabric.impl.client.rendering.FabricShaderProgram;
+import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceProvider;
 
-@Mixin(ShaderProgram.class)
+@Mixin(ShaderInstance.class)
 abstract class ShaderProgramMixin {
 	@Shadow
 	@Final
 	private String name;
 
 	// Allow loading FabricShaderPrograms from arbitrary namespaces.
-	@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Identifier;<init>(Ljava/lang/String;)V"), allow = 1)
+	@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/ResourceLocation;<init>(Ljava/lang/String;)V"), allow = 1)
 	private String modifyProgramId(String id) {
 		if ((Object) this instanceof FabricShaderProgram) {
 			return FabricShaderProgram.rewriteAsId(id, name);
@@ -47,9 +45,9 @@ abstract class ShaderProgramMixin {
 	}
 
 	// Allow loading shader stages from arbitrary namespaces.
-	@ModifyVariable(method = "loadShader", at = @At("STORE"), ordinal = 1)
-	private static String modifyStageId(String id, ResourceFactory factory, ShaderStage.Type type, String name) {
-		if (name.contains(String.valueOf(Identifier.NAMESPACE_SEPARATOR))) {
+	@ModifyVariable(method = "getOrCreate", at = @At("STORE"), ordinal = 1)
+	private static String modifyStageId(String id, ResourceProvider factory, Program.Type type, String name) {
+		if (name.contains(String.valueOf(ResourceLocation.NAMESPACE_SEPARATOR))) {
 			return FabricShaderProgram.rewriteAsId(id, name);
 		}
 

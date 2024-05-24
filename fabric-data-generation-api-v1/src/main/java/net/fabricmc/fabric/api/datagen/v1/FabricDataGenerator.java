@@ -23,11 +23,10 @@ import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.SharedConstants;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.ResourceLocation;
 import net.fabricmc.loader.api.ModContainer;
 
 /**
@@ -37,11 +36,11 @@ public final class FabricDataGenerator extends DataGenerator {
 	private final ModContainer modContainer;
 	private final boolean strictValidation;
 	private final FabricDataOutput fabricOutput;
-	private final CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture;
+	private final CompletableFuture<HolderLookup.Provider> registriesFuture;
 
 	@ApiStatus.Internal
-	public FabricDataGenerator(Path output, ModContainer mod, boolean strictValidation, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
-		super(output, SharedConstants.getGameVersion(), true);
+	public FabricDataGenerator(Path output, ModContainer mod, boolean strictValidation, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+		super(output, SharedConstants.getCurrentVersion(), true);
 		this.modContainer = Objects.requireNonNull(mod);
 		this.strictValidation = strictValidation;
 		this.fabricOutput = new FabricDataOutput(mod, output, strictValidation);
@@ -63,8 +62,8 @@ public final class FabricDataGenerator extends DataGenerator {
 	 * <p>The path in which the resource pack is generated is {@code "resourcepacks/<id path>"}. {@code id path} being the path specified
 	 * in the identifier.
 	 */
-	public Pack createBuiltinResourcePack(Identifier id) {
-		Path path = this.output.getPath().resolve("resourcepacks").resolve(id.getPath());
+	public Pack createBuiltinResourcePack(ResourceLocation id) {
+		Path path = this.vanillaPackOutput.getOutputFolder().resolve("resourcepacks").resolve(id.getPath());
 		return new Pack(true, id.toString(), new FabricDataOutput(modContainer, path, strictValidation));
 	}
 
@@ -100,23 +99,23 @@ public final class FabricDataGenerator extends DataGenerator {
 	 */
 	@Override
 	@Deprecated
-	public DataGenerator.Pack createVanillaPack(boolean shouldRun) {
+	public DataGenerator.PackGenerator getVanillaPack(boolean shouldRun) {
 		throw new UnsupportedOperationException();
 	}
 
 	/**
-	 * @deprecated Please use {@link FabricDataGenerator#createBuiltinResourcePack(Identifier)}
+	 * @deprecated Please use {@link FabricDataGenerator#createBuiltinResourcePack(ResourceLocation)}
 	 */
 	@Override
 	@Deprecated
-	public DataGenerator.Pack createVanillaSubPack(boolean shouldRun, String packName) {
+	public DataGenerator.PackGenerator getBuiltinDatapack(boolean shouldRun, String packName) {
 		throw new UnsupportedOperationException();
 	}
 
 	/**
 	 * Represents a pack of generated data (i.e. data pack or resource pack). Providers are added to a pack.
 	 */
-	public final class Pack extends DataGenerator.Pack {
+	public final class Pack extends DataGenerator.PackGenerator {
 		private Pack(boolean shouldRun, String name, FabricDataOutput output) {
 			super(shouldRun, name, output);
 		}
@@ -154,7 +153,7 @@ public final class FabricDataGenerator extends DataGenerator {
 		 */
 		@FunctionalInterface
 		public interface RegistryDependentFactory<T extends DataProvider> {
-			T create(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture);
+			T create(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture);
 		}
 	}
 }

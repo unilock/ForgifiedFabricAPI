@@ -17,11 +17,10 @@
 package net.fabricmc.fabric.impl.dimension;
 
 import com.google.common.base.Preconditions;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.TeleportTarget;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.portal.PortalInfo;
 
 public final class FabricDimensionInternals {
 	private FabricDimensionInternals() {
@@ -29,28 +28,28 @@ public final class FabricDimensionInternals {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <E extends Entity> E changeDimension(E teleported, ServerWorld dimension, TeleportTarget target) {
-		Preconditions.checkArgument(!teleported.getWorld().isClient, "Entities can only be teleported on the server side");
-		Preconditions.checkArgument(Thread.currentThread() == ((ServerWorld) teleported.getWorld()).getServer().getThread(), "Entities must be teleported from the main server thread");
+	public static <E extends Entity> E changeDimension(E teleported, ServerLevel dimension, PortalInfo target) {
+		Preconditions.checkArgument(!teleported.level().isClientSide, "Entities can only be teleported on the server side");
+		Preconditions.checkArgument(Thread.currentThread() == ((ServerLevel) teleported.level()).getServer().getRunningThread(), "Entities must be teleported from the main server thread");
 
 		try {
 			((Teleportable) teleported).fabric_setCustomTeleportTarget(target);
 
 			// Fast path for teleporting within the same dimension.
-			if (teleported.getWorld() == dimension) {
-				if (teleported instanceof ServerPlayerEntity serverPlayerEntity) {
-					serverPlayerEntity.networkHandler.requestTeleport(target.position.x, target.position.y, target.position.z, target.yaw, target.pitch);
+			if (teleported.level() == dimension) {
+				if (teleported instanceof ServerPlayer serverPlayerEntity) {
+					serverPlayerEntity.connection.teleport(target.pos.x, target.pos.y, target.pos.z, target.yRot, target.xRot);
 				} else {
-					teleported.refreshPositionAndAngles(target.position.x, target.position.y, target.position.z, target.yaw, target.pitch);
+					teleported.moveTo(target.pos.x, target.pos.y, target.pos.z, target.yRot, target.xRot);
 				}
 
-				teleported.setVelocity(target.velocity);
-				teleported.setHeadYaw(target.yaw);
+				teleported.setDeltaMovement(target.speed);
+				teleported.setYHeadRot(target.yRot);
 
 				return teleported;
 			}
 
-			return (E) teleported.moveToWorld(dimension);
+			return (E) teleported.changeDimension(dimension);
 		} finally {
 			((Teleportable) teleported).fabric_setCustomTeleportTarget(null);
 		}

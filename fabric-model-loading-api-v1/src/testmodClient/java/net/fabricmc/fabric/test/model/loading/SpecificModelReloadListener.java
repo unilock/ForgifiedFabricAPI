@@ -18,21 +18,19 @@ package net.fabricmc.fabric.test.model.loading;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SinglePreparationResourceReloader;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.Unit;
-import net.minecraft.util.profiler.Profiler;
-
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 
-public class SpecificModelReloadListener extends SinglePreparationResourceReloader<Unit> implements IdentifiableResourceReloadListener {
+public class SpecificModelReloadListener extends SimplePreparableReloadListener<Unit> implements IdentifiableResourceReloadListener {
 	public static final SpecificModelReloadListener INSTANCE = new SpecificModelReloadListener();
-	public static final Identifier ID = new Identifier(ModelTestModClient.ID, "specific_model");
+	public static final ResourceLocation ID = new ResourceLocation(ModelTestModClient.ID, "specific_model");
 
 	private BakedModel specificModel;
 
@@ -41,22 +39,22 @@ public class SpecificModelReloadListener extends SinglePreparationResourceReload
 	}
 
 	@Override
-	protected Unit prepare(ResourceManager manager, Profiler profiler) {
+	protected Unit prepare(ResourceManager manager, ProfilerFiller profiler) {
 		return Unit.INSTANCE;
 	}
 
 	@Override
-	protected void apply(Unit loader, ResourceManager manager, Profiler profiler) {
-		specificModel = MinecraftClient.getInstance().getBakedModelManager().getModel(ModelTestModClient.MODEL_ID);
+	protected void apply(Unit loader, ResourceManager manager, ProfilerFiller profiler) {
+		specificModel = Minecraft.getInstance().getModelManager().getModel(ModelTestModClient.MODEL_ID);
 	}
 
 	@Override
-	public Identifier getFabricId() {
+	public ResourceLocation getFabricId() {
 		return ID;
 	}
 
 	@Override
-	public Collection<Identifier> getFabricDependencies() {
+	public Collection<ResourceLocation> getFabricDependencies() {
 		return Arrays.asList(ResourceReloadListenerKeys.MODELS);
 	}
 }

@@ -16,10 +16,9 @@
 
 package net.fabricmc.fabric.api.client.rendering.v1;
 
-import net.minecraft.client.gui.DrawContext;
-
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.client.gui.GuiGraphics;
 
 public interface HudRenderCallback {
 	Event<HudRenderCallback> EVENT = EventFactory.createArrayBacked(HudRenderCallback.class, (listeners) -> (matrixStack, delta) -> {
@@ -31,8 +30,8 @@ public interface HudRenderCallback {
 	/**
 	 * Called after rendering the whole hud, which is displayed in game, in a world.
 	 *
-	 * @param drawContext the {@link DrawContext} instance
+	 * @param drawContext the {@link GuiGraphics} instance
 	 * @param tickDelta Progress for linearly interpolating between the previous and current game state
 	 */
-	void onHudRender(DrawContext drawContext, float tickDelta);
+	void onHudRender(GuiGraphics drawContext, float tickDelta);
 }

@@ -28,25 +28,23 @@ import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.client.util.ModelIdentifier;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.client.model.loading.v1.BlockStateResolver;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelResolver;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 
 public class ModelLoaderPluginContextImpl implements ModelLoadingPlugin.Context {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModelLoaderPluginContextImpl.class);
 
-	final Set<Identifier> extraModels = new LinkedHashSet<>();
+	final Set<ResourceLocation> extraModels = new LinkedHashSet<>();
 
 	private final Map<BlockKey, BlockStateResolverHolder> blockStateResolvers = new HashMap<>();
 	private final BlockKey lookupKey = new BlockKey();
@@ -67,7 +65,7 @@ public class ModelLoaderPluginContextImpl implements ModelLoadingPlugin.Context 
 		return null;
 	});
 
-	private static final Identifier[] MODEL_MODIFIER_PHASES = new Identifier[] { ModelModifier.OVERRIDE_PHASE, ModelModifier.DEFAULT_PHASE, ModelModifier.WRAP_PHASE, ModelModifier.WRAP_LAST_PHASE };
+	private static final ResourceLocation[] MODEL_MODIFIER_PHASES = new ResourceLocation[] { ModelModifier.OVERRIDE_PHASE, ModelModifier.DEFAULT_PHASE, ModelModifier.WRAP_PHASE, ModelModifier.WRAP_LAST_PHASE };
 
 	private final Event<ModelModifier.OnLoad> onLoadModifiers = EventFactory.createWithPhases(ModelModifier.OnLoad.class, modifiers -> (model, context) -> {
 		for (ModelModifier.OnLoad modifier : modifiers) {
@@ -106,21 +104,21 @@ public class ModelLoaderPluginContextImpl implements ModelLoadingPlugin.Context 
 	/**
 	 * This field is used by the v0 wrapper to avoid constantly wrapping the context in hot code.
 	 */
-	public final Function<Identifier, UnbakedModel> modelGetter;
+	public final Function<ResourceLocation, UnbakedModel> modelGetter;
 
-	public ModelLoaderPluginContextImpl(Function<Identifier, UnbakedModel> modelGetter) {
+	public ModelLoaderPluginContextImpl(Function<ResourceLocation, UnbakedModel> modelGetter) {
 		this.modelGetter = modelGetter;
 	}
 
 	@Override
-	public void addModels(Identifier... ids) {
-		for (Identifier id : ids) {
+	public void addModels(ResourceLocation... ids) {
+		for (ResourceLocation id : ids) {
 			extraModels.add(id);
 		}
 	}
 
 	@Override
-	public void addModels(Collection<? extends Identifier> ids) {
+	public void addModels(Collection<? extends ResourceLocation> ids) {
 		extraModels.addAll(ids);
 	}
 
@@ -129,13 +127,13 @@ public class ModelLoaderPluginContextImpl implements ModelLoadingPlugin.Context 
 		Objects.requireNonNull(block, "block cannot be null");
 		Objects.requireNonNull(resolver, "resolver cannot be null");
 
-		Optional<RegistryKey<Block>> optionalKey = Registries.BLOCK.getKey(block);
+		Optional<ResourceKey<Block>> optionalKey = BuiltInRegistries.BLOCK.getResourceKey(block);
 
 		if (optionalKey.isEmpty()) {
 			throw new IllegalArgumentException("Received unregistered block");
 		}
 
-		Identifier blockId = optionalKey.get().getValue();
+		ResourceLocation blockId = optionalKey.get().location();
 		BlockKey key = new BlockKey(blockId.getNamespace(), blockId.getPath());
 		BlockStateResolverHolder holder = new BlockStateResolverHolder(resolver, block, blockId);
 
@@ -145,7 +143,7 @@ public class ModelLoaderPluginContextImpl implements ModelLoadingPlugin.Context 
 	}
 
 	@Nullable
-	BlockStateResolverHolder getBlockStateResolver(ModelIdentifier modelId) {
+	BlockStateResolverHolder getBlockStateResolver(ModelResourceLocation modelId) {
 		BlockKey key = lookupKey;
 		key.namespace = modelId.getNamespace();
 		key.path = modelId.getPath();

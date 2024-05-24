@@ -16,9 +16,9 @@
 
 package net.fabricmc.fabric.impl.networking;
 
-import net.minecraft.network.packet.Packet;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
 
 public interface DisconnectPacketSource {
-	Packet<?> createDisconnectPacket(Text message);
+	Packet<?> createDisconnectPacket(Component message);
 }

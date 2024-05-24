@@ -17,15 +17,12 @@
 package net.fabricmc.fabric.impl.client.indigo.renderer.render;
 
 import java.util.function.Consumer;
-
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-
-import net.minecraft.client.render.VertexConsumer;
-
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
@@ -119,9 +116,9 @@ abstract class AbstractRenderContext implements RenderContext {
 
 			final int color = quad.color(i);
 			vertexConsumer.color((color >>> 16) & 0xFF, (color >>> 8) & 0xFF, color & 0xFF, (color >>> 24) & 0xFF);
-			vertexConsumer.texture(quad.u(i), quad.v(i));
-			vertexConsumer.overlay(overlay);
-			vertexConsumer.light(quad.lightmap(i));
+			vertexConsumer.uv(quad.u(i), quad.v(i));
+			vertexConsumer.overlayCoords(overlay);
+			vertexConsumer.uv2(quad.lightmap(i));
 
 			if (useNormals) {
 				quad.copyNormal(i, normalVec);
@@ -129,7 +126,7 @@ abstract class AbstractRenderContext implements RenderContext {
 			}
 
 			vertexConsumer.normal(normalVec.x(), normalVec.y(), normalVec.z());
-			vertexConsumer.next();
+			vertexConsumer.endVertex();
 		}
 	}
 }

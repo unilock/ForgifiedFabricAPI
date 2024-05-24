@@ -16,8 +16,8 @@
 
 package net.fabricmc.fabric.api.item.v1;
 
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * A provider for the preferred equipment slot of an item.
@@ -25,12 +25,12 @@ import net.minecraft.item.ItemStack;
  * an armor slot that they can go in.
  *
  * <p>The preferred requipment slot of an item stack can be queried using
- * {@link net.minecraft.entity.LivingEntity#getPreferredEquipmentSlot(ItemStack) LivingEntity.getPreferredEquipmentSlot()}.
+ * {@link net.minecraft.world.entity.LivingEntity#getEquipmentSlotForItem(ItemStack) LivingEntity.getPreferredEquipmentSlot()}.
  *
  * <p>Equipment slot providers can be set with {@link FabricItem.Settings#equipmentSlot(EquipmentSlotProvider)}.
  *
- * <p>Note that items extending {@link net.minecraft.item.ArmorItem} don't need to use this
- * as there's {@link net.minecraft.item.ArmorItem#getSlotType()}.
+ * <p>Note that items extending {@link net.minecraft.world.item.ArmorItem} don't need to use this
+ * as there's {@link net.minecraft.world.item.ArmorItem#getEquipmentSlot()}.
  */
 @FunctionalInterface
 public interface EquipmentSlotProvider {

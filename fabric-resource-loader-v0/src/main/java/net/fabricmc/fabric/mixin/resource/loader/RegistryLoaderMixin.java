@@ -24,25 +24,23 @@ import com.mojang.serialization.Lifecycle;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-
-import net.minecraft.registry.RegistryLoader;
-import net.minecraft.registry.entry.RegistryEntryInfo;
-import net.minecraft.resource.Resource;
-
 import net.fabricmc.fabric.api.resource.ModResourcePack;
+import net.minecraft.core.RegistrationInfo;
+import net.minecraft.resources.RegistryDataLoader;
+import net.minecraft.server.packs.resources.Resource;
 
-@Mixin(RegistryLoader.class)
+@Mixin(RegistryDataLoader.class)
 public class RegistryLoaderMixin {
 	@Unique
-	private static final RegistryEntryInfo MOD_PROVIDED_INFO = new RegistryEntryInfo(Optional.empty(), Lifecycle.stable());
+	private static final RegistrationInfo MOD_PROVIDED_INFO = new RegistrationInfo(Optional.empty(), Lifecycle.stable());
 
 	// On the server side, loading mod-provided DRM entries should not show experiments screen.
 	// While the lifecycle is set to experimental on the client side (a de-sync),
 	// there is no good way to fix this without breaking protocol; the lifecycle seems to be unused on
 	// the client side anyway.
-	@ModifyExpressionValue(method = "loadFromResource(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/registry/RegistryOps$RegistryInfoGetter;Lnet/minecraft/registry/MutableRegistry;Lcom/mojang/serialization/Decoder;Ljava/util/Map;)V", at = @At(value = "INVOKE", target = "Ljava/util/function/Function;apply(Ljava/lang/Object;)Ljava/lang/Object;"))
+	@ModifyExpressionValue(method = "loadContentsFromManager(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;Lnet/minecraft/core/WritableRegistry;Lcom/mojang/serialization/Decoder;Ljava/util/Map;)V", at = @At(value = "INVOKE", target = "Ljava/util/function/Function;apply(Ljava/lang/Object;)Ljava/lang/Object;"))
 	private static Object markModProvidedAsStable(Object original, @Local Resource resource) {
-		if (original instanceof RegistryEntryInfo info && info.knownPackInfo().isEmpty() && resource.getPack() instanceof ModResourcePack) {
+		if (original instanceof RegistrationInfo info && info.knownPackInfo().isEmpty() && resource.source() instanceof ModResourcePack) {
 			return MOD_PROVIDED_INFO;
 		}
 

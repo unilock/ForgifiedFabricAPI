@@ -23,37 +23,35 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.TeleportTarget;
-import net.minecraft.world.World;
-
 import net.fabricmc.fabric.impl.dimension.Teleportable;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.portal.PortalInfo;
 
 /**
- * This mixin implements {@link Entity#getTeleportTarget(ServerWorld)} for modded dimensions, as Vanilla will
+ * This mixin implements {@link Entity#findDimensionEntryPoint(ServerLevel)} for modded dimensions, as Vanilla will
  * not return a teleport target for anything but Vanilla dimensions and prevents changing teleport target in
- * {@link ServerPlayerEntity#getTeleportTarget(ServerWorld)} when teleporting to END using api.
+ * {@link ServerPlayer#findDimensionEntryPoint(ServerLevel)} when teleporting to END using api.
  * This also prevents several End dimension-specific code when teleporting using api.
  */
-@Mixin(value = {ServerPlayerEntity.class, Entity.class})
+@Mixin(value = {ServerPlayer.class, Entity.class})
 public class EntityMixin implements Teleportable {
 	@Unique
 	@Nullable
-	protected TeleportTarget customTeleportTarget;
+	protected PortalInfo customTeleportTarget;
 
 	@Override
-	public void fabric_setCustomTeleportTarget(TeleportTarget teleportTarget) {
+	public void fabric_setCustomTeleportTarget(PortalInfo teleportTarget) {
 		this.customTeleportTarget = teleportTarget;
 	}
 
-	@Inject(method = "getTeleportTarget", at = @At("HEAD"), cancellable = true, allow = 1)
-	public void getTeleportTarget(ServerWorld destination, CallbackInfoReturnable<TeleportTarget> cir) {
+	@Inject(method = "findDimensionEntryPoint", at = @At("HEAD"), cancellable = true, allow = 1)
+	public void getTeleportTarget(ServerLevel destination, CallbackInfoReturnable<PortalInfo> cir) {
 		// Check if a destination has been set for the entity currently being teleported
-		TeleportTarget customTarget = this.customTeleportTarget;
+		PortalInfo customTarget = this.customTeleportTarget;
 
 		if (customTarget != null) {
 			cir.setReturnValue(customTarget);
@@ -66,9 +64,9 @@ public class EntityMixin implements Teleportable {
 	 * - End-to-overworld spawning behavior in ServerPlayerEntity
 	 * - ServerPlayerEntity#createEndSpawnPlatform in ServerPlayerEntity
 	 */
-	@Redirect(method = "moveToWorld", at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;END:Lnet/minecraft/registry/RegistryKey;"))
-	private RegistryKey<World> stopEndSpecificBehavior() {
+	@Redirect(method = "changeDimension", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;END:Lnet/minecraft/resources/ResourceKey;"))
+	private ResourceKey<Level> stopEndSpecificBehavior() {
 		if (this.customTeleportTarget != null) return null;
-		return World.END;
+		return Level.END;
 	}
 }
