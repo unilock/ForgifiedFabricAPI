@@ -34,5 +34,13 @@
     "loom:injected_interfaces": {
       "net/minecraft/class_2303": ["net/fabricmc/fabric/api/command/v2/FabricEntitySelectorReader"]
     }
+  },
+  "entrypoints": {
+    "main": [
+      "org.sinytra.fabric.command_api.FabricCommandApiV2"
+    ],
+    "client": [
+      "org.sinytra.fabric.command_api.client.FabricCommandApiV2Client"
+    ]
   }
 }

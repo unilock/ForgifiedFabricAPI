@@ -231,7 +231,7 @@ public class ModResourcePackUtilTests {
 		assertEquals(
 				after.stream().map(Pack::getId).toList(),
 				processed.stream().map(Pack::getId).toList(),
-				() -> "Testing %s; input %s".formatted(reason, before.stream().map(Pack::getId).toList())
+				() -> "Testing %s; input %s".formatted(reason, before.stream().map(ResourcePackProfile::getId).toList())
 		);
 	}
 

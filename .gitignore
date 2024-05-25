@@ -42,3 +42,6 @@ $RECYCLE.BIN/
 
 # Mac
 .DS_Store
+
+# Generated
+api-meta/fabric-api-mojmap

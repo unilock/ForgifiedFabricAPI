@@ -36,6 +36,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.Nullable;
+import org.sinytra.fabric.resource_loader.generated.GeneratedEntryPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +115,7 @@ public final class ModResourcePackUtil {
 	}
 
 	public static InputStream getDefaultIcon() throws IOException {
-		Optional<Path> loaderIconPath = FabricLoader.getInstance().getModContainer("fabric-resource-loader-v0")
+		Optional<Path> loaderIconPath = FabricLoader.getInstance().getModContainer(GeneratedEntryPoint.MOD_ID)
 				.flatMap(resourceLoaderContainer -> resourceLoaderContainer.getMetadata().getIconPath(512).flatMap(resourceLoaderContainer::findPath));
 
 		if (loaderIconPath.isPresent()) {

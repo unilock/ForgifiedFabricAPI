@@ -8,7 +8,7 @@
     "LifecycledResourceManagerImplMixin",
     "MinecraftServerMixin",
     "RegistryLoaderMixin",
-    "ResourceMixin",
+
     "ResourcePackManagerMixin",
     "ResourcePackProfileMixin",
     "ServerPropertiesHandlerMixin",
@@ -16,7 +16,7 @@
     "TestServerMixin"
   ],
   "server": [
-    "server.LanguageMixin"
+
   ],
   "injectors": {
     "defaultRequire": 1

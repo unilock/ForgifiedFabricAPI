@@ -3,13 +3,13 @@
   "package": "net.fabricmc.fabric.mixin.event.lifecycle",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "DataPackContentsMixin",
-    "LivingEntityMixin",
+
+
     "MinecraftServerMixin",
-    "PlayerManagerMixin",
+
     "ServerWorldServerEntityHandlerMixin",
     "ServerWorldMixin",
-    "ThreadedAnvilChunkStorageMixin",
+
     "WorldMixin"
   ],
   "server": [

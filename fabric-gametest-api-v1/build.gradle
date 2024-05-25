@@ -10,7 +10,7 @@ loom {
 			vmArg "-Dfabric-api.gametest.structures.output-dir=${file("src/testmod/resources/data/fabric-gametest-api-v1-testmod/gametest/structures")}"
 
 			ideConfigGenerated = false
-			source sourceSets.testmodClient
+//			source sourceSets.testmodClient
 		}
 	}
 }

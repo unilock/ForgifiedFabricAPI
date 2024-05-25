@@ -16,7 +16,7 @@
       "net.fabricmc.fabric.test.base.FabricApiAutoTestServer"
     ],
     "fabric-gametest" : [
-      "net.fabricmc.fabric.test.base.FabricApiBaseGameTest"
+
     ]
   },
   "mixins": [

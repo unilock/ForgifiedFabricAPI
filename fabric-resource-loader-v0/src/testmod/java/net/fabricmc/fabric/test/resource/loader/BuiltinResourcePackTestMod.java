@@ -26,7 +26,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class BuiltinResourcePackTestMod implements ModInitializer {
-	public static final String MODID = "fabric-resource-loader-v0-testmod";
+	public static final String MODID = "fabric_resource_loader_v0_testmod";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BuiltinResourcePackTestMod.class);
 

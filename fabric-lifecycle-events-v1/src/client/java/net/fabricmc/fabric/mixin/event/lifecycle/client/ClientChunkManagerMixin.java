@@ -41,21 +41,11 @@ public abstract class ClientChunkManagerMixin {
 	@Shadow
 	private ClientLevel level;
 
-	@Inject(method = "replaceWithPacketData", at = @At("TAIL"))
-	private void onChunkLoad(int x, int z, FriendlyByteBuf packetByteBuf, CompoundTag nbtCompound, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfoReturnable<LevelChunk> info) {
-		ClientChunkEvents.CHUNK_LOAD.invoker().onChunkLoad(this.level, info.getReturnValue());
-	}
-
 	@Inject(method = "replaceWithPacketData", at = @At(value = "NEW", target = "net/minecraft/world/level/chunk/LevelChunk", shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD)
 	private void onChunkUnload(int x, int z, FriendlyByteBuf buf, CompoundTag tag, Consumer<ClientboundLevelChunkPacketData.BlockEntityTagOutput> consumer, CallbackInfoReturnable<LevelChunk> info, int index, LevelChunk worldChunk, ChunkPos chunkPos) {
 		if (worldChunk != null) {
 			ClientChunkEvents.CHUNK_UNLOAD.invoker().onChunkUnload(this.level, worldChunk);
 		}
-	}
-
-	@Inject(method = "drop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientChunkCache$Storage;replace(ILnet/minecraft/world/level/chunk/LevelChunk;Lnet/minecraft/world/level/chunk/LevelChunk;)Lnet/minecraft/world/level/chunk/LevelChunk;"), locals = LocalCapture.CAPTURE_FAILHARD)
-	private void onChunkUnload(ChunkPos pos, CallbackInfo ci, int i, LevelChunk chunk) {
-		ClientChunkEvents.CHUNK_UNLOAD.invoker().onChunkUnload(this.level, chunk);
 	}
 
 	@Inject(
