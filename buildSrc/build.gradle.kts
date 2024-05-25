@@ -25,7 +25,6 @@ repositories {
         name = "Architectury"
         url = uri("https://maven.architectury.dev/")
     }
-    mavenLocal()
 }
 
 dependencies {
@@ -38,12 +37,4 @@ dependencies {
     implementation("dev.architectury:at:1.0.1")
 
     implementation("commons-codec:commons-codec:1.17.0")
-    
-    // Remapping
-    implementation("dev.architectury:mercury:0.1.+")
-    implementation("org.cadixdev:mercury-mixin:0.1.1-SNAPSHOT:all") {
-        isTransitive = false
-    }
-    implementation("net.fabricmc:access-widener:2.1.0")
-    compileOnly("net.fabricmc:tiny-remapper:0.10.+")
 }

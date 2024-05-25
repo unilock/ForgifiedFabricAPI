@@ -12,16 +12,12 @@ plugins {
     id("dev.architectury.loom") // Version declared in buildSrc
 }
 
-val upstreamProjectPath = "api-meta/fabric-api-upstream"
 val implementationVersion: String by project
 val versionMc: String by project
 val versionForge: String by project
-val versionYarn: String by project
 val versionForgifiedFabricLoader: String by project
-val versionFabricLoader: String by project
 
-val API_META_PROJECTS = listOf("fabric-api-remap", "intermediary-deobf")
-val META_PROJECTS: List<String> = API_META_PROJECTS + listOf(
+val META_PROJECTS: List<String> = listOf(
     "deprecated",
     "fabric-api-bom",
     "fabric-api-catalog"
@@ -55,10 +51,6 @@ version = "$upstreamVersion+$implementationVersion+$versionMc"
 println("Version: $version")
 
 allprojects {
-    if (project.name in API_META_PROJECTS) {
-        return@allprojects
-    }
-
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
     apply(plugin = "dev.architectury.loom")
@@ -135,10 +127,6 @@ tasks {
 // Subprojects
 
 allprojects {
-    if (project.name in API_META_PROJECTS) {
-        return@allprojects
-    }
-    
     val modDependencies: Configuration by configurations.creating
 
     tasks.register("generate") {
@@ -153,10 +141,6 @@ allprojects {
 
     if (!META_PROJECTS.contains(name) && project != rootProject) {
         apply(plugin = "ffapi.neo-compat")
-
-        configurations.register("devElements") {
-            outgoing.artifact(tasks.jar)
-        }
     }
 
     if (!META_PROJECTS.contains(project.name)) {
@@ -186,21 +170,19 @@ allprojects {
     }
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            named<MavenPublication>("mavenJava") {
-                from(components["java"])
+publishing {
+    publications {
+        named<MavenPublication>("mavenJava") {
+            from(components["java"])
 
-                pom.withXml {
-                    val depsNode = GroovyXmlUtil.getOrCreateNode(asNode(), "dependencies")
-                    rootProject.configurations.include.get().dependencies.forEach {
-                        val depNode = depsNode.appendNode("dependency")
-                        depNode.appendNode("groupId", it.group)
-                        depNode.appendNode("artifactId", it.name)
-                        depNode.appendNode("version", it.version)
-                        depNode.appendNode("scope", "compile")
-                    }
+            pom.withXml {
+                val depsNode = GroovyXmlUtil.getOrCreateNode(asNode(), "dependencies")
+                rootProject.configurations.include.get().dependencies.forEach {
+                    val depNode = depsNode.appendNode("dependency")
+                    depNode.appendNode("groupId", it.group)
+                    depNode.appendNode("artifactId", it.name)
+                    depNode.appendNode("version", it.version)
+                    depNode.appendNode("scope", "compile")
                 }
             }
         }
