@@ -140,7 +140,7 @@ allprojects {
     apply(plugin = "ffapi.package-info")
 
     if (!META_PROJECTS.contains(name) && project != rootProject) {
-        apply(plugin = "ffapi.neo-compat")
+//        apply(plugin = "ffapi.neo-compat") TODO
     }
 
     if (!META_PROJECTS.contains(project.name)) {
