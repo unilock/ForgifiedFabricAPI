@@ -113,7 +113,7 @@ public final class EnumRule<E extends Enum<E>> extends GameRules.Value<EnumRule<
 	}
 
 	@Override
-	public void setValue(EnumRule<E> rule, MinecraftServer minecraftServer) {
+	public void setFrom(EnumRule<E> rule, MinecraftServer minecraftServer) {
 		if (!this.supports(rule.value)) {
 			throw new IllegalArgumentException(String.format("Rule does not support value: %s", rule.value));
 		}

@@ -97,7 +97,7 @@ public final class DoubleRule extends GameRules.Value<DoubleRule> implements Val
 	}
 
 	@Override
-	public void setValue(DoubleRule rule, MinecraftServer minecraftServer) {
+	public void setFrom(DoubleRule rule, MinecraftServer minecraftServer) {
 		if (!this.inBounds(rule.value)) {
 			throw new IllegalArgumentException(String.format("Could not set value to %s. Was out of bounds %s - %s", rule.value, this.minimumValue, this.maximumValue));
 		}

@@ -78,7 +78,7 @@ public class RecipeGameTest implements FabricGameTest {
 			}
 
 			@Override
-			public ItemStack craft(SimpleContainer inventory, HolderLookup.Provider wrapperLookup) {
+			public ItemStack assemble(SimpleContainer inventory, HolderLookup.Provider wrapperLookup) {
 				return null;
 			}
 
