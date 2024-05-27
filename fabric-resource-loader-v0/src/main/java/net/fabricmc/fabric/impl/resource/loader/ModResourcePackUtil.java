@@ -46,9 +46,12 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.ServerPacksSource;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.world.level.WorldDataConfiguration;
+import net.minecraft.world.level.validation.DirectoryValidator;
 import net.fabricmc.fabric.api.resource.ModResourcePack;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -232,5 +235,13 @@ public final class ModResourcePackUtil {
 		enabled.addAll(moveToTheEnd);
 
 		return new DataPackConfig(enabled, disabled);
+	}
+
+	/**
+	 * Creates the ResousePackManager used by the ClientDataPackManager and replaces
+	 * {@code VanillaDataPackProvider.createClientManager} used by vanilla.
+	 */
+	public static PackRepository createClientManager() {
+		return new PackRepository(new ServerPacksSource(new DirectoryValidator((path) -> true)), new ModResourcePackCreator(PackType.SERVER_DATA, true));
 	}
 }

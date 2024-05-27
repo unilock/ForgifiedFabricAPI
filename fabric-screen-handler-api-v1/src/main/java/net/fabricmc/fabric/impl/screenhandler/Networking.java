@@ -49,7 +49,7 @@ public final class Networking implements ModInitializer {
 	// title: text
 	// customData: buf
 	public static final ResourceLocation OPEN_ID = new ResourceLocation("fabric-screen-handler-api-v1", "open_screen");
-	public static final Map<ResourceLocation, StreamCodec<RegistryFriendlyByteBuf, ?>> CODEC_BY_ID = new HashMap<>();
+	public static final Map<ResourceLocation, StreamCodec<? super RegistryFriendlyByteBuf, ?>> CODEC_BY_ID = new HashMap<>();
 
 	/**
 	 * Opens an extended screen handler by sending a custom packet to the client.

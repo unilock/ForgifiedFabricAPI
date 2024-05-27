@@ -45,9 +45,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.fabricmc.loader.api.FabricLoader;
@@ -174,7 +176,7 @@ public final class FabricDataGenHelper {
 			BuilderData(ResourceKey key) {
 				this.key = key;
 				this.bootstrapFunctions = new ArrayList<>();
-				this.lifecycle = null;
+				this.lifecycle = Lifecycle.stable();
 			}
 
 			void with(RegistrySetBuilder.RegistryStub<?> registryInfo) {
@@ -194,6 +196,11 @@ public final class FabricDataGenHelper {
 		}
 
 		Map<ResourceKey<?>, BuilderData> builderDataMap = new HashMap<>();
+
+		// Ensure all dynamic registries are present.
+		for (RegistryDataLoader.RegistryData<?> key : DynamicRegistries.getDynamicRegistries()) {
+			builderDataMap.computeIfAbsent(key.key(), BuilderData::new);
+		}
 
 		for (RegistrySetBuilder builder : builders) {
 			for (RegistrySetBuilder.RegistryStub<?> info : builder.entries) {

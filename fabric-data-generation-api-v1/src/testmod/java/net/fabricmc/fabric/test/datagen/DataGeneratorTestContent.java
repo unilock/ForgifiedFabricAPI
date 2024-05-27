@@ -54,6 +54,10 @@ public class DataGeneratorTestContent implements ModInitializer {
 			TEST_DATAGEN_DYNAMIC_REGISTRY_KEY,
 			new ResourceLocation(MOD_ID, "tiny_potato")
 	);
+	public static final ResourceKey<TestDatagenObject> TEST_DYNAMIC_REGISTRY_EXTRA_ITEM_KEY = ResourceKey.create(
+			TEST_DATAGEN_DYNAMIC_REGISTRY_KEY,
+			new ResourceLocation(MOD_ID, "tinier_potato")
+	);
 	// Empty registry
 	public static final ResourceKey<Registry<TestDatagenObject>> TEST_DATAGEN_DYNAMIC_EMPTY_REGISTRY_KEY =
 			ResourceKey.createRegistryKey(new ResourceLocation("fabric", "test_datagen_dynamic_empty"));

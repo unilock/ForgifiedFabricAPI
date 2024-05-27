@@ -73,14 +73,14 @@ import net.minecraft.world.inventory.MenuType;
  */
 public class ExtendedScreenHandlerType<T extends AbstractContainerMenu, D> extends MenuType<T> {
 	private final ExtendedFactory<T, D> factory;
-	private final StreamCodec<RegistryFriendlyByteBuf, D> packetCodec;
+	private final StreamCodec<? super RegistryFriendlyByteBuf, D> packetCodec;
 
 	/**
 	 * Constructs an extended screen handler type.
 	 *
 	 * @param factory the screen handler factory used for {@link #create(int, Inventory, Object)}
 	 */
-	public ExtendedScreenHandlerType(ExtendedFactory<T, D> factory, StreamCodec<RegistryFriendlyByteBuf, D> packetCodec) {
+	public ExtendedScreenHandlerType(ExtendedFactory<T, D> factory, StreamCodec<? super RegistryFriendlyByteBuf, D> packetCodec) {
 		super(null, FeatureFlags.VANILLA_SET);
 		this.factory = Objects.requireNonNull(factory, "screen handler factory cannot be null");
 		this.packetCodec = Objects.requireNonNull(packetCodec, "packet codec cannot be null");
@@ -111,7 +111,7 @@ public class ExtendedScreenHandlerType<T extends AbstractContainerMenu, D> exten
 	/**
 	 * @return the packet codec for serializing the data of this screen handler
 	 */
-	public StreamCodec<RegistryFriendlyByteBuf, D> getPacketCodec() {
+	public StreamCodec<? super RegistryFriendlyByteBuf, D> getPacketCodec() {
 		return packetCodec;
 	}
 

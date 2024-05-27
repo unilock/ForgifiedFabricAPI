@@ -28,7 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 public class BuiltinResourcePackTestMod implements ModInitializer {
 	public static final String MODID = "fabric_resource_loader_v0_testmod";
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BuiltinResourcePackTestMod.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(BuiltinResourcePackTestMod.class);
 
 	@Override
 	public void onInitialize() {
