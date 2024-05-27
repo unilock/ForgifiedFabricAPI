@@ -143,14 +143,16 @@ allprojects {
 //        apply(plugin = "ffapi.neo-compat") TODO
     }
 
-    if (!META_PROJECTS.contains(project.name)) {
-        loom.mods.register(project.name) {
-            sourceSet(sourceSets.main.get())
-        }
-
-        if (project.file("src/testmod").exists() || project.file("src/testmodClient").exists()) {
-            loom.mods.register(project.name + "-testmod") {
-                sourceSet(sourceSets.getByName("testmod"))
+    allprojects.forEach { p ->
+        if (!META_PROJECTS.contains(project.name)) {
+            loom.mods.register(p.name) {
+                sourceSet(p.sourceSets.main.get())
+            }
+    
+            if (p.file("src/testmod").exists() || p.file("src/testmodClient").exists()) {
+                loom.mods.register(p.name + "-testmod") {
+                    sourceSet(p.sourceSets.getByName("testmod"))
+                }
             }
         }
     }
@@ -168,6 +170,19 @@ allprojects {
             }
         }
     }
+}
+
+dependencies {
+	afterEvaluate {
+		subprojects.forEach { proj ->
+			if (proj.name in META_PROJECTS) {
+				return@forEach
+			}
+
+			api(project(proj.path, "namedElements"))
+			"testmodImplementation"(proj.sourceSets.getByName("testmod").output)
+		}
+	}
 }
 
 publishing {

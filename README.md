@@ -5,7 +5,6 @@
 
 ### Some things might still not work yet
 
-- Running the root project
 - Production
 - Publishing
 - CI
@@ -18,3 +17,8 @@
   - Improved stability: we no longer need to rely on archloom's "hopes" and "prayers" for neo loom support
   - Improved dev experience: no more userdev remapping issues
 - Syncing with upstream is (hopefully) made easier via automation scripts
+
+### Running the root project
+
+- Make sure your IDEA Gradle settings are set to "Build and run using IntelliJ IDEA"
+- Use the IDE run to launch the game
