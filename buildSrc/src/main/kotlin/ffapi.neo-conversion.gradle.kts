@@ -3,12 +3,8 @@ import com.moandjiezana.toml.TomlWriter
 import dev.architectury.at.AccessTransformSet
 import dev.architectury.at.io.AccessTransformFormats
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
-import net.fabricmc.loom.api.mappings.layered.MappingsNamespace
-import net.fabricmc.loom.task.service.MappingsService
 import net.fabricmc.loom.util.LfWriter
 import net.fabricmc.loom.util.aw2at.Aw2At
-import net.fabricmc.loom.util.service.BuildSharedServiceManager
-import net.fabricmc.loom.util.service.UnsafeWorkQueueHelper
 import kotlin.io.path.*
 
 val versionMc: String by rootProject
@@ -78,26 +74,6 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
     @get:InputFile
     @get:Optional
     val accessWidener: RegularFileProperty = project.objects.fileProperty()
-
-    private val mappingServiceUuid: Property<String> = project.objects.property<String>()
-
-    @Inject
-    protected abstract fun getBuildEventsListenerRegistry(): BuildEventsListenerRegistry
-
-    init {
-        val serviceManagerProvider = BuildSharedServiceManager.createForTask(this, getBuildEventsListenerRegistry())
-
-        mappingServiceUuid.value(project.provider {
-            UnsafeWorkQueueHelper.create(
-                MappingsService.createDefault(
-                    project,
-                    serviceManagerProvider.get().get(),
-                    MappingsNamespace.NAMED.toString(),
-                    MappingsNamespace.MOJANG.toString()
-                )
-            )
-        })
-    }
 
     private fun normalizeModid(modid: String): String {
         return modid.replace('-', '_')
@@ -245,12 +221,8 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
             val awPath = accessWidener.get().asFile.toPath()
             val atPath = output.resolve("META-INF/accesstransformer.cfg")
         
-            var at = AccessTransformSet.create()
+            val at = AccessTransformSet.create()
             awPath.bufferedReader().use { at.merge(Aw2At.toAccessTransformSet(it)) }
-        
-            val service = UnsafeWorkQueueHelper.get(mappingServiceUuid, MappingsService::class.java)
-        
-            at = at.remap(service.memoryMappingTree, service.fromNamespace, service.toNamespace)
         
             LfWriter(atPath.bufferedWriter()).use {  AccessTransformFormats.FML.write(it, at) }
         }

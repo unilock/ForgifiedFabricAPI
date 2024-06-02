@@ -1,12 +1,10 @@
 import net.fabricmc.loader.impl.metadata.*
-import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
 
 val versionMc: String by rootProject
 val versionForge: String by rootProject
 
-val loom = extensions.getByType<LoomGradleExtensionAPI>()
 val sourceSets = extensions.getByType<SourceSetContainer>()
 
 // Source sets that can contain the mod entrypoint file
