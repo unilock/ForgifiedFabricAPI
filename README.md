@@ -59,9 +59,6 @@ The Forgified Fabric API is available for download on the following platforms:
 - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/forgified-fabric-api)
 - [Modrinth](https://modrinth.com/mod/forgified-fabric-api)
 
-To use Forgified Fabric API, download it from .
-Standalone CurseForge and Modrinth distributions will be available soon.
-
 The downloaded jar file should be placed in your `mods` folder.
 
 ## Using Forgified Fabric API to develop mods
