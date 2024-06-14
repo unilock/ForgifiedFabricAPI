@@ -26,15 +26,6 @@ import net.minecraft.client.Minecraft;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftClientMixin {
-	@Inject(at = @At("HEAD"), method = "tick")
-	private void onStartTick(CallbackInfo info) {
-		ClientTickEvents.START_CLIENT_TICK.invoker().onStartTick((Minecraft) (Object) this);
-	}
-
-	@Inject(at = @At("RETURN"), method = "tick")
-	private void onEndTick(CallbackInfo info) {
-		ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick((Minecraft) (Object) this);
-	}
 
 	@Inject(at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V", shift = At.Shift.AFTER, remap = false), method = "destroy")
 	private void onStopping(CallbackInfo ci) {
