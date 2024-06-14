@@ -45,7 +45,7 @@ import net.minecraft.world.level.ItemLike;
  *
  * <pre>{@code
  * public final class MyApi {
- *     public static final ItemApiLookup<FluidContainer, Void> FLUID_CONTAINER_ITEM = ItemApiLookup.get(new Identifier("mymod:fluid_container"), FluidContainer.class, Void.class);
+ *     public static final ItemApiLookup<FluidContainer, Void> FLUID_CONTAINER_ITEM = ItemApiLookup.get(Identifier.of("mymod", "fluid_container"), FluidContainer.class, Void.class);
  * }}</pre>
  * API instances are easy to access:
  *

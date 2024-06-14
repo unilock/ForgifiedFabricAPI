@@ -40,27 +40,27 @@ public class SimpleFluidRenderHandler implements FluidRenderHandler {
 	/**
 	 * The vanilla still water texture identifier.
 	 */
-	public static final ResourceLocation WATER_STILL = new ResourceLocation("block/water_still");
+	public static final ResourceLocation WATER_STILL = ResourceLocation.withDefaultNamespace("block/water_still");
 
 	/**
 	 * The vanilla flowing water texture identifier.
 	 */
-	public static final ResourceLocation WATER_FLOWING = new ResourceLocation("block/water_flow");
+	public static final ResourceLocation WATER_FLOWING = ResourceLocation.withDefaultNamespace("block/water_flow");
 
 	/**
 	 * The vanilla water overlay texture identifier.
 	 */
-	public static final ResourceLocation WATER_OVERLAY = new ResourceLocation("block/water_overlay");
+	public static final ResourceLocation WATER_OVERLAY = ResourceLocation.withDefaultNamespace("block/water_overlay");
 
 	/**
 	 * The vanilla still lava texture identifier.
 	 */
-	public static final ResourceLocation LAVA_STILL = new ResourceLocation("block/lava_still");
+	public static final ResourceLocation LAVA_STILL = ResourceLocation.withDefaultNamespace("block/lava_still");
 
 	/**
 	 * The vanilla flowing lava texture identifier.
 	 */
-	public static final ResourceLocation LAVA_FLOWING = new ResourceLocation("block/lava_flow");
+	public static final ResourceLocation LAVA_FLOWING = ResourceLocation.withDefaultNamespace("block/lava_flow");
 
 	protected final ResourceLocation stillTexture;
 	protected final ResourceLocation flowingTexture;

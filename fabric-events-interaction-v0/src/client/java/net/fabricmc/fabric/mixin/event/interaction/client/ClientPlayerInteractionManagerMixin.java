@@ -39,7 +39,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
@@ -116,7 +115,7 @@ public abstract class ClientPlayerInteractionManagerMixin {
 		}
 	}
 
-	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendPacket(Lnet/minecraft/network/protocol/Packet;)V", ordinal = 0), method = "useItem", cancellable = true)
+	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;ensureHasSentCarriedItem()V", ordinal = 0), method = "useItem", cancellable = true)
 	public void interactItem(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> info) {
 		// hook interactBlock between the spectator check and sending the first packet to invoke the use item event first
 		// this needs to be in interactBlock to avoid sending a packet in line with the event javadoc
@@ -124,10 +123,8 @@ public abstract class ClientPlayerInteractionManagerMixin {
 
 		if (result.getResult() != InteractionResult.PASS) {
 			if (result.getResult() == InteractionResult.SUCCESS) {
-				// send the move packet like vanilla to ensure the position+view vectors are accurate
-				connection.sendPacket(new ServerboundMovePlayerPacket.PosRot(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.onGround()));
 				// send interaction packet to the server with a new sequentially assigned id
-				startPrediction((ClientLevel) player.level(), id -> new ServerboundUseItemPacket(hand, id));
+				startPrediction((ClientLevel) player.level(), id -> new ServerboundUseItemPacket(hand, id, player.getYRot(), player.getXRot()));
 			}
 
 			info.setReturnValue(result.getResult());
@@ -140,7 +137,7 @@ public abstract class ClientPlayerInteractionManagerMixin {
 
 		if (result != InteractionResult.PASS) {
 			if (result == InteractionResult.SUCCESS) {
-				this.connection.sendPacket(ServerboundInteractPacket.createAttackPacket(entity, player.isShiftKeyDown()));
+				this.connection.send(ServerboundInteractPacket.createAttackPacket(entity, player.isShiftKeyDown()));
 			}
 
 			info.cancel();

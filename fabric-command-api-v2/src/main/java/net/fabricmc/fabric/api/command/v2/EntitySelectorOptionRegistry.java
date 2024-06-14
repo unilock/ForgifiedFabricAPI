@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.api.command.v2;
 
 import java.util.function.Predicate;
+import net.fabricmc.fabric.mixin.command.EntitySelectorOptionsAccessor;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.commands.arguments.selector.options.EntitySelectorOptions;
 import net.minecraft.network.chat.Component;
@@ -37,7 +38,7 @@ public final class EntitySelectorOptionRegistry {
 	 * {@code example_min_health} and can be used like {@code @e[example_min_health=5]}.
 	 * <pre>{@code
 	 * EntitySelectorOptionRegistry.register(
-	 * 	new Identifier("example", "min_health"),
+	 * 	Identifier.of("example", "min_health"),
 	 * 	Text.literal("Minimum entity health"),
 	 * 	(reader) -> {
 	 * 	    final float minHealth = reader.getReader().readFloat();
@@ -61,7 +62,7 @@ public final class EntitySelectorOptionRegistry {
 	 * @param canUse the predicate that checks whether the option is syntactically valid
 	 */
 	public static void register(ResourceLocation id, Component description, EntitySelectorOptions.Modifier handler, Predicate<EntitySelectorParser> canUse) {
-		EntitySelectorOptions.register(id.toDebugFileName(), handler, canUse, description);
+		EntitySelectorOptionsAccessor.callPutOption(id.toDebugFileName(), handler, canUse, description);
 	}
 
 	/**

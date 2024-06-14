@@ -35,10 +35,10 @@ public class RegistryMapSerializer {
 			CompoundTag idNbt = mainNbt.getCompound(registryId);
 
 			for (String id : idNbt.getAllKeys()) {
-				idMap.put(new ResourceLocation(id), idNbt.getInt(id));
+				idMap.put(ResourceLocation.parse(id), idNbt.getInt(id));
 			}
 
-			map.put(new ResourceLocation(registryId), idMap);
+			map.put(ResourceLocation.parse(registryId), idMap);
 		}
 
 		return map;

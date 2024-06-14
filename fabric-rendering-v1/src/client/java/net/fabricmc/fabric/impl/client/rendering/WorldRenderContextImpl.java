@@ -21,6 +21,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -35,9 +36,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public final class WorldRenderContextImpl implements WorldRenderContext.BlockOutlineContext, WorldRenderContext {
 	private LevelRenderer worldRenderer;
+	private DeltaTracker tickCounter;
 	private PoseStack matrixStack;
-	private float tickDelta;
-	private long limitTime;
 	private boolean blockOutlines;
 	private Camera camera;
 	private Frustum frustum;
@@ -61,8 +61,7 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 
 	public void prepare(
 			LevelRenderer worldRenderer,
-			float tickDelta,
-			long limitTime,
+			DeltaTracker delta,
 			boolean blockOutlines,
 			Camera camera,
 			GameRenderer gameRenderer,
@@ -75,9 +74,8 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 			ClientLevel world
 	) {
 		this.worldRenderer = worldRenderer;
+		this.tickCounter = delta;
 		this.matrixStack = null;
-		this.tickDelta = tickDelta;
-		this.limitTime = limitTime;
 		this.blockOutlines = blockOutlines;
 		this.camera = camera;
 		this.gameRenderer = gameRenderer;
@@ -125,13 +123,8 @@ public final class WorldRenderContextImpl implements WorldRenderContext.BlockOut
 	}
 
 	@Override
-	public float tickDelta() {
-		return tickDelta;
-	}
-
-	@Override
-	public long limitTime() {
-		return limitTime;
+	public DeltaTracker tickCounter() {
+		return this.tickCounter;
 	}
 
 	@Override

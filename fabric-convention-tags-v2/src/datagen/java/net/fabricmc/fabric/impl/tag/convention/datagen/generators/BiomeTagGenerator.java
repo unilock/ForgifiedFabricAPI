@@ -240,13 +240,14 @@ public final class BiomeTagGenerator extends FabricTagProvider<Biome> {
 				.add(Biomes.DARK_FOREST)
 				.add(Biomes.OLD_GROWTH_BIRCH_FOREST)
 				.add(Biomes.OLD_GROWTH_SPRUCE_TAIGA)
-				.add(Biomes.JUNGLE);
+				.add(Biomes.JUNGLE)
+				.add(Biomes.BAMBOO_JUNGLE)
+				.add(Biomes.MANGROVE_SWAMP);
 		tag(ConventionalBiomeTags.IS_VEGETATION_DENSE)
 				.addOptionalTag(ConventionalBiomeTags.IS_VEGETATION_DENSE_OVERWORLD);
 
 		tag(ConventionalBiomeTags.IS_VEGETATION_SPARSE_OVERWORLD)
 				.add(Biomes.WOODED_BADLANDS)
-				.add(Biomes.ERODED_BADLANDS)
 				.add(Biomes.SAVANNA)
 				.add(Biomes.SAVANNA_PLATEAU)
 				.add(Biomes.WINDSWEPT_SAVANNA)
@@ -281,7 +282,7 @@ public final class BiomeTagGenerator extends FabricTagProvider<Biome> {
 				.addOptionalTag(ConventionalBiomeTags.IS_FLOWER_FOREST);
 		tag(ConventionalBiomeTags.IS_FLOWER_FOREST)
 				.add(Biomes.FLOWER_FOREST)
-				.addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "flower_forests"));
+				.addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "flower_forests"));
 		tag(ConventionalBiomeTags.IS_OLD_GROWTH)
 				.add(Biomes.OLD_GROWTH_BIRCH_FOREST)
 				.add(Biomes.OLD_GROWTH_PINE_TAIGA)
@@ -320,25 +321,25 @@ public final class BiomeTagGenerator extends FabricTagProvider<Biome> {
 		// Backwards compat with pre-1.21 tags. Done after so optional tag is last for better readability.
 		// TODO: Remove backwards compat tag entries in 1.22
 
-		tag(ConventionalBiomeTags.IS_NETHER).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "in_nether"));
-		tag(ConventionalBiomeTags.IS_END).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "in_the_end"));
-		tag(ConventionalBiomeTags.IS_OVERWORLD).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "in_the_overworld"));
-		tag(ConventionalBiomeTags.IS_CAVE).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "caves"));
-		tag(ConventionalBiomeTags.IS_COLD_OVERWORLD).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "climate_cold"));
-		tag(ConventionalBiomeTags.IS_TEMPERATE_OVERWORLD).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "climate_temperate"));
-		tag(ConventionalBiomeTags.IS_HOT_OVERWORLD).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "climate_hot"));
-		tag(ConventionalBiomeTags.IS_WET_OVERWORLD).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "climate_wet"));
-		tag(ConventionalBiomeTags.IS_DRY_OVERWORLD).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "climate_dry"));
-		tag(ConventionalBiomeTags.IS_VEGETATION_DENSE_OVERWORLD).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "vegetation_dense"));
-		tag(ConventionalBiomeTags.IS_VEGETATION_SPARSE_OVERWORLD).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "vegetation_sparse"));
-		tag(ConventionalBiomeTags.IS_CONIFEROUS_TREE).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "tree_coniferous"));
-		tag(ConventionalBiomeTags.IS_DECIDUOUS_TREE).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "tree_deciduous"));
-		tag(ConventionalBiomeTags.IS_JUNGLE_TREE).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "tree_jungle"));
-		tag(ConventionalBiomeTags.IS_SAVANNA_TREE).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "tree_savanna"));
-		tag(ConventionalBiomeTags.IS_MOUNTAIN_PEAK).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "mountain_peak"));
-		tag(ConventionalBiomeTags.IS_MOUNTAIN_SLOPE).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "mountain_slope"));
-		tag(ConventionalBiomeTags.IS_OUTER_END_ISLAND).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "end_islands"));
-		tag(ConventionalBiomeTags.IS_NETHER_FOREST).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "nether_forests"));
-		tag(ConventionalBiomeTags.IS_FLOWER_FOREST).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "flower_forests"));
+		tag(ConventionalBiomeTags.IS_NETHER).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "in_nether"));
+		tag(ConventionalBiomeTags.IS_END).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "in_the_end"));
+		tag(ConventionalBiomeTags.IS_OVERWORLD).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "in_the_overworld"));
+		tag(ConventionalBiomeTags.IS_CAVE).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "caves"));
+		tag(ConventionalBiomeTags.IS_COLD_OVERWORLD).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "climate_cold"));
+		tag(ConventionalBiomeTags.IS_TEMPERATE_OVERWORLD).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "climate_temperate"));
+		tag(ConventionalBiomeTags.IS_HOT_OVERWORLD).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "climate_hot"));
+		tag(ConventionalBiomeTags.IS_WET_OVERWORLD).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "climate_wet"));
+		tag(ConventionalBiomeTags.IS_DRY_OVERWORLD).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "climate_dry"));
+		tag(ConventionalBiomeTags.IS_VEGETATION_DENSE_OVERWORLD).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "vegetation_dense"));
+		tag(ConventionalBiomeTags.IS_VEGETATION_SPARSE_OVERWORLD).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "vegetation_sparse"));
+		tag(ConventionalBiomeTags.IS_CONIFEROUS_TREE).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "tree_coniferous"));
+		tag(ConventionalBiomeTags.IS_DECIDUOUS_TREE).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "tree_deciduous"));
+		tag(ConventionalBiomeTags.IS_JUNGLE_TREE).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "tree_jungle"));
+		tag(ConventionalBiomeTags.IS_SAVANNA_TREE).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "tree_savanna"));
+		tag(ConventionalBiomeTags.IS_MOUNTAIN_PEAK).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "mountain_peak"));
+		tag(ConventionalBiomeTags.IS_MOUNTAIN_SLOPE).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "mountain_slope"));
+		tag(ConventionalBiomeTags.IS_OUTER_END_ISLAND).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "end_islands"));
+		tag(ConventionalBiomeTags.IS_NETHER_FOREST).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "nether_forests"));
+		tag(ConventionalBiomeTags.IS_FLOWER_FOREST).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "flower_forests"));
 	}
 }

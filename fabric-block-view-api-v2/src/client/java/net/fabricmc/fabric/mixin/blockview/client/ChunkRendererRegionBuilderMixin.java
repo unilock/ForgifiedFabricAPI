@@ -20,6 +20,9 @@ import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +31,11 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.fabricmc.fabric.impl.blockview.client.RenderDataMapConsumer;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.client.renderer.chunk.RenderRegionCache;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -42,43 +45,36 @@ public abstract class ChunkRendererRegionBuilderMixin {
 	private static final AtomicInteger ERROR_COUNTER = new AtomicInteger();
 	private static final Logger LOGGER = LoggerFactory.getLogger(ChunkRendererRegionBuilderMixin.class);
 
-	@Inject(method = "createRegion", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
-	private void createDataMap(Level world, BlockPos startPos, BlockPos endPos, int offset, CallbackInfoReturnable<RenderChunkRegion> cir, int startX, int startZ, int endX, int endZ, RenderRegionCache.ChunkInfo[][] chunksXZ) {
-		RenderChunkRegion rendererRegion = cir.getReturnValue();
+	@Inject(method = "createRegion", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/RenderRegionCache$ChunkInfo;renderChunk()Lnet/minecraft/client/renderer/chunk/RenderChunk;"))
+	private void copyDataForChunk(Level world, SectionPos chunkSectionPos, CallbackInfoReturnable<RenderChunkRegion> cir, @Local(ordinal = 1) RenderRegionCache.ChunkInfo clientChunk, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef) {
+		// Hash maps in chunks should generally not be modified outside of client thread
+		// but does happen in practice, due to mods or inconsistent vanilla behaviors, causing
+		// CMEs when we iterate the map. (Vanilla does not iterate these maps when it builds
+		// the chunk cache and does not suffer from this problem.)
+		//
+		// We handle this simply by retrying until it works. Ugly but effective.
+		while (true) {
+			try {
+				mapRef.set(mapChunk(clientChunk.chunk(), chunkSectionPos, mapRef.get()));
+				break;
+			} catch (ConcurrentModificationException e) {
+				final int count = ERROR_COUNTER.incrementAndGet();
 
-		if (rendererRegion == null) {
-			return;
-		}
+				if (count <= 5) {
+					LOGGER.warn("[Block Entity Render Data] Encountered CME during render region build. A mod is accessing or changing chunk data outside the main thread. Retrying.", e);
 
-		// instantiated lazily - avoids allocation for chunks without any data objects - which is most of them!
-		Long2ObjectOpenHashMap<Object> map = null;
-
-		for (RenderRegionCache.ChunkInfo[] chunksZ : chunksXZ) {
-			for (RenderRegionCache.ChunkInfo chunk : chunksZ) {
-				// Hash maps in chunks should generally not be modified outside of client thread
-				// but does happen in practice, due to mods or inconsistent vanilla behaviors, causing
-				// CMEs when we iterate the map. (Vanilla does not iterate these maps when it builds
-				// the chunk cache and does not suffer from this problem.)
-				//
-				// We handle this simply by retrying until it works. Ugly but effective.
-				while (true) {
-					try {
-						map = mapChunk(chunk.chunk(), startPos, endPos, map);
-						break;
-					} catch (ConcurrentModificationException e) {
-						final int count = ERROR_COUNTER.incrementAndGet();
-
-						if (count <= 5) {
-							LOGGER.warn("[Block Entity Render Data] Encountered CME during render region build. A mod is accessing or changing chunk data outside the main thread. Retrying.", e);
-
-							if (count == 5) {
-								LOGGER.info("[Block Entity Render Data] Subsequent exceptions will be suppressed.");
-							}
-						}
+					if (count == 5) {
+						LOGGER.info("[Block Entity Render Data] Subsequent exceptions will be suppressed.");
 					}
 				}
 			}
 		}
+	}
+
+	@Inject(method = "createRegion", at = @At(value = "RETURN", ordinal = 1))
+	private void createDataMap(Level world, SectionPos chunkSectionPos, CallbackInfoReturnable<RenderChunkRegion> cir, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef) {
+		RenderChunkRegion rendererRegion = cir.getReturnValue();
+		Long2ObjectOpenHashMap<Object> map = mapRef.get();
 
 		if (map != null) {
 			((RenderDataMapConsumer) rendererRegion).fabric_acceptRenderDataMap(map);
@@ -86,13 +82,18 @@ public abstract class ChunkRendererRegionBuilderMixin {
 	}
 
 	@Unique
-	private static Long2ObjectOpenHashMap<Object> mapChunk(LevelChunk chunk, BlockPos posFrom, BlockPos posTo, Long2ObjectOpenHashMap<Object> map) {
-		final int xMin = posFrom.getX();
-		final int xMax = posTo.getX();
-		final int yMin = posFrom.getY();
-		final int yMax = posTo.getY();
-		final int zMin = posFrom.getZ();
-		final int zMax = posTo.getZ();
+	private static Long2ObjectOpenHashMap<Object> mapChunk(LevelChunk chunk, SectionPos chunkSectionPos, Long2ObjectOpenHashMap<Object> map) {
+		// Skip the math below if the chunk contains no block entities
+		if (chunk.getBlockEntities().isEmpty()) {
+			return map;
+		}
+
+		final int xMin = SectionPos.sectionToBlockCoord(chunkSectionPos.x() - 1);
+		final int yMin = SectionPos.sectionToBlockCoord(chunkSectionPos.y() - 1);
+		final int zMin = SectionPos.sectionToBlockCoord(chunkSectionPos.z() - 1);
+		final int xMax = SectionPos.sectionToBlockCoord(chunkSectionPos.x() + 1);
+		final int yMax = SectionPos.sectionToBlockCoord(chunkSectionPos.y() + 1);
+		final int zMax = SectionPos.sectionToBlockCoord(chunkSectionPos.z() + 1);
 
 		for (Map.Entry<BlockPos, BlockEntity> entry : chunk.getBlockEntities().entrySet()) {
 			final BlockPos pos = entry.getKey();

@@ -217,7 +217,7 @@ public final class ServerConfigurationNetworking {
 		Objects.requireNonNull(payload, "Payload cannot be null");
 		Objects.requireNonNull(payload.type(), "CustomPayload#getId() cannot return null for payload class: " + payload.getClass());
 
-		handler.sendPacket(createS2CPacket(payload));
+		handler.send(createS2CPacket(payload));
 	}
 
 	// Helper methods

@@ -35,12 +35,12 @@ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 public final class TestBiomes {
-	public static final ResourceKey<Biome> EXAMPLE_BIOME = ResourceKey.create(Registries.BIOME, new ResourceLocation(FabricBiomeTest.MOD_ID, "example_biome"));
-	public static final ResourceKey<Biome> TEST_CRIMSON_FOREST = ResourceKey.create(Registries.BIOME, new ResourceLocation(FabricBiomeTest.MOD_ID, "test_crimson_forest"));
-	public static final ResourceKey<Biome> CUSTOM_PLAINS = ResourceKey.create(Registries.BIOME, new ResourceLocation(FabricBiomeTest.MOD_ID, "custom_plains"));
-	public static final ResourceKey<Biome> TEST_END_HIGHLANDS = ResourceKey.create(Registries.BIOME, new ResourceLocation(FabricBiomeTest.MOD_ID, "test_end_highlands"));
-	public static final ResourceKey<Biome> TEST_END_MIDLANDS = ResourceKey.create(Registries.BIOME, new ResourceLocation(FabricBiomeTest.MOD_ID, "test_end_midlands"));
-	public static final ResourceKey<Biome> TEST_END_BARRRENS = ResourceKey.create(Registries.BIOME, new ResourceLocation(FabricBiomeTest.MOD_ID, "test_end_barrens"));
+	public static final ResourceKey<Biome> EXAMPLE_BIOME = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "example_biome"));
+	public static final ResourceKey<Biome> TEST_CRIMSON_FOREST = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "test_crimson_forest"));
+	public static final ResourceKey<Biome> CUSTOM_PLAINS = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "custom_plains"));
+	public static final ResourceKey<Biome> TEST_END_HIGHLANDS = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "test_end_highlands"));
+	public static final ResourceKey<Biome> TEST_END_MIDLANDS = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "test_end_midlands"));
+	public static final ResourceKey<Biome> TEST_END_BARRRENS = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "test_end_barrens"));
 
 	private TestBiomes() {
 	}

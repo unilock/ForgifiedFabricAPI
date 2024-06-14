@@ -18,6 +18,7 @@ package net.fabricmc.fabric.test.rendering.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -63,7 +64,7 @@ public class WorldRenderEventsTests implements ClientModInitializer {
 		PoseStack matrices = context.matrixStack();
 		Vec3 camera = context.camera().getPosition();
 		Tesselator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder buffer = tessellator.getBuilder();
+		BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 
 		matrices.pushPose();
 		matrices.translate(-camera.x, -camera.y, -camera.z);
@@ -73,9 +74,8 @@ public class WorldRenderEventsTests implements ClientModInitializer {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 
-		buffer.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 		LevelRenderer.addChainedFilledBoxVertices(matrices, buffer, 0, 100, 0, 1, 101, 1, 0, 1, 0, 0.5f);
-		tessellator.end();
+		BufferUploader.drawWithShader(buffer.buildOrThrow());
 
 		matrices.popPose();
 		RenderSystem.disableBlend();

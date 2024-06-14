@@ -16,9 +16,10 @@
 
 package net.fabricmc.fabric.impl.client.indigo.renderer.render;
 
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import java.util.Set;
+import java.util.Map;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator;
 import net.minecraft.CrashReport;
@@ -27,7 +28,6 @@ import net.minecraft.ReportedException;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SectionBufferBuilderPack;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
-import net.minecraft.client.renderer.chunk.SectionRenderDispatcher.RenderSection;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -70,9 +70,9 @@ public class TerrainRenderContext extends AbstractBlockRenderContext {
 		return chunkInfo.getInitializedBuffer(layer);
 	}
 
-	public void prepare(RenderChunkRegion blockView, RenderSection chunkRenderer, RenderSection.RebuildTask.CompileResults renderData, SectionBufferBuilderPack builders, Set<RenderType> initializedLayers) {
+	public void prepare(RenderChunkRegion blockView, BlockPos chunkOrigin, SectionBufferBuilderPack builders, Map<RenderType, BufferBuilder> builderMap) {
 		blockInfo.prepareForWorld(blockView, true);
-		chunkInfo.prepare(blockView, chunkRenderer, renderData, builders, initializedLayers);
+		chunkInfo.prepare(blockView, chunkOrigin, builders, builderMap);
 	}
 
 	public void release() {
@@ -83,8 +83,8 @@ public class TerrainRenderContext extends AbstractBlockRenderContext {
 	/** Called from chunk renderer hook. */
 	public void tessellateBlock(BlockState blockState, BlockPos blockPos, final BakedModel model, PoseStack matrixStack) {
 		try {
-			Vec3 vec3d = blockState.getOffset(chunkInfo.blockView, blockPos);
-			matrixStack.translate(vec3d.x, vec3d.y, vec3d.z);
+			Vec3 offset = blockState.getOffset(chunkInfo.blockView, blockPos);
+			matrixStack.translate(offset.x, offset.y, offset.z);
 
 			this.matrix = matrixStack.last().pose();
 			this.normalMatrix = matrixStack.last().normal();

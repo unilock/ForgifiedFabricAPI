@@ -54,12 +54,12 @@ public class FabricApiLookupTest implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ResourceLocation chute = new ResourceLocation(MOD_ID, "chute");
+		ResourceLocation chute = ResourceLocation.fromNamespaceAndPath(MOD_ID, "chute");
 		Registry.register(BuiltInRegistries.BLOCK, chute, CHUTE_BLOCK);
 		Registry.register(BuiltInRegistries.ITEM, chute, CHUTE_ITEM);
 		CHUTE_BLOCK_ENTITY_TYPE = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, chute, FabricBlockEntityTypeBuilder.create(ChuteBlockEntity::new, CHUTE_BLOCK).build());
 
-		ResourceLocation cobbleGen = new ResourceLocation(MOD_ID, "cobble_gen");
+		ResourceLocation cobbleGen = ResourceLocation.fromNamespaceAndPath(MOD_ID, "cobble_gen");
 		Registry.register(BuiltInRegistries.BLOCK, cobbleGen, COBBLE_GEN_BLOCK);
 		Registry.register(BuiltInRegistries.ITEM, cobbleGen, COBBLE_GEN_ITEM);
 		COBBLE_GEN_BLOCK_ENTITY_TYPE = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, cobbleGen, FabricBlockEntityTypeBuilder.create(CobbleGenBlockEntity::new, COBBLE_GEN_BLOCK).build());
@@ -74,7 +74,7 @@ public class FabricApiLookupTest implements ModInitializer {
 		testLookupRegistry();
 		testSelfRegistration();
 
-		ResourceLocation inspector = new ResourceLocation(FabricApiLookupTest.MOD_ID, "inspector");
+		ResourceLocation inspector = ResourceLocation.fromNamespaceAndPath(FabricApiLookupTest.MOD_ID, "inspector");
 		Registry.register(BuiltInRegistries.BLOCK, inspector, INSPECTOR_BLOCK);
 		Registry.register(BuiltInRegistries.ITEM, inspector, INSPECTOR_ITEM);
 
@@ -83,18 +83,18 @@ public class FabricApiLookupTest implements ModInitializer {
 	}
 
 	private static void testLookupRegistry() {
-		BlockApiLookup<ItemInsertable, @NotNull Direction> insertable2 = BlockApiLookup.get(new ResourceLocation("testmod:item_insertable"), ItemInsertable.class, Direction.class);
+		BlockApiLookup<ItemInsertable, @NotNull Direction> insertable2 = BlockApiLookup.get(ResourceLocation.fromNamespaceAndPath("testmod", "item_insertable"), ItemInsertable.class, Direction.class);
 
 		if (insertable2 != ItemApis.INSERTABLE) {
 			throw new AssertionError("The registry should have returned the same instance.");
 		}
 
 		ensureException(() -> {
-			BlockApiLookup<Void, Void> wrongInsertable = BlockApiLookup.get(new ResourceLocation("testmod:item_insertable"), Void.class, Void.class);
+			BlockApiLookup<Void, Void> wrongInsertable = BlockApiLookup.get(ResourceLocation.fromNamespaceAndPath("testmod", "item_insertable"), Void.class, Void.class);
 			wrongInsertable.registerFallback((world, pos, state, be, nocontext) -> null);
 		}, "The registry should have prevented creation of another instance with different classes, but same id.");
 
-		if (!insertable2.getId().equals(new ResourceLocation("testmod:item_insertable"))) {
+		if (!insertable2.getId().equals(ResourceLocation.fromNamespaceAndPath("testmod", "item_insertable"))) {
 			throw new AssertionError("Incorrect identifier was returned.");
 		}
 

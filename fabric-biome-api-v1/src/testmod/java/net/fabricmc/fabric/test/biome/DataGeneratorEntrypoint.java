@@ -42,19 +42,19 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 public class DataGeneratorEntrypoint implements net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint {
 	public static final ResourceKey<ConfiguredFeature<?, ?>> COMMON_DESERT_WELL = ResourceKey.create(
 			Registries.CONFIGURED_FEATURE,
-			new ResourceLocation(FabricBiomeTest.MOD_ID, "fab_desert_well")
+			ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "fab_desert_well")
 	);
 	public static final ResourceKey<PlacedFeature> PLACED_COMMON_DESERT_WELL = ResourceKey.create(
 			Registries.PLACED_FEATURE,
-			new ResourceLocation(FabricBiomeTest.MOD_ID, "fab_desert_well")
+			ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "fab_desert_well")
 	);
 	public static final ResourceKey<ConfiguredFeature<?, ?>> COMMON_ORE = ResourceKey.create(
 			Registries.CONFIGURED_FEATURE,
-			new ResourceLocation(FabricBiomeTest.MOD_ID, "common_ore")
+			ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "common_ore")
 	);
 	public static final ResourceKey<PlacedFeature> PLACED_COMMON_ORE = ResourceKey.create(
 			Registries.PLACED_FEATURE,
-			new ResourceLocation(FabricBiomeTest.MOD_ID, "common_ore")
+			ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "common_ore")
 	);
 
 	@Override

@@ -29,8 +29,8 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public class RiverstoneUnbakedModel implements UnbakedModel {
-	private static final ResourceLocation STONE_MODEL_ID = new ResourceLocation("block/stone");
-	private static final ResourceLocation GOLD_BLOCK_MODEL_ID = new ResourceLocation("block/gold_block");
+	private static final ResourceLocation STONE_MODEL_ID = ResourceLocation.withDefaultNamespace("block/stone");
+	private static final ResourceLocation GOLD_BLOCK_MODEL_ID = ResourceLocation.withDefaultNamespace("block/gold_block");
 
 	@Override
 	public Collection<ResourceLocation> getDependencies() {
@@ -43,7 +43,7 @@ public class RiverstoneUnbakedModel implements UnbakedModel {
 
 	@Nullable
 	@Override
-	public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId) {
+	public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer) {
 		BakedModel stoneModel = baker.bake(STONE_MODEL_ID, rotationContainer);
 		BakedModel goldBlockModel = baker.bake(GOLD_BLOCK_MODEL_ID, rotationContainer);
 		return new RiverstoneBakedModel(stoneModel, goldBlockModel);

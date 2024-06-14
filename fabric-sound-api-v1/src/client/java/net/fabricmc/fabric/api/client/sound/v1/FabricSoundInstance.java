@@ -34,7 +34,7 @@ public interface FabricSoundInstance {
 	 *
 	 * @see #getAudioStream(SoundBufferLibrary, ResourceLocation, boolean)
 	 */
-	ResourceLocation EMPTY_SOUND = new ResourceLocation("fabric-sound-api-v1", "empty");
+	ResourceLocation EMPTY_SOUND = ResourceLocation.fromNamespaceAndPath("fabric-sound-api-v1", "empty");
 
 	/**
 	 * Loads the audio stream for this sound.
@@ -67,7 +67,7 @@ public interface FabricSoundInstance {
 	 * class CustomSound extends AbstractSoundInstance {
 	 *     CustomSound() {
 	 *         // Use the sound defined in sounds.json
-	 *         super(new Identifier("mod_id", "custom_sound"), SoundCategory.BLOCKS, SoundInstance.createRandom());
+	 *         super(Identifier.of("mod_id", "custom_sound"), SoundCategory.BLOCKS, SoundInstance.createRandom());
 	 *     }
 	 *
 	 *     @Override

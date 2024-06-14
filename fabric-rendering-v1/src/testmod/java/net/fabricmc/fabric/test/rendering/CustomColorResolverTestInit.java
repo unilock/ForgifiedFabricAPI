@@ -31,7 +31,7 @@ public class CustomColorResolverTestInit implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation("fabric-rendering-v1-testmod", "custom_color_block"), CUSTOM_COLOR_BLOCK);
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-rendering-v1-testmod", "custom_color_block"), CUSTOM_COLOR_BLOCK_ITEM);
+		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath("fabric-rendering-v1-testmod", "custom_color_block"), CUSTOM_COLOR_BLOCK);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-rendering-v1-testmod", "custom_color_block"), CUSTOM_COLOR_BLOCK_ITEM);
 	}
 }

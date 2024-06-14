@@ -27,6 +27,6 @@ public class CustomAtlasSourcesTestInit implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-rendering-v1-testmod", "double_iron_ingot"), DOUBLE_IRON_INGOT);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-rendering-v1-testmod", "double_iron_ingot"), DOUBLE_IRON_INGOT);
 	}
 }

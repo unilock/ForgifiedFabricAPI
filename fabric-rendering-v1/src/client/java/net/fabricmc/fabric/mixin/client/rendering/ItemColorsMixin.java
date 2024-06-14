@@ -35,7 +35,7 @@ import net.fabricmc.fabric.impl.client.rendering.ColorProviderRegistryImpl;
 public class ItemColorsMixin implements ColorProviderRegistryImpl.ColorMapperHolder<ItemLike, ItemColor> {
 	@Shadow
 	@Final
-	private IdMapper<ItemColor> providers;
+	private IdMapper<ItemColor> itemColors;
 
 	@Inject(method = "createDefault", at = @At("RETURN"))
 	private static void create(BlockColors blockMap, CallbackInfoReturnable<ItemColors> info) {
@@ -44,6 +44,6 @@ public class ItemColorsMixin implements ColorProviderRegistryImpl.ColorMapperHol
 
 	@Override
 	public ItemColor get(ItemLike item) {
-		return providers.byId(BuiltInRegistries.ITEM.getId(item.asItem()));
+		return itemColors.byId(BuiltInRegistries.ITEM.getId(item.asItem()));
 	}
 }

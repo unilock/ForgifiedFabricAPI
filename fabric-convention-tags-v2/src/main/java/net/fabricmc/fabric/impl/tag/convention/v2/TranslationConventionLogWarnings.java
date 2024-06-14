@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.locale.Language;
@@ -42,7 +43,8 @@ public class TranslationConventionLogWarnings implements ModInitializer {
 	private static final LogWarningMode LOG_UNTRANSLATED_WARNING_MODE = setupLogWarningModeProperty();
 
 	private static LogWarningMode setupLogWarningModeProperty() {
-		String property = System.getProperty("fabric-tag-conventions-v2.missingTagTranslationWarning", LogWarningMode.SHORT.name()).toUpperCase(Locale.ROOT);
+		final LogWarningMode defaultMode = FabricLoader.getInstance().isDevelopmentEnvironment() ? LogWarningMode.SHORT : LogWarningMode.SILENCED;
+		String property = System.getProperty("fabric-tag-conventions-v2.missingTagTranslationWarning", defaultMode.name()).toUpperCase(Locale.ROOT);
 
 		try {
 			return LogWarningMode.valueOf(property);
@@ -55,7 +57,12 @@ public class TranslationConventionLogWarnings implements ModInitializer {
 	private enum LogWarningMode {
 		SILENCED,
 		SHORT,
-		VERBOSE
+		VERBOSE,
+		FAIL;
+
+		boolean verbose() {
+			return this == VERBOSE || this == FAIL;
+		}
 	}
 
 	public void onInitialize() {
@@ -95,9 +102,7 @@ public class TranslationConventionLogWarnings implements ModInitializer {
 					""");
 
 			// Print out all untranslated tags when desired.
-			boolean isConfigSetToVerbose = LOG_UNTRANSLATED_WARNING_MODE == LogWarningMode.VERBOSE;
-
-			if (isConfigSetToVerbose) {
+			if (LOG_UNTRANSLATED_WARNING_MODE.verbose()) {
 				stringBuilder.append("\nUntranslated item tags:");
 
 				for (TagKey<Item> tagKey : untranslatedItemTags) {
@@ -106,6 +111,10 @@ public class TranslationConventionLogWarnings implements ModInitializer {
 			}
 
 			LOGGER.warn(stringBuilder.toString());
+
+			if (LOG_UNTRANSLATED_WARNING_MODE == LogWarningMode.FAIL) {
+				throw new RuntimeException("Tag translation validation failed");
+			}
 		});
 	}
 }

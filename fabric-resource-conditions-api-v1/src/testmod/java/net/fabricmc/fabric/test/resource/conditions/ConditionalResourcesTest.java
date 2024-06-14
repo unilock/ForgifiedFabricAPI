@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.test.resource.conditions;
 
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -24,13 +25,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 public class ConditionalResourcesTest {
 	private static final String MOD_ID = "fabric-resource-conditions-api-v1-testmod";
 
 	private static ResourceLocation id(String path) {
-		return new ResourceLocation(MOD_ID, path);
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
 	}
 
 	@GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
@@ -99,6 +101,21 @@ public class ConditionalResourcesTest {
 
 		if (registries.getLootTable(ResourceKey.create(Registries.LOOT_TABLE, id("blocks/not_loaded"))) != LootTable.EMPTY) {
 			throw new AssertionError("not_loaded loot table should not have been loaded.");
+		}
+
+		context.succeed();
+	}
+
+	@GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+	public void conditionalDynamicRegistry(GameTestHelper context) {
+		Registry<BannerPattern> registry = context.getLevel().registryAccess().registryOrThrow(Registries.BANNER_PATTERN);
+
+		if (registry.get(id("loaded")) == null) {
+			throw new AssertionError("loaded banner pattern should have been loaded.");
+		}
+
+		if (registry.get(id("not_loaded")) != null) {
+			throw new AssertionError("not_loaded banner pattern should not have been loaded.");
 		}
 
 		context.succeed();

@@ -44,10 +44,10 @@ public class TransferTestInitializer implements ModInitializer {
 		registerBlock(INFINITE_WATER_SOURCE, "infinite_water_source");
 		registerBlock(INFINITE_LAVA_SOURCE, "infinite_lava_source");
 		registerBlock(FLUID_CHUTE, "fluid_chute");
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(MOD_ID, "extract_stick"), EXTRACT_STICK);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "extract_stick"), EXTRACT_STICK);
 
 		FLUID_CHUTE_TYPE = FabricBlockEntityTypeBuilder.create(FluidChuteBlockEntity::new, FLUID_CHUTE).build();
-		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, new ResourceLocation(MOD_ID, "fluid_chute"), FLUID_CHUTE_TYPE);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, "fluid_chute"), FLUID_CHUTE_TYPE);
 
 		FluidStorage.SIDED.registerForBlocks((world, pos, state, be, direction) -> CreativeStorage.WATER, INFINITE_WATER_SOURCE);
 		FluidStorage.SIDED.registerForBlocks((world, pos, state, be, direction) -> CreativeStorage.LAVA, INFINITE_LAVA_SOURCE);
@@ -59,7 +59,7 @@ public class TransferTestInitializer implements ModInitializer {
 	}
 
 	private static void registerBlock(Block block, String name) {
-		ResourceLocation id = new ResourceLocation(MOD_ID, name);
+		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
 		Registry.register(BuiltInRegistries.BLOCK, id, block);
 		Registry.register(BuiltInRegistries.ITEM, id, new BlockItem(block, new Item.Properties()));
 	}

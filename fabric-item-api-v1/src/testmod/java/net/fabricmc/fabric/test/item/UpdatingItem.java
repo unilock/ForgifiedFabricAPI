@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.test.item;
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -29,13 +31,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class UpdatingItem extends Item {
+	private static final ResourceLocation PLUS_FIVE_ID = ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod", "plus_five");
 	private static final AttributeModifier PLUS_FIVE = new AttributeModifier(
-			BASE_ATTACK_DAMAGE_UUID, "updating item", 5, AttributeModifier.Operation.ADD_VALUE);
+			PLUS_FIVE_ID, 5, AttributeModifier.Operation.ADD_VALUE);
 
 	private final boolean allowUpdateAnimation;
 
 	public UpdatingItem(boolean allowUpdateAnimation) {
-		super(new Properties());
+		super(new Properties()
+					.component(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.builder()
+						.add(Attributes.GENERIC_ATTACK_DAMAGE, PLUS_FIVE, EquipmentSlotGroup.MAINHAND)
+						.build()
+					)
+		);
 		this.allowUpdateAnimation = allowUpdateAnimation;
 	}
 
@@ -59,14 +67,6 @@ public class UpdatingItem extends Item {
 	// True for 15 seconds every 30 seconds
 	private boolean isEnabled(ItemStack stack) {
 		return !stack.has(ItemUpdateAnimationTest.TICKS) || stack.getOrDefault(ItemUpdateAnimationTest.TICKS, 0) % 600 < 300;
-	}
-
-	@Override
-	public ItemAttributeModifiers getAttributeModifiers(ItemStack stack) {
-		// Give + 5 attack damage for 15 seconds every 30 seconds.
-		return ItemAttributeModifiers.builder()
-				.add(Attributes.ATTACK_DAMAGE, PLUS_FIVE, EquipmentSlotGroup.MAINHAND)
-				.build();
 	}
 
 	@Override

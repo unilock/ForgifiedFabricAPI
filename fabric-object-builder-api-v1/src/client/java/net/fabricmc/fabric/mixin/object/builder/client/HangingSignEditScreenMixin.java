@@ -16,13 +16,14 @@
 
 package net.fabricmc.fabric.mixin.object.builder.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.client.gui.screens.inventory.HangingSignEditScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(HangingSignEditScreen.class)
 public abstract class HangingSignEditScreenMixin extends AbstractSignEditScreen {
@@ -30,13 +31,13 @@ public abstract class HangingSignEditScreenMixin extends AbstractSignEditScreen 
 		super(blockEntity, filtered, bl);
 	}
 
-	@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/ResourceLocation;<init>(Ljava/lang/String;)V"))
-	private String init(String id) {
+	@WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/ResourceLocation;withDefaultNamespace(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;"))
+	private ResourceLocation init(String id, Operation<ResourceLocation> original) {
 		if (woodType.name().indexOf(ResourceLocation.NAMESPACE_SEPARATOR) != -1) {
-			ResourceLocation identifier = new ResourceLocation(woodType.name());
-			return identifier.getNamespace() + ":textures/gui/hanging_signs/" + identifier.getPath() + ".png";
+			ResourceLocation identifier = ResourceLocation.parse(woodType.name());
+			return identifier.withPath(path -> "textures/gui/hanging_signs/" + path + ".png");
 		}
 
-		return id;
+		return original.call(id);
 	}
 }

@@ -112,21 +112,20 @@ abstract class AbstractRenderContext implements RenderContext {
 		for (int i = 0; i < 4; i++) {
 			posVec.set(quad.x(i), quad.y(i), quad.z(i), 1.0f);
 			posVec.mul(matrix);
-			vertexConsumer.vertex(posVec.x(), posVec.y(), posVec.z());
+			vertexConsumer.addVertex(posVec.x(), posVec.y(), posVec.z());
 
 			final int color = quad.color(i);
-			vertexConsumer.color((color >>> 16) & 0xFF, (color >>> 8) & 0xFF, color & 0xFF, (color >>> 24) & 0xFF);
-			vertexConsumer.uv(quad.u(i), quad.v(i));
-			vertexConsumer.overlayCoords(overlay);
-			vertexConsumer.uv2(quad.lightmap(i));
+			vertexConsumer.setColor((color >>> 16) & 0xFF, (color >>> 8) & 0xFF, color & 0xFF, (color >>> 24) & 0xFF);
+			vertexConsumer.setUv(quad.u(i), quad.v(i));
+			vertexConsumer.setOverlay(overlay);
+			vertexConsumer.setLight(quad.lightmap(i));
 
 			if (useNormals) {
 				quad.copyNormal(i, normalVec);
 				normalVec.mul(normalMatrix);
 			}
 
-			vertexConsumer.normal(normalVec.x(), normalVec.y(), normalVec.z());
-			vertexConsumer.endVertex();
+			vertexConsumer.setNormal(normalVec.x(), normalVec.y(), normalVec.z());
 		}
 	}
 }

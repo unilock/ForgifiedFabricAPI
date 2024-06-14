@@ -23,7 +23,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
@@ -41,7 +40,7 @@ public final class DelegatingUnbakedModel implements UnbakedModel {
 	/**
 	 * Constructs a new delegating model.
 	 *
-	 * @param delegate The identifier (can be a {@link ModelResourceLocation}) of the underlying baked model.
+	 * @param delegate The identifier of the underlying baked model.
 	 */
 	public DelegatingUnbakedModel(ResourceLocation delegate) {
 		this.delegate = delegate;
@@ -55,11 +54,12 @@ public final class DelegatingUnbakedModel implements UnbakedModel {
 
 	@Override
 	public void resolveParents(Function<ResourceLocation, UnbakedModel> modelLoader) {
+		modelLoader.apply(delegate).resolveParents(modelLoader);
 	}
 
-	@Nullable
 	@Override
-	public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId) {
+	@Nullable
+	public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer) {
 		return baker.bake(delegate, rotationContainer);
 	}
 }

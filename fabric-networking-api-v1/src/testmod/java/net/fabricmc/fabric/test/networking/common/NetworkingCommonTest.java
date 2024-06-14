@@ -34,8 +34,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.test.networking.NetworkingTestmods;
 
 public class NetworkingCommonTest implements ModInitializer {
-	private List<String> recievedPlay = new ArrayList<>();
-	private List<String> recievedConfig = new ArrayList<>();
+	private boolean firstLoad = true;
+	private List<String> receivedPlay = new ArrayList<>();
+	private List<String> receivedConfig = new ArrayList<>();
 
 	@Override
 	public void onInitialize() {
@@ -50,30 +51,37 @@ public class NetworkingCommonTest implements ModInitializer {
 		ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> ServerConfigurationNetworking.send(handler, new CommonPayload("configuration")));
 
 		// Store the player uuid once received from the client
-		ServerPlayNetworking.registerGlobalReceiver(CommonPayload.ID, (payload, context) -> recievedPlay.add(context.player().getStringUUID()));
-		ServerConfigurationNetworking.registerGlobalReceiver(CommonPayload.ID, (payload, context) -> recievedConfig.add(context.networkHandler().getOwner().getId().toString()));
+		ServerPlayNetworking.registerGlobalReceiver(CommonPayload.ID, (payload, context) -> receivedPlay.add(context.player().getStringUUID()));
+		ServerConfigurationNetworking.registerGlobalReceiver(CommonPayload.ID, (payload, context) -> receivedConfig.add(context.networkHandler().getOwner().getId().toString()));
 
 		// Ensure that the packets were received on the server
 		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+			if (!firstLoad) {
+				// No need to check again if the player changes dimensions
+				return;
+			}
+
+			firstLoad = false;
+
 			if (entity instanceof ServerPlayer player) {
 				final String uuid = player.getStringUUID();
 
 				// Allow a few ticks for the packets to be received
 				executeIn(world.getServer(), 50, () -> {
-					if (!recievedPlay.remove(uuid)) {
+					if (!receivedPlay.remove(uuid)) {
 						throw new IllegalStateException("Did not receive play response");
 					}
 
-					if (!recievedConfig.remove(uuid)) {
+					if (!receivedConfig.remove(uuid)) {
 						throw new IllegalStateException("Did not receive configuration response");
 					}
-				});;
+				});
 			}
 		});
 	}
 
 	// A payload registered on both sides, for play and configuration
-	// This tests that the server can send a packet to the client, and then recieve a response from the client
+	// This tests that the server can send a packet to the client, and then receive a response from the client
 	public record CommonPayload(String data) implements CustomPacketPayload {
 		public static final CustomPacketPayload.Type<CommonPayload> ID = new Type<>(NetworkingTestmods.id("common_payload"));
 		public static final StreamCodec<FriendlyByteBuf, CommonPayload> CODEC = ByteBufCodecs.STRING_UTF8.map(CommonPayload::new, CommonPayload::data).cast();

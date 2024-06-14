@@ -67,7 +67,7 @@ public class ModResourcePackCreator implements RepositorySource {
 	};
 	public static final ModResourcePackCreator CLIENT_RESOURCE_PACK_PROVIDER = new ModResourcePackCreator(PackType.CLIENT_RESOURCES);
 	/**
-	 * The maximum ammount of known data packs requested from the client, including vanilla data packs.
+	 * The maximum number of known data packs requested from the client, including vanilla data packs.
 	 */
 	public static final int MAX_KNOWN_PACKS = Integer.getInteger("fabric-resource-loader-v0:maxKnownPacks", 1024);
 

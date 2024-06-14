@@ -29,6 +29,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -111,7 +112,7 @@ public class PayloadTypeRegistryTests {
 	}
 
 	private record C2SPlayPayload(String value) implements CustomPacketPayload {
-		public static final CustomPacketPayload.Type<C2SPlayPayload> ID = CustomPacketPayload.createType("fabric:c2s_play");
+		public static final CustomPacketPayload.Type<C2SPlayPayload> ID = new Type<>(ResourceLocation.parse("fabric:c2s_play"));
 		public static final StreamCodec<RegistryFriendlyByteBuf, C2SPlayPayload> CODEC = ByteBufCodecs.STRING_UTF8.map(C2SPlayPayload::new, C2SPlayPayload::value).cast();
 
 		@Override
@@ -121,7 +122,7 @@ public class PayloadTypeRegistryTests {
 	}
 
 	private record S2CPlayPayload(String value) implements CustomPacketPayload {
-		public static final CustomPacketPayload.Type<S2CPlayPayload> ID = CustomPacketPayload.createType("fabric:s2c_play");
+		public static final CustomPacketPayload.Type<S2CPlayPayload> ID = new Type<>(ResourceLocation.parse("fabric:s2c_play"));
 		public static final StreamCodec<RegistryFriendlyByteBuf, S2CPlayPayload> CODEC = ByteBufCodecs.STRING_UTF8.map(S2CPlayPayload::new, S2CPlayPayload::value).cast();
 
 		@Override
@@ -131,7 +132,7 @@ public class PayloadTypeRegistryTests {
 	}
 
 	private record C2SConfigPayload(String value) implements CustomPacketPayload {
-		public static final CustomPacketPayload.Type<C2SConfigPayload> ID = CustomPacketPayload.createType("fabric:c2s_config");
+		public static final CustomPacketPayload.Type<C2SConfigPayload> ID = new Type<>(ResourceLocation.parse("fabric:c2s_config"));
 		public static final StreamCodec<FriendlyByteBuf, C2SConfigPayload> CODEC = ByteBufCodecs.STRING_UTF8.map(C2SConfigPayload::new, C2SConfigPayload::value).cast();
 
 		@Override
@@ -141,7 +142,7 @@ public class PayloadTypeRegistryTests {
 	}
 
 	private record S2CConfigPayload(String value) implements CustomPacketPayload {
-		public static final CustomPacketPayload.Type<S2CConfigPayload> ID = CustomPacketPayload.createType("fabric:s2c_config");
+		public static final CustomPacketPayload.Type<S2CConfigPayload> ID = new Type<>(ResourceLocation.parse("fabric:s2c_config"));
 		public static final StreamCodec<FriendlyByteBuf, S2CConfigPayload> CODEC = ByteBufCodecs.STRING_UTF8.map(S2CConfigPayload::new, S2CConfigPayload::value).cast();
 
 		@Override

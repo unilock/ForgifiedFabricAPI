@@ -16,12 +16,14 @@
 
 package net.fabricmc.fabric.test.command;
 
+import java.util.Locale;
 import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import java.util.Locale;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 public class EntitySelectorGameTest {
 	private void spawn(GameTestHelper context, float health) {
@@ -30,7 +32,7 @@ public class EntitySelectorGameTest {
 		entity.setHealth(health);
 	}
 
-//	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE) TODO
+	@GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
 	public void testEntitySelector(GameTestHelper context) {
 		BlockPos absolute = context.absolutePos(BlockPos.ZERO);
 

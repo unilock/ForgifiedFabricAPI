@@ -25,6 +25,6 @@ public final class ObjectBuilderTestConstants {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static ResourceLocation id(String name) {
-		return new ResourceLocation(MOD_ID, name);
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
 	}
 }

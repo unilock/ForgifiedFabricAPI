@@ -29,7 +29,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public class PositionedScreen extends AbstractContainerScreen<AbstractContainerMenu> {
-	private static final ResourceLocation TEXTURE = new ResourceLocation("minecraft", "textures/gui/container/dispenser.png");
+	private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/container/dispenser.png");
 
 	public PositionedScreen(AbstractContainerMenu handler, Inventory inventory, Component title) {
 		super(handler, inventory, getPositionText(handler).orElse(title));

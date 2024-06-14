@@ -98,7 +98,7 @@ public interface BuiltinItemRendererRegistry {
 		 * @param matrices        the matrix stack
 		 * @param vertexConsumers the vertex consumer provider
 		 * @param light           packed lightmap coordinates
-		 * @param overlay         the overlay UV passed to {@link com.mojang.blaze3d.vertex.VertexConsumer#overlayCoords(int)}
+		 * @param overlay         the overlay UV passed to {@link com.mojang.blaze3d.vertex.VertexConsumer#setOverlay(int)}
 		 */
 		void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay);
 	}

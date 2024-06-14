@@ -31,7 +31,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.resources.ResourceLocation;
 
 public final class ScreenTests implements ClientModInitializer {
-	public static final ResourceLocation ARMOR_FULL_TEXTURE = new ResourceLocation("hud/armor_full");
+	public static final ResourceLocation ARMOR_FULL_TEXTURE = ResourceLocation.withDefaultNamespace("hud/armor_full");
 	private static final Logger LOGGER = LoggerFactory.getLogger("FabricScreenApiTests");
 
 	@Override

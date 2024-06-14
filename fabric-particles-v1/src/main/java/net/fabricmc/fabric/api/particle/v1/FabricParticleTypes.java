@@ -35,8 +35,8 @@ import com.mojang.serialization.MapCodec;
  *
  * {@literal @}Override
  * public void onInitialize() {
- *     Registry.register(Registry.PARTICLE_TYPE, new Identifier("testmod", "simple"), SIMPLE_TEST_PARTICLE);
- *     Registry.register(Registry.PARTICLE_TYPE, new Identifier("testmod", "custom"), CUSTOM_TEST_PARTICLE);
+ *     Registry.register(Registry.PARTICLE_TYPE, Identifier.of("testmod", "simple"), SIMPLE_TEST_PARTICLE);
+ *     Registry.register(Registry.PARTICLE_TYPE, Identifier.of("testmod", "custom"), CUSTOM_TEST_PARTICLE);
  * }}
  * </pre>
  * </blockquote>

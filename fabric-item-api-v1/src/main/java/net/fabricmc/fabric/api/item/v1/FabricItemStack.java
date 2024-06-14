@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.api.item.v1;
 
 import net.fabricmc.fabric.api.util.TriState;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -43,14 +44,15 @@ public interface FabricItemStack {
 	 * Determines whether this {@link ItemStack} can be enchanted with the given {@link Enchantment}.
 	 *
 	 * <p>When checking whether an enchantment can be applied to an {@link ItemStack}, use this method instead of
-	 * {@link Enchantment#canEnchant(ItemStack)}</p>
+	 * {@link Enchantment#canEnchant(ItemStack)} or {@link Enchantment#isPrimaryItem(ItemStack)}, with the appropriate
+	 * {@link EnchantingContext}.</p>
 	 *
 	 * @param enchantment the enchantment to check
 	 * @param context the context in which the enchantment is being checked
 	 * @return whether the enchantment is allowed to apply to the stack
-	 * @see FabricItem#canBeEnchantedWith(ItemStack, Enchantment, EnchantingContext)
+	 * @see FabricItem#canBeEnchantedWith(ItemStack, Holder, EnchantingContext)
 	 */
-	default boolean canBeEnchantedWith(Enchantment enchantment, EnchantingContext context) {
+	default boolean canBeEnchantedWith(Holder<Enchantment> enchantment, EnchantingContext context) {
 		TriState result = EnchantmentEvents.ALLOW_ENCHANTING.invoker().allowEnchanting(
 				enchantment,
 				(ItemStack) this,

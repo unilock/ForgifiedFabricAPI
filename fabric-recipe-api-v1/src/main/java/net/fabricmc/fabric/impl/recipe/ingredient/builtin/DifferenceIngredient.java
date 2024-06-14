@@ -72,7 +72,7 @@ public class DifferenceIngredient implements CustomIngredient {
 	}
 
 	private static class Serializer implements CustomIngredientSerializer<DifferenceIngredient> {
-		private static final ResourceLocation ID = new ResourceLocation("fabric", "difference");
+		private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("fabric", "difference");
 		private static final MapCodec<DifferenceIngredient> ALLOW_EMPTY_CODEC = createCodec(Ingredient.CODEC);
 		private static final MapCodec<DifferenceIngredient> DISALLOW_EMPTY_CODEC = createCodec(Ingredient.CODEC_NONEMPTY);
 		private static final StreamCodec<RegistryFriendlyByteBuf, DifferenceIngredient> PACKET_CODEC = StreamCodec.composite(

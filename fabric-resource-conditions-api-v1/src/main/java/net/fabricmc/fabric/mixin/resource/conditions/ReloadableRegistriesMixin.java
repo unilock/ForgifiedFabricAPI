@@ -67,7 +67,7 @@ public class ReloadableRegistriesMixin {
 
 	@Inject(method = "lambda$scheduleElementParse$3", at = @At("HEAD"), cancellable = true)
 	private static void applyConditions(LootDataType lootDataType, RegistryOps ops, WritableRegistry mutableRegistry, ResourceLocation id, JsonElement json, CallbackInfo ci) {
-		if (json.isJsonObject() && !ResourceConditionsImpl.applyResourceConditions(json.getAsJsonObject(), lootDataType.directory(), id, REGISTRY_LOOKUPS.get(ops))) {
+		if (json.isJsonObject() && !ResourceConditionsImpl.applyResourceConditions(json.getAsJsonObject(), lootDataType.registryKey().location().getPath(), id, REGISTRY_LOOKUPS.get(ops))) {
 			ci.cancel();
 		}
 	}

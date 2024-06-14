@@ -50,8 +50,8 @@ public abstract class ClientConfigurationNetworkHandlerMixin extends ClientCommo
 	}
 
 	@Inject(method = "handleConfigurationFinished", at = @At(value = "NEW", target = "(Lnet/minecraft/client/Minecraft;Lnet/minecraft/network/Connection;Lnet/minecraft/client/multiplayer/CommonListenerCookie;)Lnet/minecraft/client/multiplayer/ClientPacketListener;"))
-	public void onReady(ClientboundFinishConfigurationPacket packet, CallbackInfo ci) {
-		this.addon.handleReady();
+	public void handleComplete(ClientboundFinishConfigurationPacket packet, CallbackInfo ci) {
+		this.addon.handleComplete();
 	}
 
 	@Override

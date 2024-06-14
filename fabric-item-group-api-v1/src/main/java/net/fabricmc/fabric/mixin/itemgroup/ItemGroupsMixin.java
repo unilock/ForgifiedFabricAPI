@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
+import net.fabricmc.fabric.impl.itemgroup.FabricItemGroupImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -50,7 +50,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 @Mixin(CreativeModeTabs.class)
 public class ItemGroupsMixin {
 	@Unique
-	private static final int TABS_PER_PAGE = FabricItemGroup.TABS_PER_PAGE;
+	private static final int TABS_PER_PAGE = FabricItemGroupImpl.TABS_PER_PAGE;
 
 	@Inject(method = "validate", at = @At("HEAD"), cancellable = true)
 	private static void deferDuplicateCheck(CallbackInfo ci) {
@@ -84,16 +84,16 @@ public class ItemGroupsMixin {
 
 		for (Holder.Reference<CreativeModeTab> reference : sortedItemGroups) {
 			final CreativeModeTab itemGroup = reference.value();
-			final FabricItemGroup fabricItemGroup = (FabricItemGroup) itemGroup;
+			final FabricItemGroupImpl fabricItemGroup = (FabricItemGroupImpl) itemGroup;
 
 			if (vanillaGroups.contains(reference.key())) {
 				// Vanilla group goes on the first page.
-				fabricItemGroup.setPage(0);
+				fabricItemGroup.fabric_setPage(0);
 				continue;
 			}
 
 			final ItemGroupAccessor itemGroupAccessor = (ItemGroupAccessor) itemGroup;
-			fabricItemGroup.setPage((count / TABS_PER_PAGE) + 1);
+			fabricItemGroup.fabric_setPage((count / TABS_PER_PAGE) + 1);
 			int pageIndex = count % TABS_PER_PAGE;
 			CreativeModeTab.Row row = pageIndex < (TABS_PER_PAGE / 2) ? CreativeModeTab.Row.TOP : CreativeModeTab.Row.BOTTOM;
 			itemGroupAccessor.setRow(row);
@@ -108,9 +108,9 @@ public class ItemGroupsMixin {
 
 		for (ResourceKey<CreativeModeTab> registryKey : BuiltInRegistries.CREATIVE_MODE_TAB.registryKeySet()) {
 			final CreativeModeTab itemGroup = BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(registryKey);
-			final FabricItemGroup fabricItemGroup = (FabricItemGroup) itemGroup;
+			final FabricItemGroupImpl fabricItemGroup = (FabricItemGroupImpl) itemGroup;
 			final String displayName = itemGroup.getDisplayName().getString();
-			final var position = new ItemGroupPosition(itemGroup.row(), itemGroup.column(), fabricItemGroup.getPage());
+			final var position = new ItemGroupPosition(itemGroup.row(), itemGroup.column(), fabricItemGroup.fabric_getPage());
 			final String existingName = map.put(position, displayName);
 
 			if (existingName != null) {

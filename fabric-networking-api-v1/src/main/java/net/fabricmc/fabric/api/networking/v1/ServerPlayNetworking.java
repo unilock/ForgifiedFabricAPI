@@ -287,7 +287,7 @@ public final class ServerPlayNetworking {
 		Objects.requireNonNull(payload, "Payload cannot be null");
 		Objects.requireNonNull(payload.type(), "CustomPayload#getId() cannot return null for payload class: " + payload.getClass());
 
-		player.connection.sendPacket(createS2CPacket(payload));
+		player.connection.send(createS2CPacket(payload));
 	}
 
 	private ServerPlayNetworking() {

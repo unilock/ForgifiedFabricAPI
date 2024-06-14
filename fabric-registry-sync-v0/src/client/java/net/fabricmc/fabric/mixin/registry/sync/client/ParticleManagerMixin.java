@@ -34,10 +34,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 public class ParticleManagerMixin {
 	@Final
 	@Shadow
-	private Int2ObjectMap<ParticleProvider<?>> factories;
+	private Int2ObjectMap<ParticleProvider<?>> providers;
 
 	@Inject(method = "<init>", at = @At("RETURN"))
 	public void onInit(ClientLevel world, TextureManager textureManager, CallbackInfo info) {
-		Int2ObjectMapTracker.register(BuiltInRegistries.PARTICLE_TYPE, "ParticleManager.factories", factories);
+		Int2ObjectMapTracker.register(BuiltInRegistries.PARTICLE_TYPE, "ParticleManager.factories", providers);
 	}
 }

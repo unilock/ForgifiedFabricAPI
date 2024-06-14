@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.test.item.gametest;
 
-import java.util.Objects;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.fabric.test.item.CustomDamageTest;
 import net.minecraft.core.BlockPos;
@@ -35,7 +34,7 @@ public class FurnaceGameTest implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void basicSmelt(GameTestHelper context) {
 		context.setBlock(POS, Blocks.FURNACE);
-		FurnaceBlockEntity blockEntity = (FurnaceBlockEntity) Objects.requireNonNull(context.getBlockEntity(POS));
+		FurnaceBlockEntity blockEntity = context.getBlockEntity(POS);
 
 		setInputs(blockEntity, new ItemStack(Blocks.COBBLESTONE, 8), new ItemStack(Items.COAL, 2));
 
@@ -57,7 +56,7 @@ public class FurnaceGameTest implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void vanillaRemainderTest(GameTestHelper context) {
 		context.setBlock(POS, Blocks.FURNACE);
-		FurnaceBlockEntity blockEntity = (FurnaceBlockEntity) Objects.requireNonNull(context.getBlockEntity(POS));
+		FurnaceBlockEntity blockEntity = context.getBlockEntity(POS);
 
 		setInputs(blockEntity, new ItemStack(Blocks.COBBLESTONE, 64), new ItemStack(Items.LAVA_BUCKET));
 
@@ -73,7 +72,7 @@ public class FurnaceGameTest implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void fabricRemainderTest(GameTestHelper context) {
 		context.setBlock(POS, Blocks.FURNACE);
-		FurnaceBlockEntity blockEntity = (FurnaceBlockEntity) Objects.requireNonNull(context.getBlockEntity(POS));
+		FurnaceBlockEntity blockEntity = context.getBlockEntity(POS);
 
 		setInputs(blockEntity, new ItemStack(Blocks.COBBLESTONE, 32), new ItemStack(CustomDamageTest.WEIRD_PICK));
 

@@ -58,7 +58,7 @@ public final class DynamicRegistriesImpl {
 			throw new IllegalArgumentException("Dynamic registry " + key + " has already been registered!");
 		}
 
-		var entry = new RegistryDataLoader.RegistryData<>(key, codec);
+		var entry = new RegistryDataLoader.RegistryData<>(key, codec, false);
 		DYNAMIC_REGISTRIES.add(entry);
 		FABRIC_DYNAMIC_REGISTRY_KEYS.add(key);
 		return entry;
@@ -73,7 +73,7 @@ public final class DynamicRegistriesImpl {
 			RegistryDataLoader.SYNCHRONIZED_REGISTRIES = new ArrayList<>(RegistryDataLoader.SYNCHRONIZED_REGISTRIES);
 		}
 
-		RegistryDataLoader.SYNCHRONIZED_REGISTRIES.add(new RegistryDataLoader.RegistryData<>(key, networkCodec));
+		RegistryDataLoader.SYNCHRONIZED_REGISTRIES.add(new RegistryDataLoader.RegistryData<>(key, networkCodec, false));
 
 		if (!(RegistrySynchronization.NETWORKABLE_REGISTRIES instanceof HashSet<ResourceKey<? extends Registry<?>>>)) {
 			RegistrySynchronization.NETWORKABLE_REGISTRIES = new HashSet<>(RegistrySynchronization.NETWORKABLE_REGISTRIES);

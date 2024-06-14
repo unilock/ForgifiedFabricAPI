@@ -27,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
 
 class SineSound extends AbstractSoundInstance {
 	SineSound(Vec3 pos) {
-		super(new ResourceLocation(ClientSoundTest.MOD_ID, "sine_wave"), SoundSource.BLOCKS, SoundInstance.createUnseededRandom());
+		super(ResourceLocation.fromNamespaceAndPath(ClientSoundTest.MOD_ID, "sine_wave"), SoundSource.BLOCKS, SoundInstance.createUnseededRandom());
 		x = pos.x;
 		y = pos.y;
 		z = pos.z;

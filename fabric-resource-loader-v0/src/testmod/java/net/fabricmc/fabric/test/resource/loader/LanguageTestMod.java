@@ -18,13 +18,11 @@ package net.fabricmc.fabric.test.resource.loader;
 
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 public class LanguageTestMod implements DedicatedServerModInitializer {
 	@Override
 	public void onInitializeServer() {
-		NeoForge.EVENT_BUS.addListener(ServerStartingEvent.class, ev -> testTranslationLoaded());
+		testTranslationLoaded();
 	}
 
 	private static void testTranslationLoaded() {

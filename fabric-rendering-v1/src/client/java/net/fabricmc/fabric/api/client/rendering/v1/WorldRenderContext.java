@@ -19,6 +19,7 @@ package net.fabricmc.fabric.api.client.rendering.v1;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -50,9 +51,7 @@ public interface WorldRenderContext {
 	@Nullable
 	PoseStack matrixStack();
 
-	float tickDelta();
-
-	long limitTime();
+	DeltaTracker tickCounter();
 
 	boolean blockOutlines();
 

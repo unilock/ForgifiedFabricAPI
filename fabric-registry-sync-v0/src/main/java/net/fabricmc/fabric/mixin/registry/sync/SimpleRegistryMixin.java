@@ -297,8 +297,10 @@ public abstract class SimpleRegistryMixin<T> implements WritableRegistry<T>, Rem
 		for (int i = 0; i < byId.size(); i++) {
 			Holder.Reference<T> reference = byId.get(i);
 
-			// Unused id, skip
-			if (reference == null) continue;
+			// Unused id, can happen if there are holes in the registry.
+			if (reference == null) {
+				throw new RemapException("Unused id " + i + " in registry " + key().location());
+			}
 
 			ResourceLocation id = reference.key().location();
 

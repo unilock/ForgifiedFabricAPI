@@ -27,22 +27,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.fabricmc.fabric.api.networking.v1.FabricServerConfigurationNetworkHandler;
-import net.fabricmc.fabric.impl.networking.DisconnectPacketSource;
 import net.fabricmc.fabric.impl.networking.NetworkHandlerExtensions;
 import net.fabricmc.fabric.impl.networking.server.ServerConfigurationNetworkAddon;
 
 // We want to apply a bit earlier than other mods which may not use us in order to prevent refCount issues
 @Mixin(value = ServerConfigurationPacketListenerImpl.class, priority = 900)
-public abstract class ServerConfigurationNetworkHandlerMixin extends ServerCommonPacketListenerImpl implements NetworkHandlerExtensions, DisconnectPacketSource, FabricServerConfigurationNetworkHandler {
+public abstract class ServerConfigurationNetworkHandlerMixin extends ServerCommonPacketListenerImpl implements NetworkHandlerExtensions, FabricServerConfigurationNetworkHandler {
 	@Shadow
 	@Nullable
 	private ConfigurationTask currentTask;
@@ -132,7 +128,7 @@ public abstract class ServerConfigurationNetworkHandlerMixin extends ServerCommo
 
 		if (task != null) {
 			this.currentTask = task;
-			task.start(this::sendPacket);
+			task.start(this::send);
 			return true;
 		}
 
@@ -142,11 +138,6 @@ public abstract class ServerConfigurationNetworkHandlerMixin extends ServerCommo
 	@Override
 	public ServerConfigurationNetworkAddon getAddon() {
 		return addon;
-	}
-
-	@Override
-	public Packet<?> createDisconnectPacket(Component message) {
-		return new ClientboundDisconnectPacket(message);
 	}
 
 	@Override

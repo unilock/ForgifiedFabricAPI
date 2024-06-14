@@ -32,11 +32,11 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public class ArmorKnockbackResistanceTest implements ModInitializer {
-	private static final Holder<ArmorMaterial> WOOD_ARMOR = Registry.registerForHolder(BuiltInRegistries.ARMOR_MATERIAL, new ResourceLocation("fabric-item-api-v1-testmod", "wood"), createTestArmorMaterial());
+	private static final Holder<ArmorMaterial> WOOD_ARMOR = Registry.registerForHolder(BuiltInRegistries.ARMOR_MATERIAL, ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod", "wood"), createTestArmorMaterial());
 
 	@Override
 	public void onInitialize() {
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-item-api-v1-testmod",
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod",
 				"wooden_boots"), new ArmorItem(WOOD_ARMOR, ArmorItem.Type.BOOTS, new Item.Properties()));
 	}
 
@@ -49,9 +49,9 @@ public class ArmorKnockbackResistanceTest implements ModInitializer {
 			map.put(ArmorItem.Type.BODY, 3);
 		}),
 			0,
-			SoundEvents.ARMOR_EQUIP_LEATHER,
+			SoundEvents.ITEM_ARMOR_EQUIP_LEATHER,
 				() -> Ingredient.of(Items.LEATHER),
-			List.of(new ArmorMaterial.Layer(new ResourceLocation("fabric-item-api-v1-testmod", "wood"))),
+			List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod", "wood"))),
 			0,
 			0.5F
 		);

@@ -18,13 +18,14 @@ package net.fabricmc.fabric.mixin.client.message;
 
 import java.time.Instant;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.authlib.GameProfile;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
@@ -65,17 +66,13 @@ public abstract class MessageHandlerMixin {
 	}
 
 	@Inject(method = "handleSystemMessage", at = @At("HEAD"), cancellable = true)
-	private void fabric_allowGameMessage(Component message, boolean overlay, CallbackInfo ci) {
-		if (!ClientReceiveMessageEvents.ALLOW_GAME.invoker().allowReceiveGameMessage(message, overlay)) {
-			ClientReceiveMessageEvents.GAME_CANCELED.invoker().onReceiveGameMessageCanceled(message, overlay);
+	private void fabric_allowGameMessage(Component _message, boolean overlay, CallbackInfo ci, @Local(argsOnly = true) LocalRef<Component> message) {
+		if (ClientReceiveMessageEvents.ALLOW_GAME.invoker().allowReceiveGameMessage(message.get(), overlay)) {
+			message.set(ClientReceiveMessageEvents.MODIFY_GAME.invoker().modifyReceivedGameMessage(message.get(), overlay));
+			ClientReceiveMessageEvents.GAME.invoker().onReceiveGameMessage(message.get(), overlay);
+		} else {
+			ClientReceiveMessageEvents.GAME_CANCELED.invoker().onReceiveGameMessageCanceled(message.get(), overlay);
 			ci.cancel();
 		}
-	}
-
-	@ModifyVariable(method = "handleSystemMessage", at = @At(value = "LOAD", ordinal = 0), ordinal = 0, argsOnly = true)
-	private Component fabric_modifyGameMessage(Component message, Component message1, boolean overlay) {
-		message = ClientReceiveMessageEvents.MODIFY_GAME.invoker().modifyReceivedGameMessage(message, overlay);
-		ClientReceiveMessageEvents.GAME.invoker().onReceiveGameMessage(message, overlay);
-		return message;
 	}
 }

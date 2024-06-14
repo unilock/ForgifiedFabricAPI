@@ -36,16 +36,16 @@ public class TexturedRenderLayersMixin {
 	@Inject(method = "createSignMaterial", at = @At("HEAD"), cancellable = true)
 	private static void modifyTextureId(WoodType type, CallbackInfoReturnable<Material> cir) {
 		if (type.name().indexOf(ResourceLocation.NAMESPACE_SEPARATOR) != -1) {
-			ResourceLocation identifier = new ResourceLocation(type.name());
-			cir.setReturnValue(new Material(SIGN_SHEET, new ResourceLocation(identifier.getNamespace(), "entity/signs/" + identifier.getPath())));
+			ResourceLocation identifier = ResourceLocation.parse(type.name());
+			cir.setReturnValue(new Material(SIGN_SHEET, ResourceLocation.fromNamespaceAndPath(identifier.getNamespace(), "entity/signs/" + identifier.getPath())));
 		}
 	}
 
 	@Inject(method = "createHangingSignMaterial", at = @At("HEAD"), cancellable = true)
 	private static void modifyHangingTextureId(WoodType type, CallbackInfoReturnable<Material> cir) {
 		if (type.name().indexOf(ResourceLocation.NAMESPACE_SEPARATOR) != -1) {
-			ResourceLocation identifier = new ResourceLocation(type.name());
-			cir.setReturnValue(new Material(SIGN_SHEET, new ResourceLocation(identifier.getNamespace(), "entity/signs/hanging/" + identifier.getPath())));
+			ResourceLocation identifier = ResourceLocation.parse(type.name());
+			cir.setReturnValue(new Material(SIGN_SHEET, ResourceLocation.fromNamespaceAndPath(identifier.getNamespace(), "entity/signs/hanging/" + identifier.getPath())));
 		}
 	}
 }

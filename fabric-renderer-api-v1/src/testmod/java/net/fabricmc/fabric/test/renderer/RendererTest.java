@@ -48,6 +48,6 @@ public final class RendererTest implements ModInitializer {
 	}
 
 	public static ResourceLocation id(String path) {
-		return new ResourceLocation("fabric-renderer-api-v1-testmod", path);
+		return ResourceLocation.fromNamespaceAndPath("fabric-renderer-api-v1-testmod", path);
 	}
 }

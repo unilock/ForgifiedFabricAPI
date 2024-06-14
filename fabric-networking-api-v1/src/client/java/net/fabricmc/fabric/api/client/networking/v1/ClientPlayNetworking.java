@@ -242,7 +242,7 @@ public final class ClientPlayNetworking {
 
 		// You cant send without a client player, so this is fine
 		if (Minecraft.getInstance().getConnection() != null) {
-			Minecraft.getInstance().getConnection().sendPacket(createC2SPacket(payload));
+			Minecraft.getInstance().getConnection().send(createC2SPacket(payload));
 			return;
 		}
 

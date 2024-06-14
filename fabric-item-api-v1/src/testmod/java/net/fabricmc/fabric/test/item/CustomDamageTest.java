@@ -23,12 +23,14 @@ import net.fabricmc.fabric.api.item.v1.EnchantmentEvents;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.util.TriState;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -41,8 +43,8 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 
 public class CustomDamageTest implements ModInitializer {
-	public static final DataComponentType<Integer> WEIRD = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, new ResourceLocation("fabric-item-api-v1-testmod", "weird"),
-																DataComponentType.<Integer>builder().persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
+	public static final DataComponentType<Integer> WEIRD = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod", "weird"),
+																			DataComponentType.<Integer>builder().persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
 	public static final CustomDamageHandler WEIRD_DAMAGE_HANDLER = (stack, amount, entity, slot, breakCallback) -> {
 		// If sneaking, apply all damage to vanilla. Otherwise, increment a tag on the stack by one and don't apply any damage
 		if (entity.isShiftKeyDown()) {
@@ -57,13 +59,11 @@ public class CustomDamageTest implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-item-api-v1-testmod", "weird_pickaxe"), WEIRD_PICK);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod", "weird_pickaxe"), WEIRD_PICK);
 		FuelRegistry.INSTANCE.add(WEIRD_PICK, 200);
 		FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> builder.addMix(Potions.WATER, WEIRD_PICK, Potions.AWKWARD));
 		EnchantmentEvents.ALLOW_ENCHANTING.register(((enchantment, target, enchantingContext) -> {
-			if (target.is(Items.DIAMOND_PICKAXE)
-					&& enchantment == Enchantments.SHARPNESS
-					&& EnchantmentHelper.hasSilkTouch(target)) {
+			if (target.is(Items.DIAMOND_PICKAXE) && enchantment.is(Enchantments.SHARPNESS) && EnchantmentHelper.hasTag(target, EnchantmentTags.MINING_EXCLUSIVE_SET)) {
 				return TriState.TRUE;
 			}
 
@@ -95,9 +95,9 @@ public class CustomDamageTest implements ModInitializer {
 		}
 
 		@Override
-		public boolean canBeEnchantedWith(ItemStack stack, Enchantment enchantment, EnchantingContext context) {
-			return context == EnchantingContext.ANVIL && enchantment == Enchantments.FIRE_ASPECT
-				|| enchantment != Enchantments.FORTUNE && super.canBeEnchantedWith(stack, enchantment, context);
+		public boolean canBeEnchantedWith(ItemStack stack, Holder<Enchantment> enchantment, EnchantingContext context) {
+			return context == EnchantingContext.ACCEPTABLE && enchantment.is(Enchantments.FIRE_ASPECT)
+				|| !enchantment.is(Enchantments.FORTUNE) && super.canBeEnchantedWith(stack, enchantment, context);
 		}
 	}
 }

@@ -78,14 +78,14 @@ public class RegistrySyncTest implements ModInitializer {
 			}
 		}
 
-		ResourceKey<Registry<String>> fabricRegistryKey = ResourceKey.createRegistryKey(new ResourceLocation("registry_sync", "fabric_registry"));
+		ResourceKey<Registry<String>> fabricRegistryKey = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("registry_sync", "fabric_registry"));
 		MappedRegistry<String> fabricRegistry = FabricRegistryBuilder.createSimple(fabricRegistryKey)
 				.attribute(RegistryAttribute.SYNCED)
 				.buildAndRegister();
 
-		Registry.register(fabricRegistry, new ResourceLocation("registry_sync", "test"), "test");
+		Registry.register(fabricRegistry, ResourceLocation.fromNamespaceAndPath("registry_sync", "test"), "test");
 
-		Validate.isTrue(BuiltInRegistries.REGISTRY.keySet().contains(new ResourceLocation("registry_sync", "fabric_registry")));
+		Validate.isTrue(BuiltInRegistries.REGISTRY.keySet().contains(ResourceLocation.fromNamespaceAndPath("registry_sync", "fabric_registry")));
 
 		Validate.isTrue(RegistryAttributeHolder.get(fabricRegistry).hasAttribute(RegistryAttribute.MODDED));
 		Validate.isTrue(RegistryAttributeHolder.get(fabricRegistry).hasAttribute(RegistryAttribute.SYNCED));
@@ -153,11 +153,11 @@ public class RegistrySyncTest implements ModInitializer {
 	private static void registerBlocks(String namespace, int amount, int startingId) {
 		for (int i = 0; i < amount; i++) {
 			Block block = new Block(BlockBehaviour.Properties.of());
-			Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(namespace, "block_" + (i + startingId)), block);
+			Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(namespace, "block_" + (i + startingId)), block);
 
 			if (REGISTER_ITEMS) {
 				BlockItem blockItem = new BlockItem(block, new Item.Properties());
-				Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(namespace, "block_" + (i + startingId)), blockItem);
+				Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, "block_" + (i + startingId)), blockItem);
 			}
 		}
 	}
@@ -166,7 +166,7 @@ public class RegistrySyncTest implements ModInitializer {
 		Object2IntMap<ResourceLocation> map = new Object2IntOpenHashMap<>();
 
 		for (int i = 0; i < 12; i++) {
-			map.put(new ResourceLocation("mod_" + i, "entry"), 0);
+			map.put(ResourceLocation.fromNamespaceAndPath("mod_" + i, "entry"), 0);
 		}
 
 		return map;

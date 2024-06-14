@@ -16,11 +16,13 @@
 
 package net.fabricmc.fabric.mixin.item;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
@@ -42,7 +44,7 @@ abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
 					target = "Lnet/minecraft/world/item/enchantment/Enchantment;canEnchant(Lnet/minecraft/world/item/ItemStack;)Z"
 			)
 	)
-	private boolean callAllowEnchantingEvent(Enchantment instance, ItemStack stack) {
-		return stack.canBeEnchantedWith(instance, EnchantingContext.ANVIL);
+	private boolean callAllowEnchantingEvent(Enchantment instance, ItemStack stack, @Local Holder<Enchantment> registryEntry) {
+		return stack.canBeEnchantedWith(registryEntry, EnchantingContext.ACCEPTABLE);
 	}
 }

@@ -28,6 +28,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -36,11 +37,11 @@ import net.fabricmc.fabric.test.attachment.AttachmentTestMod;
 public class AttachmentCopyTests implements FabricGameTest {
 	// using a lambda type because serialization shouldn't play a role in this
 	public static AttachmentType<IntSupplier> DUMMY = AttachmentRegistry.create(
-			new ResourceLocation(AttachmentTestMod.MOD_ID, "dummy")
+			ResourceLocation.fromNamespaceAndPath(AttachmentTestMod.MOD_ID, "dummy")
 	);
 	public static AttachmentType<IntSupplier> COPY_ON_DEATH = AttachmentRegistry.<IntSupplier>builder()
 			.copyOnDeath()
-			.buildAndRegister(new ResourceLocation(AttachmentTestMod.MOD_ID, "copy_test"));
+			.buildAndRegister(ResourceLocation.fromNamespaceAndPath(AttachmentTestMod.MOD_ID, "copy_test"));
 
 	@GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
 	public void testCrossWorldTeleport(GameTestHelper context) {
@@ -54,7 +55,7 @@ public class AttachmentCopyTests implements FabricGameTest {
 		entity.setAttached(DUMMY, () -> 10);
 		entity.setAttached(COPY_ON_DEATH, () -> 10);
 
-		Entity moved = entity.changeDimension(end);
+		Entity moved = entity.changeDimension(new DimensionTransition(end, entity, DimensionTransition.DO_NOTHING));
 		if (moved == null) throw new GameTestAssertException("Cross-world teleportation failed");
 
 		IntSupplier attached1 = moved.getAttached(DUMMY);

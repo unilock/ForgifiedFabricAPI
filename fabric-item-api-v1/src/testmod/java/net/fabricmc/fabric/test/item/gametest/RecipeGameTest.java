@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.test.item.gametest;
 
+import java.util.List;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.fabric.test.item.CustomDamageTest;
 import net.minecraft.core.HolderLookup;
@@ -23,9 +24,9 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -34,11 +35,11 @@ import net.minecraft.world.level.Level;
 public class RecipeGameTest implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void vanillaRemainderTest(GameTestHelper context) {
-		Recipe<SimpleContainer> testRecipe = createTestingRecipeInstance();
+		Recipe<CraftingInput> testRecipe = createTestingRecipeInstance();
 
-		SimpleContainer inventory = new SimpleContainer(
+		CraftingInput inventory = CraftingInput.of(1, 2, List.of(
 				new ItemStack(Items.WATER_BUCKET),
-				new ItemStack(Items.DIAMOND));
+				new ItemStack(Items.DIAMOND)));
 
 		NonNullList<ItemStack> remainderList = testRecipe.getRemainingItems(inventory);
 
@@ -51,13 +52,13 @@ public class RecipeGameTest implements FabricGameTest {
 
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void fabricRemainderTest(GameTestHelper context) {
-		Recipe<SimpleContainer> testRecipe = createTestingRecipeInstance();
+		Recipe<CraftingInput> testRecipe = createTestingRecipeInstance();
 
-		SimpleContainer inventory = new SimpleContainer(
+		CraftingInput inventory = CraftingInput.of(1, 4, List.of(
 				new ItemStack(CustomDamageTest.WEIRD_PICK),
 				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK), 10),
 				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK), 31),
-				new ItemStack(Items.DIAMOND));
+				new ItemStack(Items.DIAMOND)));
 
 		NonNullList<ItemStack> remainderList = testRecipe.getRemainingItems(inventory);
 
@@ -70,15 +71,15 @@ public class RecipeGameTest implements FabricGameTest {
 		context.succeed();
 	}
 
-	private Recipe<SimpleContainer> createTestingRecipeInstance() {
+	private Recipe<CraftingInput> createTestingRecipeInstance() {
 		return new Recipe<>() {
 			@Override
-			public boolean matches(SimpleContainer inventory, Level world) {
+			public boolean matches(CraftingInput recipeInput, Level world) {
 				return true;
 			}
 
 			@Override
-			public ItemStack assemble(SimpleContainer inventory, HolderLookup.Provider wrapperLookup) {
+			public ItemStack assemble(CraftingInput recipeInput, HolderLookup.Provider wrapperLookup) {
 				return null;
 			}
 

@@ -68,7 +68,7 @@ public class AttachmentSerializingImpl {
 			CompoundTag compound = nbt.getCompound(AttachmentTarget.NBT_ATTACHMENT_KEY);
 
 			for (String key : compound.getAllKeys()) {
-				AttachmentType<?> type = AttachmentRegistryImpl.get(new ResourceLocation(key));
+				AttachmentType<?> type = AttachmentRegistryImpl.get(ResourceLocation.parse(key));
 
 				if (type == null) {
 					LOGGER.warn("Unknown attachment type " + key + " found when deserializing, skipping");

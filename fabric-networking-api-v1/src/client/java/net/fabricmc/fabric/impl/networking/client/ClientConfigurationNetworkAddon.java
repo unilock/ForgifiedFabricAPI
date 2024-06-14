@@ -31,12 +31,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public final class ClientConfigurationNetworkAddon extends ClientCommonNetworkAddon<ClientConfigurationNetworking.ConfigurationPayloadHandler<?>, ClientConfigurationPacketListenerImpl> {
 	private final ContextImpl context;
 	private boolean sentInitialRegisterPacket;
+	private boolean hasStarted;
 
 	public ClientConfigurationNetworkAddon(ClientConfigurationPacketListenerImpl handler, Minecraft client) {
 		super(ClientNetworkingImpl.CONFIGURATION, ((ClientCommonNetworkHandlerAccessor) handler).getConnection(), "ClientPlayNetworkAddon for " + ((ClientConfigurationNetworkHandlerAccessor) handler).getLocalGameProfile().getName(), handler, client);
@@ -52,12 +54,39 @@ public final class ClientConfigurationNetworkAddon extends ClientCommonNetworkAd
 	}
 
 	@Override
+	public void onServerReady() {
+		super.onServerReady();
+		invokeStartEvent();
+	}
+
+	@Override
 	protected void receiveRegistration(boolean register, RegistrationPayload payload) {
 		super.receiveRegistration(register, payload);
 
 		if (register && !this.sentInitialRegisterPacket) {
 			this.sendInitialChannelRegistrationPacket();
 			this.sentInitialRegisterPacket = true;
+
+			this.onServerReady();
+		}
+	}
+
+	@Override
+	public boolean handle(CustomPacketPayload payload) {
+		boolean result = super.handle(payload);
+
+		if (payload instanceof BrandPayload) {
+			// If we have received this without first receiving the registration packet, its likely a vanilla server.
+			invokeStartEvent();
+		}
+
+		return result;
+	}
+
+	private void invokeStartEvent() {
+		if (!hasStarted) {
+			hasStarted = true;
+			ClientConfigurationConnectionEvents.START.invoker().onConfigurationStart(this.handler, this.client);
 		}
 	}
 
@@ -82,7 +111,8 @@ public final class ClientConfigurationNetworkAddon extends ClientCommonNetworkAd
 		C2SConfigurationChannelEvents.UNREGISTER.invoker().onChannelUnregister(this.handler, this, this.client, ids);
 	}
 
-	public void handleReady() {
+	public void handleComplete() {
+		ClientConfigurationConnectionEvents.COMPLETE.invoker().onConfigurationComplete(this.handler, this.client);
 		ClientConfigurationConnectionEvents.READY.invoker().onConfigurationReady(this.handler, this.client);
 		ClientNetworkingImpl.setClientConfigurationAddon(null);
 	}

@@ -54,9 +54,9 @@ public final class EntityEventTests implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation("fabric-entity-events-v1-testmod", "test_bed"), TEST_BED);
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-entity-events-v1-testmod", "test_bed"), new BlockItem(TEST_BED, new Item.Properties()));
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-entity-events-v1-testmod", "diamond_elytra"), DIAMOND_ELYTRA);
+		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath("fabric-entity-events-v1-testmod", "test_bed"), TEST_BED);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-entity-events-v1-testmod", "test_bed"), new BlockItem(TEST_BED, new Item.Properties()));
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-entity-events-v1-testmod", "diamond_elytra"), DIAMOND_ELYTRA);
 
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register((world, entity, killed) -> {
 			LOGGER.info("Entity {} Killed: {}", entity, killed);

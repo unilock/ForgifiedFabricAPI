@@ -45,8 +45,8 @@ public class DefaultResourceConditionsTest {
 	private static final String TESTMOD_ID = "fabric-resource-conditions-api-v1-testmod";
 	private static final String API_MOD_ID = "fabric-resource-conditions-api-v1";
 	private static final String UNKNOWN_MOD_ID = "fabric-tiny-potato-api-v1";
-	private static final ResourceKey<? extends Registry<Object>> UNKNOWN_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(TESTMOD_ID, "unknown_registry"));
-	private static final ResourceLocation UNKNOWN_ENTRY_ID = new ResourceLocation(TESTMOD_ID, "tiny_potato");
+	private static final ResourceKey<? extends Registry<Object>> UNKNOWN_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(TESTMOD_ID, "unknown_registry"));
+	private static final ResourceLocation UNKNOWN_ENTRY_ID = ResourceLocation.fromNamespaceAndPath(TESTMOD_ID, "tiny_potato");
 
 	private void expectCondition(GameTestHelper context, String name, ResourceCondition condition, boolean expected) {
 		HolderLookup.Provider registryLookup = context.getLevel().registryAccess();
@@ -122,7 +122,7 @@ public class DefaultResourceConditionsTest {
 		ResourceCondition vanilla = ResourceConditions.featuresEnabled(FeatureFlags.VANILLA);
 		// Reminder: GameTest enables all features by default
 		ResourceCondition vanillaAndBundle = ResourceConditions.featuresEnabled(FeatureFlags.VANILLA, FeatureFlags.BUNDLE);
-		ResourceLocation unknownId = new ResourceLocation(TESTMOD_ID, "unknown_feature_to_test_condition");
+		ResourceLocation unknownId = ResourceLocation.fromNamespaceAndPath(TESTMOD_ID, "unknown_feature_to_test_condition");
 		ResourceCondition unknown = ResourceConditions.featuresEnabled(unknownId);
 		// Passing an array to avoid type ambiguity
 		ResourceCondition empty = ResourceConditions.featuresEnabled(new FeatureFlag[]{});

@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
+import net.fabricmc.fabric.impl.itemgroup.FabricItemGroupImpl;
 import net.fabricmc.fabric.impl.itemgroup.ItemGroupEventsImpl;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -39,7 +39,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(CreativeModeTab.class)
-abstract class ItemGroupMixin implements FabricItemGroup {
+abstract class ItemGroupMixin implements FabricItemGroupImpl {
 	@Shadow
 	private Collection<ItemStack> displayItems;
 
@@ -47,10 +47,10 @@ abstract class ItemGroupMixin implements FabricItemGroup {
 	private Set<ItemStack> displayItemsSearchTab;
 
 	@Unique
-	private int fabric_page = -1;
+	private int page = -1;
 
 	@SuppressWarnings("ConstantConditions")
-	@Inject(method = "buildContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTab;rebuildSearchTree()V"))
+	@Inject(method = "buildContents", at = @At("TAIL"))
 	public void getStacks(CreativeModeTab.ItemDisplayParameters context, CallbackInfo ci) {
 		final CreativeModeTab self = (CreativeModeTab) (Object) this;
 		final ResourceKey<CreativeModeTab> registryKey = BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(self).orElseThrow(() -> new IllegalStateException("Unregistered item group : " + self));
@@ -89,16 +89,16 @@ abstract class ItemGroupMixin implements FabricItemGroup {
 	}
 
 	@Override
-	public int getPage() {
-		if (fabric_page < 0) {
+	public int fabric_getPage() {
+		if (page < 0) {
 			throw new IllegalStateException("Item group has no page");
 		}
 
-		return fabric_page;
+		return page;
 	}
 
 	@Override
-	public void setPage(int page) {
-		this.fabric_page = page;
+	public void fabric_setPage(int page) {
+		this.page = page;
 	}
 }

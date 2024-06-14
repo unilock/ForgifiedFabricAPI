@@ -47,12 +47,12 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 public abstract class FabricBlockLootTableProvider extends BlockLootSubProvider implements FabricLootTableProvider {
 	private final FabricDataOutput output;
 	private final Set<ResourceLocation> excludedFromStrictValidation = new HashSet<>();
-	private final CompletableFuture<HolderLookup.Provider> registryLookup;
+	private final CompletableFuture<HolderLookup.Provider> registryLookupFuture;
 
 	protected FabricBlockLootTableProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
-		super(Collections.emptySet(), FeatureFlags.REGISTRY.allFlags());
+		super(Collections.emptySet(), FeatureFlags.REGISTRY.allFlags(), registryLookup.join());
 		this.output = dataOutput;
-		this.registryLookup = registryLookup;
+		this.registryLookupFuture = registryLookup;
 	}
 
 	/**
@@ -71,7 +71,7 @@ public abstract class FabricBlockLootTableProvider extends BlockLootSubProvider 
 	}
 
 	@Override
-	public void generate(HolderLookup.Provider registryLookup, BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer) {
+	public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer) {
 		generate();
 
 		for (Map.Entry<ResourceKey<LootTable>, LootTable.Builder> entry : map.entrySet()) {
@@ -109,7 +109,7 @@ public abstract class FabricBlockLootTableProvider extends BlockLootSubProvider 
 
 	@Override
 	public CompletableFuture<?> run(CachedOutput writer) {
-		return FabricLootTableProviderImpl.run(writer, this, LootContextParamSets.BLOCK, output, registryLookup);
+		return FabricLootTableProviderImpl.run(writer, this, LootContextParamSets.BLOCK, output, registryLookupFuture);
 	}
 
 	@Override

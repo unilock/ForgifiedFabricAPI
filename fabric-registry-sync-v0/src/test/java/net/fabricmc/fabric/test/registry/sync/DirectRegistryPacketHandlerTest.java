@@ -54,7 +54,7 @@ public class DirectRegistryPacketHandlerTest {
 		DirectRegistryPacketHandler handler = new DirectRegistryPacketHandler();
 
 		Map<ResourceLocation, Object2IntMap<ResourceLocation>> registry = new HashMap<>();
-		registry.put(new ResourceLocation("test"), createRegistry(150));
+		registry.put(ResourceLocation.parse("test"), createRegistry(150));
 
 		var payloads = new ArrayList<DirectRegistryPacketHandler.Payload>();
 		handler.sendPacket(payloads::add, registry);
@@ -76,7 +76,7 @@ public class DirectRegistryPacketHandlerTest {
 		Map<ResourceLocation, Object2IntMap<ResourceLocation>> registry = new HashMap<>();
 
 		for (int i = 0; i < 50; i++) {
-			registry.put(new ResourceLocation("test", "namespace_" + i), createRegistry(15000));
+			registry.put(ResourceLocation.fromNamespaceAndPath("test", "namespace_" + i), createRegistry(15000));
 		}
 
 		var payloads = new ArrayList<DirectRegistryPacketHandler.Payload>();
@@ -98,7 +98,7 @@ public class DirectRegistryPacketHandlerTest {
 		Object2IntMap<ResourceLocation> entries = new Object2IntOpenHashMap<>();
 
 		for (int i = 0; i < size; i++) {
-			entries.put(new ResourceLocation("test", "entry_" + i), i);
+			entries.put(ResourceLocation.fromNamespaceAndPath("test", "entry_" + i), i);
 		}
 
 		return entries;

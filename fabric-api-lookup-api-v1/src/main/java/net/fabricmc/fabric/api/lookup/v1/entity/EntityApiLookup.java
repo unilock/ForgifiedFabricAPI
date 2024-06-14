@@ -43,7 +43,7 @@ import net.minecraft.world.entity.EntityType;
  * <p>We need to create the EntityApiLookup. We don't need any context so we use {@link Void}.
  * <pre>{@code
  * public class MyApi {
- *     public static final EntityApiLookup<Leveled, Void> LEVELED_ENTITY = EntityApiLookup.get(new Identifier("mymod:leveled_entity"), Leveled.class, Void.class);
+ *     public static final EntityApiLookup<Leveled, Void> LEVELED_ENTITY = EntityApiLookup.get(Identifier.of("mymod", "leveled_entity"), Leveled.class, Void.class);
  * }
  * }</pre>
  *

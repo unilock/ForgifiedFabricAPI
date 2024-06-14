@@ -58,7 +58,43 @@ public final class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
 		copy(ConventionalBlockTags.WOODEN_CHESTS, ConventionalItemTags.WOODEN_CHESTS);
 		copy(ConventionalBlockTags.GLASS_BLOCKS, ConventionalItemTags.GLASS_BLOCKS);
 		copy(ConventionalBlockTags.GLASS_PANES, ConventionalItemTags.GLASS_PANES);
-		copy(ConventionalBlockTags.SHULKER_BOXES, ConventionalItemTags.SHULKER_BOXES);
+		copy(ConventionalBlockTags.GLAZED_TERRACOTTA, ConventionalItemTags.GLAZED_TERRACOTTA);
+		tag(ConventionalItemTags.SHULKER_BOXES)
+				.add(Items.SHULKER_BOX)
+				.add(Items.WHITE_SHULKER_BOX)
+				.add(Items.ORANGE_SHULKER_BOX)
+				.add(Items.MAGENTA_SHULKER_BOX)
+				.add(Items.LIGHT_BLUE_SHULKER_BOX)
+				.add(Items.YELLOW_SHULKER_BOX)
+				.add(Items.LIME_SHULKER_BOX)
+				.add(Items.PINK_SHULKER_BOX)
+				.add(Items.GRAY_SHULKER_BOX)
+				.add(Items.LIGHT_GRAY_SHULKER_BOX)
+				.add(Items.CYAN_SHULKER_BOX)
+				.add(Items.PURPLE_SHULKER_BOX)
+				.add(Items.BLUE_SHULKER_BOX)
+				.add(Items.BROWN_SHULKER_BOX)
+				.add(Items.GREEN_SHULKER_BOX)
+				.add(Items.RED_SHULKER_BOX)
+				.add(Items.BLACK_SHULKER_BOX);
+		copy(ConventionalBlockTags.CONCRETE, ConventionalItemTags.CONCRETE);
+		tag(ConventionalItemTags.CONCRETE_POWDER)
+				.add(Items.WHITE_CONCRETE_POWDER)
+				.add(Items.ORANGE_CONCRETE_POWDER)
+				.add(Items.MAGENTA_CONCRETE_POWDER)
+				.add(Items.LIGHT_BLUE_CONCRETE_POWDER)
+				.add(Items.YELLOW_CONCRETE_POWDER)
+				.add(Items.LIME_CONCRETE_POWDER)
+				.add(Items.PINK_CONCRETE_POWDER)
+				.add(Items.GRAY_CONCRETE_POWDER)
+				.add(Items.LIGHT_GRAY_CONCRETE_POWDER)
+				.add(Items.CYAN_CONCRETE_POWDER)
+				.add(Items.PURPLE_CONCRETE_POWDER)
+				.add(Items.BLUE_CONCRETE_POWDER)
+				.add(Items.BROWN_CONCRETE_POWDER)
+				.add(Items.GREEN_CONCRETE_POWDER)
+				.add(Items.RED_CONCRETE_POWDER)
+				.add(Items.BLACK_CONCRETE_POWDER);
 
 		copy(ConventionalBlockTags.BUDDING_BLOCKS, ConventionalItemTags.BUDDING_BLOCKS);
 		copy(ConventionalBlockTags.BUDS, ConventionalItemTags.BUDS);
@@ -299,6 +335,7 @@ public final class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
 				.addOptionalTag(ConventionalItemTags.COPPER_RAW_MATERIALS)
 				.addOptionalTag(ConventionalItemTags.IRON_RAW_MATERIALS)
 				.addOptionalTag(ConventionalItemTags.GOLD_RAW_MATERIALS);
+
 		tag(ConventionalItemTags.RAW_BLOCKS)
 				.addOptionalTag(ConventionalItemTags.COPPER_RAW_BLOCKS)
 				.addOptionalTag(ConventionalItemTags.GOLD_RAW_BLOCKS)
@@ -366,16 +403,89 @@ public final class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
 				.addOptionalTag(ItemTags.PICKAXES)
 				.addOptionalTag(ItemTags.SHOVELS)
 				.addOptionalTag(ItemTags.SWORDS)
-				.addOptionalTag(ConventionalItemTags.BOWS_TOOLS)
-				.addOptionalTag(ConventionalItemTags.BRUSHES_TOOLS)
-				.addOptionalTag(ConventionalItemTags.CROSSBOWS_TOOLS)
-				.addOptionalTag(ConventionalItemTags.FISHING_RODS_TOOLS)
-				.addOptionalTag(ConventionalItemTags.SHEARS_TOOLS)
-				.addOptionalTag(ConventionalItemTags.SHIELDS_TOOLS)
-				.addOptionalTag(ConventionalItemTags.SPEARS_TOOLS)
-				.addOptionalTag(ConventionalItemTags.MINING_TOOLS)
-				.addOptionalTag(ConventionalItemTags.MELEE_WEAPONS_TOOLS)
+				.addOptionalTag(ConventionalItemTags.BOW_TOOLS)
+				.addOptionalTag(ConventionalItemTags.BRUSH_TOOLS)
+				.addOptionalTag(ConventionalItemTags.CROSSBOW_TOOLS)
+				.addOptionalTag(ConventionalItemTags.FISHING_ROD_TOOLS)
+				.addOptionalTag(ConventionalItemTags.SHEAR_TOOLS)
+				.addOptionalTag(ConventionalItemTags.SHIELD_TOOLS)
+				.addOptionalTag(ConventionalItemTags.SPEAR_TOOLS)
+				.addOptionalTag(ConventionalItemTags.MINING_TOOL_TOOLS)
+				.addOptionalTag(ConventionalItemTags.MELEE_WEAPON_TOOLS)
+				.addOptionalTag(ConventionalItemTags.RANGED_WEAPON_TOOLS);
+
+		tag(ConventionalItemTags.BOW_TOOLS)
+				.add(Items.BOW)
+				.addOptionalTag(ConventionalItemTags.BOWS_TOOLS);
+		tag(ConventionalItemTags.CROSSBOW_TOOLS)
+				.add(Items.CROSSBOW)
+				.addOptionalTag(ConventionalItemTags.CROSSBOWS_TOOLS);
+		tag(ConventionalItemTags.SHEAR_TOOLS)
+				.add(Items.SHEARS)
+				.addOptionalTag(ConventionalItemTags.SHEARS_TOOLS);
+		tag(ConventionalItemTags.SHIELD_TOOLS)
+				.add(Items.SHIELD)
+				.addOptionalTag(ConventionalItemTags.SHIELDS_TOOLS);
+		tag(ConventionalItemTags.SPEAR_TOOLS)
+				.add(Items.TRIDENT)
+				.addOptionalTag(ConventionalItemTags.SPEARS_TOOLS);
+		tag(ConventionalItemTags.FISHING_ROD_TOOLS)
+				.add(Items.FISHING_ROD)
+				.addOptionalTag(ConventionalItemTags.FISHING_RODS_TOOLS);
+		tag(ConventionalItemTags.BRUSH_TOOLS)
+				.add(Items.BRUSH)
+				.addOptionalTag(ConventionalItemTags.BRUSHES_TOOLS);
+
+		tag(ConventionalItemTags.MINING_TOOL_TOOLS)
+				.add(Items.WOODEN_PICKAXE)
+				.add(Items.STONE_PICKAXE)
+				.add(Items.GOLDEN_PICKAXE)
+				.add(Items.IRON_PICKAXE)
+				.add(Items.DIAMOND_PICKAXE)
+				.add(Items.NETHERITE_PICKAXE)
+				.addOptionalTag(ConventionalItemTags.MINING_TOOLS);
+
+		tag(ConventionalItemTags.MELEE_WEAPON_TOOLS)
+				.add(Items.WOODEN_SWORD)
+				.add(Items.STONE_SWORD)
+				.add(Items.GOLDEN_SWORD)
+				.add(Items.IRON_SWORD)
+				.add(Items.DIAMOND_SWORD)
+				.add(Items.NETHERITE_SWORD)
+				.add(Items.WOODEN_AXE)
+				.add(Items.STONE_AXE)
+				.add(Items.GOLDEN_AXE)
+				.add(Items.IRON_AXE)
+				.add(Items.DIAMOND_AXE)
+				.add(Items.NETHERITE_AXE)
+				.addOptionalTag(ConventionalItemTags.MELEE_WEAPONS_TOOLS);
+
+		tag(ConventionalItemTags.RANGED_WEAPON_TOOLS)
+				.add(Items.BOW)
+				.add(Items.CROSSBOW)
+				.add(Items.TRIDENT)
 				.addOptionalTag(ConventionalItemTags.RANGED_WEAPONS_TOOLS);
+
+		tag(ConventionalItemTags.ARMORS)
+				.addOptionalTag(ItemTags.HEAD_ARMOR)
+				.addOptionalTag(ItemTags.CHEST_ARMOR)
+				.addOptionalTag(ItemTags.LEG_ARMOR)
+				.addOptionalTag(ItemTags.FOOT_ARMOR);
+
+		tag(ConventionalItemTags.ENCHANTABLES)
+				.addOptionalTag(ItemTags.ARMOR_ENCHANTABLE)
+				.addOptionalTag(ItemTags.EQUIPPABLE_ENCHANTABLE)
+				.addOptionalTag(ItemTags.WEAPON_ENCHANTABLE)
+				.addOptionalTag(ItemTags.SWORD_ENCHANTABLE)
+				.addOptionalTag(ItemTags.MINING_ENCHANTABLE)
+				.addOptionalTag(ItemTags.MINING_LOOT_ENCHANTABLE)
+				.addOptionalTag(ItemTags.FISHING_ENCHANTABLE)
+				.addOptionalTag(ItemTags.TRIDENT_ENCHANTABLE)
+				.addOptionalTag(ItemTags.BOW_ENCHANTABLE)
+				.addOptionalTag(ItemTags.CROSSBOW_ENCHANTABLE)
+				.addOptionalTag(ItemTags.MACE_ENCHANTABLE)
+				.addOptionalTag(ItemTags.FIRE_ASPECT_ENCHANTABLE)
+				.addOptionalTag(ItemTags.DURABILITY_ENCHANTABLE);
 
 		tag(ConventionalItemTags.BOWS_TOOLS)
 				.add(Items.BOW);
@@ -418,27 +528,6 @@ public final class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
 				.add(Items.BOW)
 				.add(Items.CROSSBOW)
 				.add(Items.TRIDENT);
-
-		tag(ConventionalItemTags.ARMORS)
-				.addOptionalTag(ItemTags.HEAD_ARMOR)
-				.addOptionalTag(ItemTags.CHEST_ARMOR)
-				.addOptionalTag(ItemTags.LEG_ARMOR)
-				.addOptionalTag(ItemTags.FOOT_ARMOR);
-
-		tag(ConventionalItemTags.ENCHANTABLES)
-				.addOptionalTag(ItemTags.ARMOR_ENCHANTABLE)
-				.addOptionalTag(ItemTags.EQUIPPABLE_ENCHANTABLE)
-				.addOptionalTag(ItemTags.WEAPON_ENCHANTABLE)
-				.addOptionalTag(ItemTags.SWORD_ENCHANTABLE)
-				.addOptionalTag(ItemTags.MINING_ENCHANTABLE)
-				.addOptionalTag(ItemTags.MINING_LOOT_ENCHANTABLE)
-				.addOptionalTag(ItemTags.FISHING_ENCHANTABLE)
-				.addOptionalTag(ItemTags.TRIDENT_ENCHANTABLE)
-				.addOptionalTag(ItemTags.BOW_ENCHANTABLE)
-				.addOptionalTag(ItemTags.CROSSBOW_ENCHANTABLE)
-				.addOptionalTag(ItemTags.MACE_ENCHANTABLE)
-				.addOptionalTag(ItemTags.FIRE_ASPECT_ENCHANTABLE)
-				.addOptionalTag(ItemTags.DURABILITY_ENCHANTABLE);
 	}
 
 	private void generateVillagerJobSites() {
@@ -457,6 +546,15 @@ public final class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
 
 		tag(ConventionalItemTags.STRINGS)
 				.add(Items.STRING);
+
+		tag(ConventionalItemTags.LEATHERS)
+				.add(Items.LEATHER);
+
+		tag(ConventionalItemTags.MUSIC_DISCS)
+				.add(Items.MUSIC_DISC_13, Items.MUSIC_DISC_CAT, Items.MUSIC_DISC_BLOCKS, Items.MUSIC_DISC_CHIRP, Items.MUSIC_DISC_FAR,
+						Items.MUSIC_DISC_MALL, Items.MUSIC_DISC_MELLOHI, Items.MUSIC_DISC_STAL, Items.MUSIC_DISC_STRAD, Items.MUSIC_DISC_WARD,
+						Items.MUSIC_DISC_11, Items.MUSIC_DISC_WAIT, Items.MUSIC_DISC_OTHERSIDE, Items.MUSIC_DISC_5, Items.MUSIC_DISC_PIGSTEP,
+						Items.MUSIC_DISC_RELIC, Items.MUSIC_DISC_CREATOR, Items.MUSIC_DISC_CREATOR_MUSIC_BOX, Items.MUSIC_DISC_PRECIPICE);
 
 		tag(ConventionalItemTags.WOODEN_RODS)
 				.add(Items.STICK);
@@ -601,37 +699,37 @@ public final class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
 		// Backwards compat with pre-1.21 tags. Done after so optional tag is last for better readability.
 		// TODO: Remove backwards compat tag entries in 1.22
 
-		tag(ConventionalItemTags.WOODEN_BARRELS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "wooden_barrels"));
-		tag(ConventionalItemTags.WOODEN_CHESTS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "wooden_chests"));
-		tag(ConventionalItemTags.BLACK_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "black_dyes"));
-		tag(ConventionalItemTags.BLUE_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "blue_dyes"));
-		tag(ConventionalItemTags.BROWN_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "brown_dyes"));
-		tag(ConventionalItemTags.GREEN_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "green_dyes"));
-		tag(ConventionalItemTags.RED_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "red_dyes"));
-		tag(ConventionalItemTags.WHITE_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "white_dyes"));
-		tag(ConventionalItemTags.YELLOW_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "yellow_dyes"));
-		tag(ConventionalItemTags.LIGHT_BLUE_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "light_blue_dyes"));
-		tag(ConventionalItemTags.LIGHT_GRAY_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "light_gray_dyes"));
-		tag(ConventionalItemTags.LIME_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "lime_dyes"));
-		tag(ConventionalItemTags.MAGENTA_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "magenta_dyes"));
-		tag(ConventionalItemTags.ORANGE_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "orange_dyes"));
-		tag(ConventionalItemTags.PINK_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "pink_dyes"));
-		tag(ConventionalItemTags.CYAN_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "cyan_dyes"));
-		tag(ConventionalItemTags.GRAY_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "gray_dyes"));
-		tag(ConventionalItemTags.PURPLE_DYES).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "purple_dyes"));
-		tag(ConventionalItemTags.IRON_RAW_MATERIALS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "raw_iron_ores"));
-		tag(ConventionalItemTags.COPPER_RAW_MATERIALS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "raw_copper_ores"));
-		tag(ConventionalItemTags.GOLD_RAW_MATERIALS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "raw_gold_ores"));
-		tag(ConventionalItemTags.GLOWSTONE_DUSTS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "glowstone_dusts"));
-		tag(ConventionalItemTags.REDSTONE_DUSTS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "redstone_dusts"));
-		tag(ConventionalItemTags.DIAMOND_GEMS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "diamonds"));
-		tag(ConventionalItemTags.LAPIS_GEMS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "lapis"));
-		tag(ConventionalItemTags.EMERALD_GEMS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "emeralds"));
-		tag(ConventionalItemTags.QUARTZ_GEMS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "quartz"));
-		tag(ConventionalItemTags.SHEARS_TOOLS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "shears"));
-		tag(ConventionalItemTags.SPEARS_TOOLS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "spears"));
-		tag(ConventionalItemTags.BOWS_TOOLS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "bows"));
-		tag(ConventionalItemTags.SHIELDS_TOOLS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "shields"));
-		tag(ConventionalItemTags.STRINGS).addOptionalTag(new ResourceLocation(TagUtil.C_TAG_NAMESPACE, "string"));
+		tag(ConventionalItemTags.WOODEN_BARRELS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "wooden_barrels"));
+		tag(ConventionalItemTags.WOODEN_CHESTS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "wooden_chests"));
+		tag(ConventionalItemTags.BLACK_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "black_dyes"));
+		tag(ConventionalItemTags.BLUE_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "blue_dyes"));
+		tag(ConventionalItemTags.BROWN_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "brown_dyes"));
+		tag(ConventionalItemTags.GREEN_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "green_dyes"));
+		tag(ConventionalItemTags.RED_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "red_dyes"));
+		tag(ConventionalItemTags.WHITE_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "white_dyes"));
+		tag(ConventionalItemTags.YELLOW_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "yellow_dyes"));
+		tag(ConventionalItemTags.LIGHT_BLUE_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "light_blue_dyes"));
+		tag(ConventionalItemTags.LIGHT_GRAY_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "light_gray_dyes"));
+		tag(ConventionalItemTags.LIME_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "lime_dyes"));
+		tag(ConventionalItemTags.MAGENTA_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "magenta_dyes"));
+		tag(ConventionalItemTags.ORANGE_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "orange_dyes"));
+		tag(ConventionalItemTags.PINK_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "pink_dyes"));
+		tag(ConventionalItemTags.CYAN_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "cyan_dyes"));
+		tag(ConventionalItemTags.GRAY_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "gray_dyes"));
+		tag(ConventionalItemTags.PURPLE_DYES).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "purple_dyes"));
+		tag(ConventionalItemTags.IRON_RAW_MATERIALS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "raw_iron_ores"));
+		tag(ConventionalItemTags.COPPER_RAW_MATERIALS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "raw_copper_ores"));
+		tag(ConventionalItemTags.GOLD_RAW_MATERIALS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "raw_gold_ores"));
+		tag(ConventionalItemTags.GLOWSTONE_DUSTS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "glowstone_dusts"));
+		tag(ConventionalItemTags.REDSTONE_DUSTS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "redstone_dusts"));
+		tag(ConventionalItemTags.DIAMOND_GEMS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "diamonds"));
+		tag(ConventionalItemTags.LAPIS_GEMS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "lapis"));
+		tag(ConventionalItemTags.EMERALD_GEMS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "emeralds"));
+		tag(ConventionalItemTags.QUARTZ_GEMS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "quartz"));
+		tag(ConventionalItemTags.SHEAR_TOOLS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "shears"));
+		tag(ConventionalItemTags.SPEAR_TOOLS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "spears"));
+		tag(ConventionalItemTags.BOW_TOOLS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "bows"));
+		tag(ConventionalItemTags.SHIELD_TOOLS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "shields"));
+		tag(ConventionalItemTags.STRINGS).addOptionalTag(ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "string"));
 	}
 }

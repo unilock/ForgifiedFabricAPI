@@ -112,6 +112,7 @@ public abstract class FabricRecipeProvider extends RecipeProvider {
 
 			@Override
 			public Advancement.Builder advancement() {
+				//noinspection removal
 				return Advancement.Builder.recipeAdvancement().parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
 			}
 		});
@@ -122,6 +123,6 @@ public abstract class FabricRecipeProvider extends RecipeProvider {
 	 * Override this method to change the recipe identifier. The default implementation normalizes the namespace to the mod ID.
 	 */
 	protected ResourceLocation getRecipeIdentifier(ResourceLocation identifier) {
-		return new ResourceLocation(output.getModId(), identifier.getPath());
+		return ResourceLocation.fromNamespaceAndPath(output.getModId(), identifier.getPath());
 	}
 }

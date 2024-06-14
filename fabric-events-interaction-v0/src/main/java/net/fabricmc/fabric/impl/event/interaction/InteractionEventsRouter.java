@@ -56,7 +56,7 @@ public class InteractionEventsRouter implements ModInitializer {
 			for (int x = 0; x < 3; x++) {
 				for (int y = 0; y < 3; y++) {
 					for (int z = 0; z < 3; z++) {
-						((ServerPlayer) player).connection.sendPacket(new ClientboundBlockUpdatePacket(world, cornerPos.offset(x, y, z)));
+						((ServerPlayer) player).connection.send(new ClientboundBlockUpdatePacket(world, cornerPos.offset(x, y, z)));
 					}
 				}
 			}

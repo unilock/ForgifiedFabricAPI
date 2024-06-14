@@ -36,13 +36,13 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 public class TooltipComponentTestInit implements ModInitializer {
 	public static Item CUSTOM_TOOLTIP_ITEM = new CustomTooltipItem();
-	public static Holder<ArmorMaterial> TEST_ARMOR_MATERIAL = Registry.registerForHolder(BuiltInRegistries.ARMOR_MATERIAL, new ResourceLocation("fabric-rendering-v1-testmod", "test_material"), createTestArmorMaterial());
+	public static Holder<ArmorMaterial> TEST_ARMOR_MATERIAL = Registry.registerForHolder(BuiltInRegistries.ARMOR_MATERIAL, ResourceLocation.fromNamespaceAndPath("fabric-rendering-v1-testmod", "test_material"), createTestArmorMaterial());
 	public static Item CUSTOM_ARMOR_ITEM = new ArmorItem(TEST_ARMOR_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Properties());
 
 	@Override
 	public void onInitialize() {
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-rendering-v1-testmod", "custom_tooltip"), CUSTOM_TOOLTIP_ITEM);
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-rendering-v1-testmod", "test_chest"), CUSTOM_ARMOR_ITEM);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-rendering-v1-testmod", "custom_tooltip"), CUSTOM_TOOLTIP_ITEM);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-rendering-v1-testmod", "test_chest"), CUSTOM_ARMOR_ITEM);
 	}
 
 	private static class CustomTooltipItem extends Item {
@@ -68,9 +68,9 @@ public class TooltipComponentTestInit implements ModInitializer {
 			map.put(ArmorItem.Type.BODY, 3);
 		}),
 			0,
-			SoundEvents.ARMOR_EQUIP_LEATHER,
+			SoundEvents.ITEM_ARMOR_EQUIP_LEATHER,
 				() -> Ingredient.of(Items.LEATHER),
-			List.of(new ArmorMaterial.Layer(new ResourceLocation("fabric-rendering-v1-testmod", "test_material"))),
+			List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath("fabric-rendering-v1-testmod", "test_material"))),
 			0,
 			0
 		);

@@ -17,7 +17,6 @@
 package net.fabricmc.fabric.api.client.model.loading.v1;
 
 import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -71,7 +70,7 @@ public interface BlockStateResolver {
 		void setModel(BlockState state, UnbakedModel model);
 
 		/**
-		 * Loads a model using an {@link ResourceLocation} or {@link ModelResourceLocation}, or gets it if it was already loaded.
+		 * Loads a model using an {@link ResourceLocation}, or gets it if it was already loaded.
 		 *
 		 * @param id the model identifier
 		 * @return the unbaked model, or a missing model if it is not present
@@ -80,9 +79,6 @@ public interface BlockStateResolver {
 
 		/**
 		 * The current model loader instance, which changes between resource reloads.
-		 *
-		 * <p>Do <b>not</b> call {@link ModelBakery#getModel} as it does not supported nested model resolution;
-		 * use {@link #getOrLoadModel} from the context instead.
 		 */
 		ModelBakery loader();
 	}

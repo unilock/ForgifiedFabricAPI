@@ -23,9 +23,9 @@ import net.minecraft.resources.ResourceLocation;
 
 public final class ItemApis {
 	public static final BlockApiLookup<ItemInsertable, @NotNull Direction> INSERTABLE =
-			BlockApiLookup.get(new ResourceLocation("testmod:item_insertable"), ItemInsertable.class, Direction.class);
+			BlockApiLookup.get(ResourceLocation.fromNamespaceAndPath("testmod", "item_insertable"), ItemInsertable.class, Direction.class);
 	public static final BlockApiLookup<ItemExtractable, @NotNull Direction> EXTRACTABLE =
-			BlockApiLookup.get(new ResourceLocation("testmod:item_extractable"), ItemExtractable.class, Direction.class);
+			BlockApiLookup.get(ResourceLocation.fromNamespaceAndPath("testmod", "item_extractable"), ItemExtractable.class, Direction.class);
 
 	private ItemApis() {
 	}

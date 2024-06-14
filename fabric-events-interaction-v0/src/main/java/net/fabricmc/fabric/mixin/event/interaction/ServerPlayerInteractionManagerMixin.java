@@ -62,7 +62,7 @@ public class ServerPlayerInteractionManagerMixin {
 
 		if (result != InteractionResult.PASS) {
 			// The client might have broken the block on its side, so make sure to let it know.
-			this.player.connection.sendPacket(new ClientboundBlockUpdatePacket(level, pos));
+			this.player.connection.send(new ClientboundBlockUpdatePacket(level, pos));
 
 			if (level.getBlockState(pos).hasBlockEntity()) {
 				BlockEntity blockEntity = level.getBlockEntity(pos);
@@ -71,7 +71,7 @@ public class ServerPlayerInteractionManagerMixin {
 					Packet<ClientGamePacketListener> updatePacket = blockEntity.getUpdatePacket();
 
 					if (updatePacket != null) {
-						this.player.connection.sendPacket(updatePacket);
+						this.player.connection.send(updatePacket);
 					}
 				}
 			}

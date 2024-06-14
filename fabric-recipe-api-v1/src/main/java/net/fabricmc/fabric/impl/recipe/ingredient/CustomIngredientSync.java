@@ -44,7 +44,7 @@ import net.minecraft.server.network.ConfigurationTask;
  * </ul>
  */
 public class CustomIngredientSync implements ModInitializer {
-	public static final ResourceLocation PACKET_ID = new ResourceLocation("fabric", "custom_ingredient_sync");
+	public static final ResourceLocation PACKET_ID = ResourceLocation.fromNamespaceAndPath("fabric", "custom_ingredient_sync");
 	public static final int PROTOCOL_VERSION_1 = 1;
 	public static final ThreadLocal<Set<ResourceLocation>> CURRENT_SUPPORTED_INGREDIENTS = new ThreadLocal<>();
 

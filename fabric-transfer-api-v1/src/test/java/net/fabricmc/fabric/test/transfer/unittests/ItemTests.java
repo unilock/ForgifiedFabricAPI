@@ -60,8 +60,8 @@ class ItemTests extends AbstractTransferApiTest {
 	@BeforeAll
 	static void beforeAll() {
 		bootstrap();
-		ENERGY = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, new ResourceLocation(TransferTestInitializer.MOD_ID, "energy"),
-									DataComponentType.<Integer>builder().persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
+		ENERGY = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceLocation.fromNamespaceAndPath(TransferTestInitializer.MOD_ID, "energy"),
+								DataComponentType.<Integer>builder().persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
 	}
 
 	@Test

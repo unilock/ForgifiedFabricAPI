@@ -54,7 +54,7 @@ public class ResourceReloadListenerTestMod implements ModInitializer {
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public ResourceLocation getFabricId() {
-				return new ResourceLocation(MODID, "client_second");
+				return ResourceLocation.fromNamespaceAndPath(MODID, "client_second");
 			}
 
 			@Override
@@ -66,14 +66,14 @@ public class ResourceReloadListenerTestMod implements ModInitializer {
 
 			@Override
 			public Collection<ResourceLocation> getFabricDependencies() {
-				return Collections.singletonList(new ResourceLocation(MODID, "client_first"));
+				return Collections.singletonList(ResourceLocation.fromNamespaceAndPath(MODID, "client_first"));
 			}
 		});
 
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public ResourceLocation getFabricId() {
-				return new ResourceLocation(MODID, "client_first");
+				return ResourceLocation.fromNamespaceAndPath(MODID, "client_first");
 			}
 
 			@Override
@@ -87,7 +87,7 @@ public class ResourceReloadListenerTestMod implements ModInitializer {
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public ResourceLocation getFabricId() {
-				return new ResourceLocation(MODID, "server_second");
+				return ResourceLocation.fromNamespaceAndPath(MODID, "server_second");
 			}
 
 			@Override
@@ -99,14 +99,14 @@ public class ResourceReloadListenerTestMod implements ModInitializer {
 
 			@Override
 			public Collection<ResourceLocation> getFabricDependencies() {
-				return Collections.singletonList(new ResourceLocation(MODID, "server_first"));
+				return Collections.singletonList(ResourceLocation.fromNamespaceAndPath(MODID, "server_first"));
 			}
 		});
 
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public ResourceLocation getFabricId() {
-				return new ResourceLocation(MODID, "server_first");
+				return ResourceLocation.fromNamespaceAndPath(MODID, "server_first");
 			}
 
 			@Override

@@ -37,11 +37,11 @@ public class ItemGroupTest implements ModInitializer {
 	private static final String MOD_ID = "fabric-item-group-api-v1-testmod";
 	private static Item TEST_ITEM;
 
-	private static final ResourceKey<CreativeModeTab> ITEM_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, new ResourceLocation(MOD_ID, "test_group"));
+	private static final ResourceKey<CreativeModeTab> ITEM_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "test_group"));
 
 	@Override
 	public void onInitialize() {
-		TEST_ITEM = Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-item-groups-v0-testmod", "item_test_group"), new Item(new Item.Properties()));
+		TEST_ITEM = Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-item-groups-v0-testmod", "item_test_group"), new Item(new Item.Properties()));
 
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ITEM_GROUP, FabricItemGroup.builder()
 				.title(Component.literal("Test Item Group"))
@@ -84,7 +84,7 @@ public class ItemGroupTest implements ModInitializer {
 		for (int j = 0; j < 20; j++) {
 			Registry.register(
 					BuiltInRegistries.CREATIVE_MODE_TAB,
-					new ResourceLocation(MOD_ID, "empty_group_" + j),
+					ResourceLocation.fromNamespaceAndPath(MOD_ID, "empty_group_" + j),
 					FabricItemGroup.builder()
 							.title(Component.literal("Empty Item Group: " + j))
 							.build()
@@ -94,7 +94,7 @@ public class ItemGroupTest implements ModInitializer {
 		for (int i = 0; i < 100; i++) {
 			final int index = i;
 
-			Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, new ResourceLocation(MOD_ID, "test_group_" + i), FabricItemGroup.builder()
+			Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "test_group_" + i), FabricItemGroup.builder()
 					.title(Component.literal("Test Item Group: " + i))
 					.icon((Supplier<ItemStack>) () -> new ItemStack(BuiltInRegistries.BLOCK.byId(index)))
 					.displayItems((context, entries) -> {

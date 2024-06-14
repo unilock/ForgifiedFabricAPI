@@ -33,7 +33,7 @@ import net.fabricmc.fabric.impl.client.rendering.ColorProviderRegistryImpl;
 public class BlockColorsMixin implements ColorProviderRegistryImpl.ColorMapperHolder<Block, BlockColor> {
 	@Shadow
 	@Final
-	private IdMapper<BlockColor> providers;
+	private IdMapper<BlockColor> blockColors;
 
 	@Inject(method = "createDefault", at = @At("RETURN"))
 	private static void create(CallbackInfoReturnable<BlockColors> info) {
@@ -42,6 +42,6 @@ public class BlockColorsMixin implements ColorProviderRegistryImpl.ColorMapperHo
 
 	@Override
 	public BlockColor get(Block block) {
-		return providers.byId(BuiltInRegistries.BLOCK.getId(block));
+		return blockColors.byId(BuiltInRegistries.BLOCK.getId(block));
 	}
 }

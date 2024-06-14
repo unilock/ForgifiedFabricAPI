@@ -19,6 +19,7 @@ package net.fabricmc.fabric.impl.datagen.loot;
 import java.util.Collections;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
+import net.fabricmc.fabric.mixin.datagen.loot.BlockLootTableGeneratorAccessor;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
@@ -29,7 +30,7 @@ public class ConditionBlockLootTableGenerator extends BlockLootSubProvider {
 	private final ResourceCondition[] conditions;
 
 	public ConditionBlockLootTableGenerator(BlockLootSubProvider parent, ResourceCondition[] conditions) {
-		super(Collections.emptySet(), FeatureFlags.REGISTRY.allFlags());
+		super(Collections.emptySet(), FeatureFlags.REGISTRY.allFlags(), ((BlockLootTableGeneratorAccessor) parent).getRegistries());
 
 		this.parent = parent;
 		this.conditions = conditions;

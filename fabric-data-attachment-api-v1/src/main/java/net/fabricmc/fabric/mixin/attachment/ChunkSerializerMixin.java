@@ -30,6 +30,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.storage.ChunkSerializer;
+import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 
 @Mixin(ChunkSerializer.class)
 abstract class ChunkSerializerMixin {
@@ -40,7 +41,7 @@ abstract class ChunkSerializerMixin {
 			),
 			method = "read"
 	)
-	private static LevelChunk readWorldChunkAttachments(LevelChunk chunk, ServerLevel world, PoiManager poiStorage, ChunkPos chunkPos, CompoundTag nbt) {
+	private static LevelChunk readWorldChunkAttachments(LevelChunk chunk, ServerLevel world, PoiManager poiStorage, RegionStorageInfo storageKey, ChunkPos chunkPos, CompoundTag nbt) {
 		((AttachmentTargetImpl) chunk).fabric_readAttachmentsFromNbt(nbt, world.registryAccess());
 		return chunk;
 	}
@@ -52,7 +53,7 @@ abstract class ChunkSerializerMixin {
 			),
 			method = "read"
 	)
-	private static ProtoChunk readProtoChunkAttachments(ProtoChunk chunk, ServerLevel world, PoiManager poiStorage, ChunkPos chunkPos, CompoundTag nbt) {
+	private static ProtoChunk readProtoChunkAttachments(ProtoChunk chunk, ServerLevel world, PoiManager poiStorage, RegionStorageInfo storageKey, ChunkPos chunkPos, CompoundTag nbt) {
 		((AttachmentTargetImpl) chunk).fabric_readAttachmentsFromNbt(nbt, world.registryAccess());
 		return chunk;
 	}

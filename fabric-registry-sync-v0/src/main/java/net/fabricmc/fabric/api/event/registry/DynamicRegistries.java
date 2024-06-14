@@ -56,7 +56,7 @@ import net.minecraft.resources.ResourceKey;
  * // @link region substring=RegistryKey target=RegistryKey
  * // @link region substring=ofRegistry target="RegistryKey#ofRegistry"
  * // @link region substring=Identifier target="net.minecraft.util.Identifier#Identifier(String, String)"
- * public static final RegistryKey<Registry<MyData>> MY_DATA_KEY = RegistryKey.ofRegistry(new Identifier("my_mod", "my_data"));
+ * public static final RegistryKey<Registry<MyData>> MY_DATA_KEY = RegistryKey.ofRegistry(Identifier.of("my_mod", "my_data"));
  * // @end @end @end
  *
  * // Option 1: Register a non-synced registry

@@ -16,17 +16,20 @@
 
 package net.fabricmc.fabric.mixin.itemgroup.client;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
+import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;
 import net.fabricmc.fabric.impl.client.itemgroup.FabricCreativeGuiComponents;
-import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
+import net.fabricmc.fabric.impl.itemgroup.FabricItemGroupImpl;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
@@ -37,7 +40,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 
 @Mixin(CreativeModeInventoryScreen.class)
-public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMenu> extends EffectRenderingInventoryScreen<T> implements CreativeGuiExtensions {
+public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMenu> extends EffectRenderingInventoryScreen<T> implements FabricCreativeInventoryScreen {
 	public CreativeInventoryScreenMixin(T screenHandler, Inventory playerInventory, Component text) {
 		super(screenHandler, playerInventory, text);
 	}
@@ -49,51 +52,15 @@ public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMe
 	private static CreativeModeTab selectedTab;
 
 	// "static" matches selectedTab
-	private static int fabric_currentPage = 0;
+	@Unique
+	private static int currentPage = 0;
 
-	@Override
-	public void fabric_nextPage() {
-		if (!fabric_hasGroupForPage(fabric_currentPage + 1)) {
-			return;
-		}
-
-		fabric_currentPage++;
-		fabric_updateSelection();
-	}
-
-	@Override
-	public void fabric_previousPage() {
-		if (fabric_currentPage == 0) {
-			return;
-		}
-
-		fabric_currentPage--;
-		fabric_updateSelection();
-	}
-
-	@Override
-	public boolean fabric_isButtonVisible(FabricCreativeGuiComponents.Type type) {
-		return CreativeModeTabs.tabs().size() > (Objects.requireNonNull(CreativeModeTabs.CACHED_PARAMETERS).hasPermissions() ? 14 : 13);
-	}
-
-	@Override
-	public boolean fabric_isButtonEnabled(FabricCreativeGuiComponents.Type type) {
-		if (type == FabricCreativeGuiComponents.Type.NEXT) {
-			return fabric_hasGroupForPage(fabric_currentPage + 1);
-		}
-
-		if (type == FabricCreativeGuiComponents.Type.PREVIOUS) {
-			return fabric_currentPage != 0;
-		}
-
-		return false;
-	}
-
-	private void fabric_updateSelection() {
-		if (!fabric_isGroupVisible(selectedTab)) {
+	@Unique
+	private void updateSelection() {
+		if (!isGroupVisible(selectedTab)) {
 			CreativeModeTabs.allTabs()
 					.stream()
-					.filter(this::fabric_isGroupVisible)
+					.filter(this::isGroupVisible)
 					.min((a, b) -> Boolean.compare(a.isAlignedRight(), b.isAlignedRight()))
 					.ifPresent(this::selectTab);
 		}
@@ -101,63 +68,131 @@ public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMe
 
 	@Inject(method = "init", at = @At("RETURN"))
 	private void init(CallbackInfo info) {
-		fabric_currentPage = fabric_getPage(selectedTab);
+		currentPage = getPage(selectedTab);
 
 		int xpos = leftPos + 170;
 		int ypos = topPos + 4;
 
-		addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos + 11, ypos, FabricCreativeGuiComponents.Type.NEXT, this));
-		addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos, ypos, FabricCreativeGuiComponents.Type.PREVIOUS, this));
+		CreativeModeInventoryScreen self = (CreativeModeInventoryScreen) (Object) this;
+		addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos + 11, ypos, FabricCreativeGuiComponents.Type.NEXT, self));
+		addRenderableWidget(new FabricCreativeGuiComponents.ItemGroupButtonWidget(xpos, ypos, FabricCreativeGuiComponents.Type.PREVIOUS, self));
 	}
 
 	@Inject(method = "selectTab", at = @At("HEAD"), cancellable = true)
 	private void setSelectedTab(CreativeModeTab itemGroup, CallbackInfo info) {
-		if (!fabric_isGroupVisible(itemGroup)) {
+		if (!isGroupVisible(itemGroup)) {
 			info.cancel();
 		}
 	}
 
 	@Inject(method = "checkTabHovering", at = @At("HEAD"), cancellable = true)
 	private void renderTabTooltipIfHovered(GuiGraphics drawContext, CreativeModeTab itemGroup, int mx, int my, CallbackInfoReturnable<Boolean> info) {
-		if (!fabric_isGroupVisible(itemGroup)) {
+		if (!isGroupVisible(itemGroup)) {
 			info.setReturnValue(false);
 		}
 	}
 
 	@Inject(method = "checkTabClicked", at = @At("HEAD"), cancellable = true)
 	private void isClickInTab(CreativeModeTab itemGroup, double mx, double my, CallbackInfoReturnable<Boolean> info) {
-		if (!fabric_isGroupVisible(itemGroup)) {
+		if (!isGroupVisible(itemGroup)) {
 			info.setReturnValue(false);
 		}
 	}
 
 	@Inject(method = "renderTabButton", at = @At("HEAD"), cancellable = true)
 	private void renderTabIcon(GuiGraphics drawContext, CreativeModeTab itemGroup, CallbackInfo info) {
-		if (!fabric_isGroupVisible(itemGroup)) {
+		if (!isGroupVisible(itemGroup)) {
 			info.cancel();
 		}
 	}
 
-	private boolean fabric_isGroupVisible(CreativeModeTab itemGroup) {
-		return itemGroup.shouldDisplay() && fabric_currentPage == fabric_getPage(itemGroup);
-	}
-
-	private static int fabric_getPage(CreativeModeTab itemGroup) {
-		if (FabricCreativeGuiComponents.COMMON_GROUPS.contains(itemGroup)) {
-			return fabric_currentPage;
-		}
-
-		final FabricItemGroup fabricItemGroup = (FabricItemGroup) itemGroup;
-		return fabricItemGroup.getPage();
-	}
-
-	private static boolean fabric_hasGroupForPage(int page) {
-		return CreativeModeTabs.tabs().stream()
-				.anyMatch(itemGroup -> fabric_getPage(itemGroup) == page);
+	@Unique
+	private boolean isGroupVisible(CreativeModeTab itemGroup) {
+		return itemGroup.shouldDisplay() && currentPage == getPage(itemGroup);
 	}
 
 	@Override
-	public int fabric_currentPage() {
-		return fabric_currentPage;
+	public int getPage(CreativeModeTab itemGroup) {
+		if (FabricCreativeGuiComponents.COMMON_GROUPS.contains(itemGroup)) {
+			return currentPage;
+		}
+
+		final FabricItemGroupImpl fabricItemGroup = (FabricItemGroupImpl) itemGroup;
+		return fabricItemGroup.fabric_getPage();
+	}
+
+	@Unique
+	private boolean hasGroupForPage(int page) {
+		return CreativeModeTabs.tabs()
+				.stream()
+				.anyMatch(itemGroup -> getPage(itemGroup) == page);
+	}
+
+	@Override
+	public boolean switchToPage(int page) {
+		if (!hasGroupForPage(page)) {
+			return false;
+		}
+
+		if (currentPage == page) {
+			return false;
+		}
+
+		currentPage = page;
+		updateSelection();
+		return true;
+	}
+
+	@Override
+	public int getCurrentPage() {
+		return currentPage;
+	}
+
+	@Override
+	public int getPageCount() {
+		return FabricCreativeGuiComponents.getPageCount();
+	}
+
+	@Override
+	public List<CreativeModeTab> getItemGroupsOnPage(int page) {
+		return CreativeModeTabs.tabs()
+				.stream()
+				.filter(itemGroup -> getPage(itemGroup) == page)
+				// Thanks to isXander for the sorting
+				.sorted(Comparator.comparing(CreativeModeTab::row).thenComparingInt(CreativeModeTab::column))
+				.sorted((a, b) -> {
+					if (a.isAlignedRight() && !b.isAlignedRight()) return 1;
+					if (!a.isAlignedRight() && b.isAlignedRight()) return -1;
+					return 0;
+				})
+				.toList();
+	}
+
+	@Override
+	public boolean hasAdditionalPages() {
+		return CreativeModeTabs.tabs().size() > (Objects.requireNonNull(CreativeModeTabs.CACHED_PARAMETERS).hasPermissions() ? 14 : 13);
+	}
+
+	@Override
+	public CreativeModeTab getSelectedItemGroup() {
+		return selectedTab;
+	}
+
+	@Override
+	public boolean setSelectedItemGroup(CreativeModeTab itemGroup) {
+		Objects.requireNonNull(itemGroup, "itemGroup");
+
+		if (selectedTab == itemGroup) {
+			return false;
+		}
+
+		if (currentPage != getPage(itemGroup)) {
+			if (!switchToPage(getPage(itemGroup))) {
+				return false;
+			}
+		}
+
+		selectTab(itemGroup);
+		return true;
 	}
 }

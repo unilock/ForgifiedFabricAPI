@@ -29,10 +29,12 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.RegistryOps;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -47,10 +49,18 @@ public abstract class FabricCodecDataProvider<T> implements DataProvider {
 	private final CompletableFuture<HolderLookup.Provider> registriesFuture;
 	private final Codec<T> codec;
 
-	protected FabricCodecDataProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture, PackOutput.Target outputType, String directoryName, Codec<T> codec) {
-		this.pathResolver = dataOutput.createPathProvider(outputType, directoryName);
+	private FabricCodecDataProvider(PackOutput.PathProvider pathResolver, CompletableFuture<HolderLookup.Provider> registriesFuture, Codec<T> codec) {
+		this.pathResolver = pathResolver;
 		this.registriesFuture = Objects.requireNonNull(registriesFuture);
 		this.codec = codec;
+	}
+
+	protected FabricCodecDataProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture, PackOutput.Target outputType, String directoryName, Codec<T> codec) {
+		this(dataOutput.createPathProvider(outputType, directoryName), registriesFuture, codec);
+	}
+
+	protected FabricCodecDataProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture, ResourceKey<? extends Registry<?>> key, Codec<T> codec) {
+		this(dataOutput.createRegistryElementsPathProvider(key), registriesFuture, codec);
 	}
 
 	@Override

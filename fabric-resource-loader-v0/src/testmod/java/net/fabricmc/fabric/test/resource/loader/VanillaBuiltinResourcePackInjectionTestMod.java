@@ -33,7 +33,7 @@ public class VanillaBuiltinResourcePackInjectionTestMod implements ModInitialize
 
 	@Override
 	public void onInitialize() {
-		ResourceLocation id = new ResourceLocation(MODID, "testblock");
+		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MODID, "testblock");
 
 		Registry.register(BuiltInRegistries.BLOCK, id, TEST_BLOCK);
 		Registry.register(BuiltInRegistries.ITEM, id, new BlockItem(TEST_BLOCK, new Item.Properties()));

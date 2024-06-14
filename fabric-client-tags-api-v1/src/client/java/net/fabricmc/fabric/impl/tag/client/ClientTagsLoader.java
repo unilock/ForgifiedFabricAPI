@@ -35,12 +35,12 @@ import org.slf4j.LoggerFactory;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagFile;
 import net.minecraft.tags.TagKey;
-import net.minecraft.tags.TagManager;
 
 public class ClientTagsLoader {
 	private static final Logger LOGGER = LoggerFactory.getLogger("fabric-client-tags-api-v1");
@@ -109,7 +109,7 @@ public class ClientTagsLoader {
 	 * @return the paths to all tag json files within the available mods
 	 */
 	private static HashSet<Path> getTagFiles(ResourceKey<? extends Registry<?>> registryKey, ResourceLocation identifier) {
-		return getTagFiles(TagManager.getTagDir(registryKey), identifier);
+		return getTagFiles(Registries.tagsDirPath(registryKey), identifier);
 	}
 
 	/**

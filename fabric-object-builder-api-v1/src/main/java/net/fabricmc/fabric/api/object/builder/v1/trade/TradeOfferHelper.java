@@ -135,21 +135,21 @@ public final class TradeOfferHelper {
 		 * <p>In vanilla, this pool contains offers to buy water buckets, baked potatoes, etc.
 		 * for emeralds.
 		 */
-		ResourceLocation BUY_ITEMS_POOL = new ResourceLocation("minecraft", "buy_items");
+		ResourceLocation BUY_ITEMS_POOL = ResourceLocation.withDefaultNamespace("buy_items");
 		/**
 		 * The pool ID for the "sell special items" pool.
 		 * Two trade offers are picked from this pool.
 		 *
 		 * <p>In vanilla, this pool contains offers to sell logs, enchanted iron pickaxes, etc.
 		 */
-		ResourceLocation SELL_SPECIAL_ITEMS_POOL = new ResourceLocation("minecraft", "sell_special_items");
+		ResourceLocation SELL_SPECIAL_ITEMS_POOL = ResourceLocation.withDefaultNamespace("sell_special_items");
 		/**
 		 * The pool ID for the "sell common items" pool.
 		 * Five trade offers are picked from this pool.
 		 *
 		 * <p>In vanilla, this pool contains offers to sell flowers, saplings, etc.
 		 */
-		ResourceLocation SELL_COMMON_ITEMS_POOL = new ResourceLocation("minecraft", "sell_common_items");
+		ResourceLocation SELL_COMMON_ITEMS_POOL = ResourceLocation.withDefaultNamespace("sell_common_items");
 
 		/**
 		 * Adds a new pool to the offer list. Exactly {@code count} offers are picked from

@@ -41,7 +41,7 @@ import net.minecraft.util.Mth;
 public class CustomAtlasSourcesTest implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		AtlasSourceTypeRegistry.register(new ResourceLocation("fabric-rendering-v1-testmod", "double"), DoubleAtlasSource.TYPE);
+		AtlasSourceTypeRegistry.register(ResourceLocation.fromNamespaceAndPath("fabric-rendering-v1-testmod", "double"), DoubleAtlasSource.TYPE);
 	}
 
 	private static class DoubleAtlasSource implements SpriteSource {

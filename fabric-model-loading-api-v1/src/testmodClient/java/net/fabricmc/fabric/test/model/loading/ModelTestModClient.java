@@ -45,7 +45,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public class ModelTestModClient implements ClientModInitializer {
 	public static final String ID = "fabric-model-loading-api-v1-testmod";
 
-	public static final ResourceLocation MODEL_ID = new ResourceLocation(ID, "half_red_sand");
+	public static final ResourceLocation HALF_RED_SAND_MODEL_ID = id("half_red_sand");
+	public static final ResourceLocation GOLD_BLOCK_MODEL_ID = ResourceLocation.withDefaultNamespace("block/gold_block");
+	public static final ResourceLocation BROWN_GLAZED_TERRACOTTA_MODEL_ID = ResourceLocation.withDefaultNamespace("block/brown_glazed_terracotta");
 
 	static class DownQuadRemovingModel extends ForwardingBakedModel {
 		DownQuadRemovingModel(BakedModel model) {
@@ -63,19 +65,23 @@ public class ModelTestModClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ModelLoadingPlugin.register(pluginContext -> {
-			pluginContext.addModels(MODEL_ID);
+			pluginContext.addModels(HALF_RED_SAND_MODEL_ID);
 			// remove bottom face of gold blocks
 			pluginContext.modifyModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, context) -> {
-				if (context.id().getPath().equals("block/gold_block")) {
+				ResourceLocation id = context.resourceId();
+
+				if (id != null && id.equals(GOLD_BLOCK_MODEL_ID)) {
 					return new DownQuadRemovingModel(model);
-				} else {
-					return model;
 				}
+
+				return model;
 			});
 			// make fences with west: true and everything else false appear to be a missing model visually
 			ModelResourceLocation fenceId = BlockModelShaper.stateToModelLocation(Blocks.OAK_FENCE.defaultBlockState().setValue(CrossCollisionBlock.WEST, true));
 			pluginContext.modifyModelOnLoad().register(ModelModifier.OVERRIDE_PHASE, (model, context) -> {
-				if (fenceId.equals(context.id())) {
+				ModelResourceLocation id = context.topLevelId();
+
+				if (id != null && id.equals(fenceId)) {
 					return context.getOrLoadModel(ModelBakery.MISSING_MODEL_LOCATION);
 				}
 
@@ -84,8 +90,10 @@ public class ModelTestModClient implements ClientModInitializer {
 			// make brown glazed terracotta appear to be a missing model visually, but without affecting the item, by using pre-bake
 			// using load here would make the item also appear missing
 			pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (model, context) -> {
-				if (context.id().getPath().equals("block/brown_glazed_terracotta")) {
-					return context.loader().getModel(ModelBakery.MISSING_MODEL_LOCATION);
+				ResourceLocation id = context.resourceId();
+
+				if (id != null && id.equals(BROWN_GLAZED_TERRACOTTA_MODEL_ID)) {
+					return context.baker().getModel(ModelBakery.MISSING_MODEL_LOCATION);
 				}
 
 				return model;
@@ -97,7 +105,7 @@ public class ModelTestModClient implements ClientModInitializer {
 
 				// All the block state models are top-level...
 				// Use a delegating unbaked model to make sure the identical models only get baked a single time.
-				ResourceLocation wheatStage0Id = new ResourceLocation("block/wheat_stage0");
+				ResourceLocation wheatStage0Id = ResourceLocation.withDefaultNamespace("block/wheat_stage0");
 
 				UnbakedModel stage0Model = new DelegatingUnbakedModel(wheatStage0Id);
 
@@ -105,7 +113,7 @@ public class ModelTestModClient implements ClientModInitializer {
 					context.setModel(state.setValue(CropBlock.AGE, age), stage0Model);
 				}
 
-				context.setModel(state.setValue(CropBlock.AGE, 7), context.getOrLoadModel(new ResourceLocation("block/wheat_stage7")));
+				context.setModel(state.setValue(CropBlock.AGE, 7), context.getOrLoadModel(ResourceLocation.withDefaultNamespace("block/wheat_stage7")));
 			});
 		});
 
@@ -116,5 +124,9 @@ public class ModelTestModClient implements ClientModInitializer {
 				registrationHelper.register(new BakedModelFeatureRenderer<>(playerRenderer, SpecificModelReloadListener.INSTANCE::getSpecificModel));
 			}
 		});
+	}
+
+	public static ResourceLocation id(String path) {
+		return ResourceLocation.fromNamespaceAndPath(ID, path);
 	}
 }

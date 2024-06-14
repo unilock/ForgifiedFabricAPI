@@ -52,7 +52,7 @@ public class ScreenHandlerTest implements ModInitializer {
 	public static final MenuType<BoxScreenHandler> BOX_SCREEN_HANDLER = new ExtendedScreenHandlerType<>(BoxScreenHandler::new, BlockPos.STREAM_CODEC.cast());
 
 	public static ResourceLocation id(String path) {
-		return new ResourceLocation(ID, path);
+		return ResourceLocation.fromNamespaceAndPath(ID, path);
 	}
 
 	@Override

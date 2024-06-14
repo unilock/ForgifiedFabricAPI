@@ -20,12 +20,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoLuminanceFix;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Context for non-terrain block rendering.
@@ -54,23 +58,33 @@ public class BlockRenderContext extends AbstractBlockRenderContext {
 	}
 
 	public void render(BlockAndTintGetter blockView, BakedModel model, BlockState state, BlockPos pos, PoseStack matrixStack, VertexConsumer buffer, boolean cull, RandomSource random, long seed, int overlay) {
-		this.vertexConsumer = buffer;
-		this.matrix = matrixStack.last().pose();
-		this.normalMatrix = matrixStack.last().normal();
-		this.overlay = overlay;
+		try {
+			Vec3 offset = state.getOffset(blockView, pos);
+			matrixStack.translate(offset.x, offset.y, offset.z);
 
-		blockInfo.random = random;
-		blockInfo.seed = seed;
-		blockInfo.recomputeSeed = false;
+			this.vertexConsumer = buffer;
+			this.matrix = matrixStack.last().pose();
+			this.normalMatrix = matrixStack.last().normal();
+			this.overlay = overlay;
 
-		aoCalc.clear();
-		blockInfo.prepareForWorld(blockView, cull);
-		blockInfo.prepareForBlock(state, pos, model.useAmbientOcclusion());
+			blockInfo.random = random;
+			blockInfo.seed = seed;
+			blockInfo.recomputeSeed = false;
 
-		model.emitBlockQuads(blockView, state, pos, blockInfo.randomSupplier, this);
+			aoCalc.clear();
+			blockInfo.prepareForWorld(blockView, cull);
+			blockInfo.prepareForBlock(state, pos, model.useAmbientOcclusion());
 
-		blockInfo.release();
-		blockInfo.random = null;
-		this.vertexConsumer = null;
+			model.emitBlockQuads(blockView, state, pos, blockInfo.randomSupplier, this);
+		} catch (Throwable throwable) {
+			CrashReport crashReport = CrashReport.forThrowable(throwable, "Tessellating block model - Indigo Renderer");
+			CrashReportCategory crashReportSection = crashReport.addCategory("Block model being tessellated");
+			CrashReportCategory.populateBlockDetails(crashReportSection, blockView, pos, state);
+			throw new ReportedException(crashReport);
+		} finally {
+			blockInfo.release();
+			blockInfo.random = null;
+			this.vertexConsumer = null;
+		}
 	}
 }

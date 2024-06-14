@@ -29,14 +29,15 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.portal.DimensionTransition;
 
 @Mixin(Entity.class)
 abstract class EntityMixin {
 	@Shadow
-	public Level level;
+	private Level level;
 
 	@Inject(method = "changeDimension", at = @At("RETURN"))
-	private void afterWorldChanged(ServerLevel destination, CallbackInfoReturnable<Entity> cir) {
+	private void afterWorldChanged(DimensionTransition target, CallbackInfoReturnable<Entity> cir) {
 		// Ret will only have an entity if the teleport worked (entity not removed, teleportTarget was valid, entity was successfully created)
 		Entity ret = cir.getReturnValue();
 

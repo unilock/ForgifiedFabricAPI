@@ -16,18 +16,19 @@
 
 package net.fabricmc.fabric.impl.client.indigo.renderer.render;
 
-import java.util.Set;
+import java.util.Map;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoLuminanceFix;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SectionBufferBuilderPack;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
-import net.minecraft.client.renderer.chunk.SectionRenderDispatcher.RenderSection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
@@ -66,13 +67,9 @@ public class ChunkRenderInfo {
 	private final Long2FloatOpenHashMap aoLevelCache;
 
 	private final BlockPos.MutableBlockPos chunkOrigin = new BlockPos.MutableBlockPos();
-	RenderSection.RebuildTask.CompileResults renderData;
-	RenderSection chunkRenderer;
 	SectionBufferBuilderPack builders;
-	Set<RenderType> initializedLayers;
+	Map<RenderType, BufferBuilder> buffers;
 	BlockAndTintGetter blockView;
-
-	private final Object2ObjectOpenHashMap<RenderType, BufferBuilder> buffers = new Object2ObjectOpenHashMap<>();
 
 	ChunkRenderInfo() {
 		brightnessCache = new Long2IntOpenHashMap();
@@ -81,34 +78,26 @@ public class ChunkRenderInfo {
 		aoLevelCache.defaultReturnValue(Float.MAX_VALUE);
 	}
 
-	void prepare(RenderChunkRegion blockView, RenderSection chunkRenderer, RenderSection.RebuildTask.CompileResults renderData, SectionBufferBuilderPack builders, Set<RenderType> initializedLayers) {
+	void prepare(RenderChunkRegion blockView, BlockPos chunkOrigin, SectionBufferBuilderPack builders, Map<RenderType, BufferBuilder> buffers) {
 		this.blockView = blockView;
-		this.chunkOrigin.set(chunkRenderer.getOrigin());
-		this.renderData = renderData;
-		this.chunkRenderer = chunkRenderer;
+		this.chunkOrigin.set(chunkOrigin);
 		this.builders = builders;
-		this.initializedLayers = initializedLayers;
-		buffers.clear();
+		this.buffers = buffers;
 		brightnessCache.clear();
 		aoLevelCache.clear();
 	}
 
 	void release() {
-		renderData = null;
-		chunkRenderer = null;
-		buffers.clear();
 	}
 
 	/** Lazily retrieves output buffer for given layer, initializing as needed. */
 	public BufferBuilder getInitializedBuffer(RenderType renderLayer) {
+		// TODO 24w21b - possibly AW class_9810#method_60903 which does the same thing?
 		BufferBuilder builder = buffers.get(renderLayer);
 
 		if (builder == null) {
-			builder = builders.builder(renderLayer);
-
-			if (initializedLayers.add(renderLayer)) {
-				chunkRenderer.beginLayer(builder);
-			}
+			ByteBufferBuilder byteBuilder = builders.buffer(renderLayer);
+			builder = new BufferBuilder(byteBuilder, VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK);
 
 			buffers.put(renderLayer, builder);
 		}

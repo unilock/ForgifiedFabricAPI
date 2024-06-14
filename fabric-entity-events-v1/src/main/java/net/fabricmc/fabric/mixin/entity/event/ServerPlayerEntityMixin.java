@@ -76,8 +76,7 @@ abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 	}
 
 	/**
-	 * This is called by both "moveToWorld" and "teleport".
-	 * So this is suitable to handle the after event from both call sites.
+	 * This is called by {@code teleportTo}.
 	 */
 	@Inject(method = "triggerDimensionChangeTriggers(Lnet/minecraft/server/level/ServerLevel;)V", at = @At("TAIL"))
 	private void afterWorldChanged(ServerLevel origin, CallbackInfo ci) {

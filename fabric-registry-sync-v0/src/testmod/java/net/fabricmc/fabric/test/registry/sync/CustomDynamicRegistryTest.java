@@ -33,20 +33,20 @@ public final class CustomDynamicRegistryTest implements ModInitializer {
 	private static final Logger LOGGER = LogUtils.getLogger();
 
 	public static final ResourceKey<Registry<TestDynamicObject>> TEST_DYNAMIC_REGISTRY_KEY =
-			ResourceKey.createRegistryKey(new ResourceLocation("fabric", "test_dynamic"));
+			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("fabric", "test_dynamic"));
 	public static final ResourceKey<Registry<TestNestedDynamicObject>> TEST_NESTED_DYNAMIC_REGISTRY_KEY =
-			ResourceKey.createRegistryKey(new ResourceLocation("fabric", "test_dynamic_nested"));
+			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("fabric", "test_dynamic_nested"));
 	public static final ResourceKey<Registry<TestDynamicObject>> TEST_SYNCED_1_DYNAMIC_REGISTRY_KEY =
-			ResourceKey.createRegistryKey(new ResourceLocation("fabric", "test_dynamic_synced_1"));
+			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("fabric", "test_dynamic_synced_1"));
 	public static final ResourceKey<Registry<TestDynamicObject>> TEST_SYNCED_2_DYNAMIC_REGISTRY_KEY =
-			ResourceKey.createRegistryKey(new ResourceLocation("fabric", "test_dynamic_synced_2"));
+			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("fabric", "test_dynamic_synced_2"));
 	public static final ResourceKey<Registry<TestDynamicObject>> TEST_EMPTY_SYNCED_DYNAMIC_REGISTRY_KEY =
-			ResourceKey.createRegistryKey(new ResourceLocation("fabric", "test_dynamic_synced_empty"));
+			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("fabric", "test_dynamic_synced_empty"));
 
 	private static final ResourceKey<TestDynamicObject> SYNCED_ENTRY_KEY =
-			ResourceKey.create(TEST_SYNCED_1_DYNAMIC_REGISTRY_KEY, new ResourceLocation("fabric-registry-sync-v0-testmod", "synced"));
+			ResourceKey.create(TEST_SYNCED_1_DYNAMIC_REGISTRY_KEY, ResourceLocation.fromNamespaceAndPath("fabric-registry-sync-v0-testmod", "synced"));
 	private static final TagKey<TestDynamicObject> TEST_DYNAMIC_OBJECT_TAG =
-			TagKey.create(TEST_SYNCED_1_DYNAMIC_REGISTRY_KEY, new ResourceLocation("fabric-registry-sync-v0-testmod", "test"));
+			TagKey.create(TEST_SYNCED_1_DYNAMIC_REGISTRY_KEY, ResourceLocation.fromNamespaceAndPath("fabric-registry-sync-v0-testmod", "test"));
 
 	@Override
 	public void onInitialize() {

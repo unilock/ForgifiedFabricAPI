@@ -22,7 +22,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.animal.Pig;
 
 public class InspectablePigEntityRenderer extends PigRenderer {
-	private static final ResourceLocation TEXTURE = new ResourceLocation("missingno");
+	private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("missingno");
 
 	public InspectablePigEntityRenderer(EntityRendererProvider.Context context) {
 		super(context);

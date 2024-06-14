@@ -43,7 +43,7 @@ public class ClientTagTest implements ClientModInitializer {
 	public void onInitializeClient() {
 		final ModContainer container = FabricLoader.getInstance().getModContainer(MODID).get();
 
-		if (!ResourceManagerHelper.registerBuiltinResourcePack(new ResourceLocation(MODID, "test2"),
+		if (!ResourceManagerHelper.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(MODID, "test2"),
 				container, ResourcePackActivationType.ALWAYS_ENABLED)) {
 			throw new IllegalStateException("Could not register built-in resource pack.");
 		}
@@ -66,7 +66,7 @@ public class ClientTagTest implements ClientModInitializer {
 			}
 
 			if (ClientTags.isInWithLocalFallback(TagKey.create(BuiltInRegistries.BLOCK.key(),
-					new ResourceLocation("fabric", "sword_efficient")), Blocks.DIRT)) {
+					ResourceLocation.fromNamespaceAndPath("fabric", "sword_efficient")), Blocks.DIRT)) {
 				throw new AssertionError("Expected not to find dirt in fabric:sword_efficient, but it was found!");
 			}
 
@@ -81,7 +81,7 @@ public class ClientTagTest implements ClientModInitializer {
 		// but the this test should pass as minecraft:sword_efficient will contain dirt on the server
 		ClientTickEvents.END_WORLD_TICK.register(client -> {
 			if (!ClientTags.isInWithLocalFallback(TagKey.create(BuiltInRegistries.BLOCK.key(),
-					new ResourceLocation("fabric", "sword_efficient")), Blocks.DIRT)) {
+					ResourceLocation.fromNamespaceAndPath("fabric", "sword_efficient")), Blocks.DIRT)) {
 				throw new AssertionError("Expected to find dirt in fabric:sword_efficient, but it was not found!");
 			}
 		});

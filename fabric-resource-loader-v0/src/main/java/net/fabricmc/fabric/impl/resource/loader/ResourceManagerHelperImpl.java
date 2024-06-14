@@ -151,9 +151,7 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 		if (instance != null) {
 			List<PreparableReloadListener> mutable = new ArrayList<>(listeners);
 			instance.sort(mutable);
-			// FFAPI: Return mutable list to match input type
-			// See https://github.com/Sinytra/Connector/issues/641
-			return mutable;
+			return Collections.unmodifiableList(mutable);
 		}
 
 		return listeners;

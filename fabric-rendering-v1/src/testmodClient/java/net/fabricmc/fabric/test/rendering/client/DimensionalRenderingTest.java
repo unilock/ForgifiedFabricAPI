@@ -18,6 +18,7 @@ package net.fabricmc.fabric.test.rendering.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -32,7 +33,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 public class DimensionalRenderingTest implements ClientModInitializer {
-	private static final ResourceLocation END_SKY = new ResourceLocation("textures/block/dirt.png");
+	private static final ResourceLocation END_SKY = ResourceLocation.withDefaultNamespace("textures/block/dirt.png");
 
 	private static void render(WorldRenderContext context) {
 		RenderSystem.enableBlend();
@@ -41,40 +42,39 @@ public class DimensionalRenderingTest implements ClientModInitializer {
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		RenderSystem.setShaderTexture(0, END_SKY);
 		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.getBuilder();
+		BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 
 		Matrix4f matrix4f = context.positionMatrix();
-		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-		bufferBuilder.vertex(matrix4f, -100.0f, -100.0f, -100.0f).uv(0.0F, 0.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, -100.0f, -100.0f, 100.0f).uv(0.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, -100.0f, 100.0f).uv(1.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, -100.0f, -100.0f).uv(1.0F, 0.0F).color(255, 255, 255, 255).endVertex();
+		bufferBuilder.addVertex(matrix4f, -100.0f, -100.0f, -100.0f).setUv(0.0F, 0.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, -100.0f, -100.0f, 100.0f).setUv(0.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, -100.0f, 100.0f).setUv(1.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, -100.0f, -100.0f).setUv(1.0F, 0.0F).setColor(255, 255, 255, 255);
 
-		bufferBuilder.vertex(matrix4f, -100.0f, 100.0f, -100.0f).uv(0.0F, 0.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, -100.0f, -100.0f, -99.0f).uv(0.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, -100.0f, -99.0f).uv(1.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, 100.0f, -100.0f).uv(1.0F, 0.0F).color(255, 255, 255, 255).endVertex();
+		bufferBuilder.addVertex(matrix4f, -100.0f, 100.0f, -100.0f).setUv(0.0F, 0.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, -100.0f, -100.0f, -99.0f).setUv(0.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, -100.0f, -99.0f).setUv(1.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, 100.0f, -100.0f).setUv(1.0F, 0.0F).setColor(255, 255, 255, 255);
 
-		bufferBuilder.vertex(matrix4f, -100.0f, -100.0f, 100.0f).uv(0.0F, 0.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, -100.0f, 100.0f, 100.0f).uv(0.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, 100.0f, 100.0f).uv(1.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, -100.0f, 100.0f).uv(1.0F, 0.0F).color(255, 255, 255, 255).endVertex();
+		bufferBuilder.addVertex(matrix4f, -100.0f, -100.0f, 100.0f).setUv(0.0F, 0.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, -100.0f, 100.0f, 100.0f).setUv(0.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, 100.0f, 100.0f).setUv(1.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, -100.0f, 100.0f).setUv(1.0F, 0.0F).setColor(255, 255, 255, 255);
 
-		bufferBuilder.vertex(matrix4f, -100.0f, 100.0f, 101.0f).uv(0.0F, 0.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, -100.0f, 100.0f, -100.0f).uv(0.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, 100.0f, -100.0f).uv(1.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, 100.0f, 100.0f).uv(1.0F, 0.0F).color(255, 255, 255, 255).endVertex();
+		bufferBuilder.addVertex(matrix4f, -100.0f, 100.0f, 101.0f).setUv(0.0F, 0.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, -100.0f, 100.0f, -100.0f).setUv(0.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, 100.0f, -100.0f).setUv(1.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, 100.0f, 100.0f).setUv(1.0F, 0.0F).setColor(255, 255, 255, 255);
 
-		bufferBuilder.vertex(matrix4f, 100.0f, -100.0f, -100.0f).uv(0.0F, 0.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, -100.0f, 100.0f).uv(0.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, 100.0f, 100.0f).uv(1.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0f, 100.0f, -100.0f).uv(1.0F, 0.0F).color(255, 255, 255, 255).endVertex();
+		bufferBuilder.addVertex(matrix4f, 100.0f, -100.0f, -100.0f).setUv(0.0F, 0.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, -100.0f, 100.0f).setUv(0.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, 100.0f, 100.0f).setUv(1.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, 100.0f, 100.0f, -100.0f).setUv(1.0F, 0.0F).setColor(255, 255, 255, 255);
 
-		bufferBuilder.vertex(matrix4f, -100.0f, 100.0f, -100.0f).uv(0.0F, 0.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, -100.0f, 100.0f, 100.0f).uv(0.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, -100.0f, -100.0f, 100.0f).uv(1.0F, 1.0F).color(255, 255, 255, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, -100.0f, -100.0f, -100.0f).uv(1.0F, 0.0F).color(255, 255, 255, 255).endVertex();
-		tessellator.end();
+		bufferBuilder.addVertex(matrix4f, -100.0f, 100.0f, -100.0f).setUv(0.0F, 0.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, -100.0f, 100.0f, 100.0f).setUv(0.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, -100.0f, -100.0f, 100.0f).setUv(1.0F, 1.0F).setColor(255, 255, 255, 255);
+		bufferBuilder.addVertex(matrix4f, -100.0f, -100.0f, -100.0f).setUv(1.0F, 0.0F).setColor(255, 255, 255, 255);
+		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 
 		RenderSystem.depthMask(true);
 		RenderSystem.disableBlend();
@@ -82,7 +82,7 @@ public class DimensionalRenderingTest implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		DimensionRenderingRegistry.registerSkyRenderer(ResourceKey.create(Registries.DIMENSION, new ResourceLocation("fabric_dimension", "void")), DimensionalRenderingTest::render);
-		DimensionRenderingRegistry.registerDimensionEffects(new ResourceLocation("fabric_dimension", "void"), new DimensionSpecialEffects.EndEffects());
+		DimensionRenderingRegistry.registerSkyRenderer(ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath("fabric_dimension", "void")), DimensionalRenderingTest::render);
+		DimensionRenderingRegistry.registerDimensionEffects(ResourceLocation.fromNamespaceAndPath("fabric_dimension", "void"), new DimensionSpecialEffects.EndEffects());
 	}
 }

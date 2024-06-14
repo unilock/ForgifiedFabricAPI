@@ -29,9 +29,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.fabricmc.fabric.impl.recipe.ingredient.ShapelessMatch;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.Level;
@@ -54,13 +54,13 @@ public class ShapelessRecipeMixin {
 		}
 	}
 
-	@Inject(at = @At("HEAD"), method = "matches", cancellable = true)
-	public void customIngredientMatch(CraftingContainer craftingInventory, Level world, CallbackInfoReturnable<Boolean> cir) {
+	@Inject(at = @At("HEAD"), method = "matches(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/world/level/Level;)Z", cancellable = true)
+	public void customIngredientMatch(CraftingInput recipeInput, Level world, CallbackInfoReturnable<Boolean> cir) {
 		if (fabric_requiresTesting) {
-			List<ItemStack> nonEmptyStacks = new ArrayList<>(craftingInventory.getContainerSize());
+			List<ItemStack> nonEmptyStacks = new ArrayList<>(recipeInput.ingredientCount());
 
-			for (int i = 0; i < craftingInventory.getContainerSize(); ++i) {
-				ItemStack stack = craftingInventory.getItem(i);
+			for (int i = 0; i < recipeInput.ingredientCount(); ++i) {
+				ItemStack stack = recipeInput.getItem(i);
 
 				if (!stack.isEmpty()) {
 					nonEmptyStacks.add(stack);

@@ -28,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.ApiStatus;
+import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -107,7 +108,7 @@ public abstract class FabricLanguageProvider implements DataProvider {
 	private Path getLangFilePath(String code) {
 		return dataOutput
 				.createPathProvider(PackOutput.Target.RESOURCE_PACK, "lang")
-				.json(new ResourceLocation(dataOutput.getModId(), code));
+				.json(ResourceLocation.fromNamespaceAndPath(dataOutput.getModId(), code));
 	}
 
 	@Override
@@ -183,8 +184,8 @@ public abstract class FabricLanguageProvider implements DataProvider {
 		 * @param enchantment The {@link Enchantment} to get the translation key from.
 		 * @param value       The value of the entry.
 		 */
-		default void add(Enchantment enchantment, String value) {
-			add(enchantment.getDescriptionId(), value);
+		default void addEnchantment(ResourceKey<Enchantment> enchantment, String value) {
+			add(Util.makeDescriptionId("enchantment", enchantment.location()), value);
 		}
 
 		/**

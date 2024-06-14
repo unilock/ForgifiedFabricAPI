@@ -40,7 +40,7 @@ public interface BuiltinItemRenderer {
 	 * @param matrices        the matrix stack
 	 * @param vertexConsumers the vertex consumer provider
 	 * @param light           the color light multiplier at the rendering position
-	 * @param overlay         the overlay UV passed to {@link com.mojang.blaze3d.vertex.VertexConsumer#overlayCoords(int)}
+	 * @param overlay         the overlay UV passed to {@link com.mojang.blaze3d.vertex.VertexConsumer#setOverlay(int)}
 	 */
 	void render(ItemStack stack, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay);
 }

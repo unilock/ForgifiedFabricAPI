@@ -75,7 +75,7 @@ public record RegistrationPayload(Type<RegistrationPayload> id, List<ResourceLoc
 		String literal = sb.toString();
 
 		try {
-			ids.add(new ResourceLocation(literal));
+			ids.add(ResourceLocation.parse(literal));
 		} catch (ResourceLocationException ex) {
 			NetworkingImpl.LOGGER.warn("Received invalid channel identifier \"{}\"", literal);
 		}

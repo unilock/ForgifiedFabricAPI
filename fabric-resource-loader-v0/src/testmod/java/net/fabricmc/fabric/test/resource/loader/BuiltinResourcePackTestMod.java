@@ -26,7 +26,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class BuiltinResourcePackTestMod implements ModInitializer {
-	public static final String MODID = "fabric_resource_loader_v0_testmod";
+	public static final String MODID = "fabric-resource-loader-v0-testmod";
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(BuiltinResourcePackTestMod.class);
 
@@ -34,11 +34,11 @@ public class BuiltinResourcePackTestMod implements ModInitializer {
 	public void onInitialize() {
 		// Should always be present as it's **this** mod.
 		FabricLoader.getInstance().getModContainer(MODID)
-				.map(container -> ResourceManagerHelper.registerBuiltinResourcePack(new ResourceLocation(MODID, "test"),
+				.map(container -> ResourceManagerHelper.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(MODID, "test"),
 						container, Component.literal("Fabric Resource Loader Test Pack"), ResourcePackActivationType.DEFAULT_ENABLED))
 				.filter(success -> !success).ifPresent(success -> LOGGER.warn("Could not register built-in resource pack with custom name."));
 		FabricLoader.getInstance().getModContainer(MODID)
-				.map(container -> ResourceManagerHelper.registerBuiltinResourcePack(new ResourceLocation(MODID, "test2"),
+				.map(container -> ResourceManagerHelper.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(MODID, "test2"),
 						container, ResourcePackActivationType.NORMAL))
 				.filter(success -> !success).ifPresent(success -> LOGGER.warn("Could not register built-in resource pack."));
 	}

@@ -31,6 +31,7 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -53,7 +54,7 @@ public abstract class FabricAdvancementProvider implements DataProvider {
 
 	protected FabricAdvancementProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
 		this.output = output;
-		this.pathResolver = output.createPathProvider(PackOutput.Target.DATA_PACK, "advancements");
+		this.pathResolver = output.createRegistryElementsPathProvider(Registries.ADVANCEMENT);
 		this.registryLookup = registryLookup;
 	}
 

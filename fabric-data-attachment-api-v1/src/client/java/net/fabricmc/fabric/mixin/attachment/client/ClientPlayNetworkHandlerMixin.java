@@ -36,7 +36,7 @@ abstract class ClientPlayNetworkHandlerMixin {
 		/*
 		 * The KEEP_ATTRIBUTES flag is not set on a death respawn, and set in all other cases
 		 */
-		AttachmentTargetImpl.transfer(oldPlayer, newPlayer, !packet.shouldKeep(ClientboundRespawnPacket.KEEP_ATTRIBUTES));
+		AttachmentTargetImpl.transfer(oldPlayer, newPlayer, !packet.shouldKeep(ClientboundRespawnPacket.KEEP_ATTRIBUTE_MODIFIERS));
 		init.call(newPlayer);
 	}
 }

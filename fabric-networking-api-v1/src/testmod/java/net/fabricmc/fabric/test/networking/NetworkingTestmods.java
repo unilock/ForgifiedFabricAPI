@@ -25,7 +25,7 @@ public final class NetworkingTestmods {
 	public static final Logger LOGGER = LoggerFactory.getLogger(ID);
 
 	public static ResourceLocation id(String name) {
-		return new ResourceLocation(ID, name);
+		return ResourceLocation.fromNamespaceAndPath(ID, name);
 	}
 
 	private NetworkingTestmods() {

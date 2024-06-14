@@ -16,7 +16,7 @@
 
 package net.fabricmc.fabric.impl.client.model.loading;
 
-import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 
@@ -27,11 +27,5 @@ public interface ModelLoaderHooks {
 
 	UnbakedModel fabric_getOrLoadModel(ResourceLocation id);
 
-	void fabric_putModel(ResourceLocation id, UnbakedModel model);
-
-	void fabric_putModelDirectly(ResourceLocation id, UnbakedModel model);
-
-	void fabric_queueModelDependencies(UnbakedModel model);
-
-	BlockModel fabric_loadModelFromJson(ResourceLocation id);
+	void fabric_add(ModelResourceLocation id, UnbakedModel model);
 }

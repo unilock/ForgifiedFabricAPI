@@ -62,6 +62,7 @@ loom.apply {
 
     runs {
         configureEach {
+            isIdeConfigGenerated = project.rootProject == project
             property("mixin.debug", "true")
             // FIXME Set this from fabric-api-base as ResourcePackProfileMixin fails otherwise
             property("mixin.initialiserInjectionMode", "safe")
@@ -69,7 +70,6 @@ loom.apply {
 
         create("gametest") {
             server()
-            isIdeConfigGenerated = project.rootProject == project
             name = "Testmod Game Test Server"
             source(testmod)
 
@@ -79,14 +79,12 @@ loom.apply {
 
         create("testmodClient") {
             client()
-            isIdeConfigGenerated = project.rootProject == project
             name = "Testmod Client"
             source(testmod)
         }
 
         create("testmodServer") {
             server()
-            isIdeConfigGenerated = project.rootProject == project
             name = "Testmod Server"
             source(testmod)
         }

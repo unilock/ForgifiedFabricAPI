@@ -46,21 +46,21 @@ public class DataGeneratorTestContent implements ModInitializer {
 	public static Block BLOCK_WITH_VANILLA_LOOT_TABLE;
 	public static Block BLOCK_THAT_DROPS_NOTHING;
 
-	public static final ResourceKey<CreativeModeTab> SIMPLE_ITEM_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, new ResourceLocation(MOD_ID, "simple"));
+	public static final ResourceKey<CreativeModeTab> SIMPLE_ITEM_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "simple"));
 
 	public static final ResourceKey<Registry<TestDatagenObject>> TEST_DATAGEN_DYNAMIC_REGISTRY_KEY =
-			ResourceKey.createRegistryKey(new ResourceLocation("fabric", "test_datagen_dynamic"));
+			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("fabric", "test_datagen_dynamic"));
 	public static final ResourceKey<TestDatagenObject> TEST_DYNAMIC_REGISTRY_ITEM_KEY = ResourceKey.create(
 			TEST_DATAGEN_DYNAMIC_REGISTRY_KEY,
-			new ResourceLocation(MOD_ID, "tiny_potato")
+			ResourceLocation.fromNamespaceAndPath(MOD_ID, "tiny_potato")
 	);
 	public static final ResourceKey<TestDatagenObject> TEST_DYNAMIC_REGISTRY_EXTRA_ITEM_KEY = ResourceKey.create(
 			TEST_DATAGEN_DYNAMIC_REGISTRY_KEY,
-			new ResourceLocation(MOD_ID, "tinier_potato")
+			ResourceLocation.fromNamespaceAndPath(MOD_ID, "tinier_potato")
 	);
 	// Empty registry
 	public static final ResourceKey<Registry<TestDatagenObject>> TEST_DATAGEN_DYNAMIC_EMPTY_REGISTRY_KEY =
-			ResourceKey.createRegistryKey(new ResourceLocation("fabric", "test_datagen_dynamic_empty"));
+			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("fabric", "test_datagen_dynamic_empty"));
 
 	@Override
 	public void onInitialize() {
@@ -82,7 +82,7 @@ public class DataGeneratorTestContent implements ModInitializer {
 	}
 
 	private static Block createBlock(String name, boolean hasItem, BlockBehaviour.Properties settings) {
-		ResourceLocation identifier = new ResourceLocation(MOD_ID, name);
+		ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
 		Block block = Registry.register(BuiltInRegistries.BLOCK, identifier, new Block(settings));
 
 		if (hasItem) {

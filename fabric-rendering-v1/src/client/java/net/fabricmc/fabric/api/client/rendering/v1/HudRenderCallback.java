@@ -18,6 +18,7 @@ package net.fabricmc.fabric.api.client.rendering.v1;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 
 public interface HudRenderCallback {
@@ -31,7 +32,7 @@ public interface HudRenderCallback {
 	 * Called after rendering the whole hud, which is displayed in game, in a world.
 	 *
 	 * @param drawContext the {@link GuiGraphics} instance
-	 * @param tickDelta Progress for linearly interpolating between the previous and current game state
+	 * @param tickCounter the {@link DeltaTracker} instance
 	 */
-	void onHudRender(GuiGraphics drawContext, float tickDelta);
+	void onHudRender(GuiGraphics drawContext, DeltaTracker tickCounter);
 }

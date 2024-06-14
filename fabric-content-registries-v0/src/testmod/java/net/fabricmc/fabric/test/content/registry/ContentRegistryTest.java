@@ -63,7 +63,7 @@ import net.minecraft.world.phys.BlockHitResult;
 public final class ContentRegistryTest implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(ContentRegistryTest.class);
 
-	public static final ResourceLocation TEST_EVENT_ID = new ResourceLocation("fabric-content-registries-v0-testmod", "test_event");
+	public static final ResourceLocation TEST_EVENT_ID = ResourceLocation.fromNamespaceAndPath("fabric-content-registries-v0-testmod", "test_event");
 	public static final Holder.Reference<GameEvent> TEST_EVENT = Registry.registerForHolder(BuiltInRegistries.GAME_EVENT, TEST_EVENT_ID, new GameEvent(GameEvent.DEFAULT_NOTIFICATION_RADIUS));
 
 	@Override
@@ -138,7 +138,7 @@ public final class ContentRegistryTest implements ModInitializer {
 
 		VillagerInteractionRegistries.registerCollectable(Items.OAK_SAPLING);
 
-		VillagerInteractionRegistries.registerGiftLootTable(VillagerProfession.NITWIT, ResourceKey.create(Registries.LOOT_TABLE, new ResourceLocation("fake_loot_table")));
+		VillagerInteractionRegistries.registerGiftLootTable(VillagerProfession.NITWIT, ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.withDefaultNamespace("fake_loot_table")));
 
 		Registry.register(BuiltInRegistries.BLOCK, TEST_EVENT_ID, new TestEventBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
 		SculkSensorFrequencyRegistry.register(TEST_EVENT.key(), 2);
@@ -154,7 +154,7 @@ public final class ContentRegistryTest implements ModInitializer {
 		}
 
 		var dirtyPotion = new DirtyPotionItem(new Item.Properties().stacksTo(1));
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-content-registries-v0-testmod", "dirty_potion"),
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-content-registries-v0-testmod", "dirty_potion"),
 				dirtyPotion);
 		/* Mods should use BrewingRecipeRegistry.registerPotionType(Item), which is access widened by fabric-transitive-access-wideners-v1
 		 * This testmod uses an accessor due to Loom limitations that prevent TAWs from applying across Gradle subproject boundaries */

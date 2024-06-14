@@ -37,7 +37,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 
 public class FrameUnbakedModel implements UnbakedModel {
-	private static final Material OBSIDIAN_SPRITE_ID = new Material(TextureAtlas.LOCATION_BLOCKS, new ResourceLocation("block/obsidian"));
+	private static final Material OBSIDIAN_SPRITE_ID = new Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.withDefaultNamespace("block/obsidian"));
 
 	@Override
 	public Collection<ResourceLocation> getDependencies() {
@@ -54,7 +54,7 @@ public class FrameUnbakedModel implements UnbakedModel {
 	 */
 	@Nullable
 	@Override
-	public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId) {
+	public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer) {
 		// The renderer API may not have an implementation, so we should check if it exists.
 		if (!RendererAccess.INSTANCE.hasRenderer()) {
 			// No renderer implementation is present.

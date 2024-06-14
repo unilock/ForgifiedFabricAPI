@@ -16,26 +16,34 @@
 
 package net.fabricmc.fabric.mixin.resource.loader;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import net.fabricmc.fabric.impl.resource.loader.FabricResourcePackProfile;
-import net.fabricmc.fabric.impl.resource.loader.ModResourcePackCreator;
-import net.fabricmc.fabric.impl.resource.loader.ModResourcePackUtil;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.llamalad7.mixinextras.sugar.Local;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import net.fabricmc.fabric.impl.resource.loader.FabricResourcePackProfile;
+import net.fabricmc.fabric.impl.resource.loader.ModResourcePackCreator;
+import net.fabricmc.fabric.impl.resource.loader.ModResourcePackUtil;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.FolderRepositorySource;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.repository.RepositorySource;
 
 @Mixin(PackRepository.class)
 public abstract class ResourcePackManagerMixin {
@@ -43,7 +51,35 @@ public abstract class ResourcePackManagerMixin {
 	private static final Logger LOGGER = LoggerFactory.getLogger("ResourcePackManagerMixin");
 
 	@Shadow
+	@Final
+	@Mutable
+	public Set<RepositorySource> sources;
+
+	@Shadow
 	private Map<String, Pack> available;
+
+	@Inject(method = "<init>", at = @At("RETURN"))
+	public void construct(RepositorySource[] resourcePackProviders, CallbackInfo info) {
+		// Use a LinkedHashSet to preserve ordering
+		sources = new LinkedHashSet<>(sources);
+
+		// Search resource pack providers to find any server-related pack provider.
+		boolean shouldAddServerProvider = false;
+
+		for (RepositorySource provider : this.sources) {
+			if (provider instanceof FolderRepositorySource
+					&& (((FolderRepositorySource) provider).packSource == PackSource.WORLD
+					|| ((FolderRepositorySource) provider).packSource == PackSource.SERVER)) {
+				shouldAddServerProvider = true;
+				break;
+			}
+		}
+
+		// On server, add the mod resource pack provider.
+		if (shouldAddServerProvider) {
+			sources.add(new ModResourcePackCreator(PackType.SERVER_DATA));
+		}
+	}
 
 	@Inject(method = "rebuildSelected", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableList;copyOf(Ljava/util/Collection;)Lcom/google/common/collect/ImmutableList;", shift = At.Shift.BEFORE))
 	private void handleAutoEnableDisable(Collection<String> enabledNames, CallbackInfoReturnable<List<Pack>> cir, @Local List<Pack> enabledAfterFirstRun) {

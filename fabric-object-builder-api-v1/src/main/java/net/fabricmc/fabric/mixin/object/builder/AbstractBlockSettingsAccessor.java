@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.mixin.object.builder;
 
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import net.minecraft.resources.ResourceKey;
@@ -96,7 +95,7 @@ public interface AbstractBlockSettingsAccessor {
 	BlockBehaviour.StatePredicate getEmissiveRendering();
 
 	@Accessor
-	Optional<BlockBehaviour.OffsetFunction> getOffsetFunction();
+	BlockBehaviour.OffsetFunction getOffsetFunction();
 
 	@Accessor
 	ResourceKey<LootTable> getDrops();
@@ -160,7 +159,7 @@ public interface AbstractBlockSettingsAccessor {
 	void setRequiredFeatures(FeatureFlagSet requiredFeatures);
 
 	@Accessor
-	void setOffsetFunction(Optional<BlockBehaviour.OffsetFunction> offsetter);
+	void setOffsetFunction(BlockBehaviour.OffsetFunction offsetter);
 
 	@Accessor
 	void setIgnitedByLava(boolean burnable);

@@ -49,7 +49,7 @@ public class PillarUnbakedModel implements UnbakedModel {
 
 	@Nullable
 	@Override
-	public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId) {
+	public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer) {
 		TextureAtlasSprite[] sprites = new TextureAtlasSprite[SPRITES.size()];
 
 		for (int i = 0; i < sprites.length; ++i) {

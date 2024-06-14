@@ -42,8 +42,8 @@ import net.minecraft.world.level.GameRules;
 public class GameRulesTestMod implements ModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GameRulesTestMod.class);
 	private static final Direction[] CARDINAL_DIRECTIONS = Arrays.stream(Direction.values()).filter(direction -> direction != Direction.UP && direction != Direction.DOWN).toArray(Direction[]::new);
-	public static final CustomGameRuleCategory GREEN_CATEGORY = new CustomGameRuleCategory(new ResourceLocation("fabric", "green"), Component.literal("This One is Green").withStyle(style -> style.withBold(true).withColor(ChatFormatting.DARK_GREEN)));
-	public static final CustomGameRuleCategory RED_CATEGORY = new CustomGameRuleCategory(new ResourceLocation("fabric", "red"), Component.literal("This One is Red").withStyle(style -> style.withBold(true).withColor(ChatFormatting.DARK_RED)));
+	public static final CustomGameRuleCategory GREEN_CATEGORY = new CustomGameRuleCategory(ResourceLocation.fromNamespaceAndPath("fabric", "green"), Component.literal("This One is Green").withStyle(style -> style.withBold(true).withColor(ChatFormatting.DARK_GREEN)));
+	public static final CustomGameRuleCategory RED_CATEGORY = new CustomGameRuleCategory(ResourceLocation.fromNamespaceAndPath("fabric", "red"), Component.literal("This One is Red").withStyle(style -> style.withBold(true).withColor(ChatFormatting.DARK_RED)));
 
 	// Bounded, Integer, Double and Float rules
 	public static final GameRules.Key<GameRules.IntegerValue> POSITIVE_ONLY_TEST_INT = register("positiveOnlyTestInteger", GameRules.Category.UPDATES, GameRuleFactory.createIntRule(2, 0));

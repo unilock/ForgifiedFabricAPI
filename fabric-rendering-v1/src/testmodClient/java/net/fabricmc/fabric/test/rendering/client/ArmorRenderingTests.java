@@ -28,7 +28,7 @@ import net.minecraft.world.item.Items;
 
 public class ArmorRenderingTests implements ClientModInitializer {
 	private HumanoidModel<LivingEntity> armorModel;
-	private final ResourceLocation texture = new ResourceLocation("textures/block/dirt.png");
+	private final ResourceLocation texture = ResourceLocation.withDefaultNamespace("textures/block/dirt.png");
 
 	// Renders a biped model with dirt texture, replacing diamond helmet and diamond chest plate rendering
 	@Override

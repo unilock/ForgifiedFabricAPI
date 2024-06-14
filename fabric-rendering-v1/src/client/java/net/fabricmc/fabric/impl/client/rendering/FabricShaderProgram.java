@@ -37,8 +37,8 @@ public final class FabricShaderProgram extends ShaderInstance {
 	 * @param containedId the ID contained within the input string
 	 * @return the corrected full ID string
 	 */
-	public static String rewriteAsId(String input, String containedId) {
-		ResourceLocation contained = new ResourceLocation(containedId);
-		return contained.getNamespace() + ResourceLocation.NAMESPACE_SEPARATOR + input.replace(containedId, contained.getPath());
+	public static ResourceLocation rewriteAsId(String input, String containedId) {
+		ResourceLocation contained = ResourceLocation.parse(containedId);
+		return contained.withPath(path -> input.replace(containedId, path));
 	}
 }

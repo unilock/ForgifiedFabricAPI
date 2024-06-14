@@ -94,7 +94,7 @@ public class CommonPacketTests {
 	}
 
 	private record TestPayload(String data) implements CustomPacketPayload {
-		static final CustomPacketPayload.Type<TestPayload> ID = new CustomPacketPayload.Type<>(new ResourceLocation("fabric", "global_client"));
+		static final CustomPacketPayload.Type<TestPayload> ID = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("fabric", "global_client"));
 		static final StreamCodec<RegistryFriendlyByteBuf, TestPayload> CODEC = CustomPacketPayload.codec(TestPayload::write, TestPayload::new);
 
 		TestPayload(RegistryFriendlyByteBuf buf) {
@@ -234,20 +234,20 @@ public class CommonPacketTests {
 		FriendlyByteBuf buf = PacketByteBufs.create();
 		buf.writeVarInt(1); // Version
 		buf.writeUtf("play"); // Target phase
-		buf.writeCollection(List.of(new ResourceLocation("fabric", "test")), FriendlyByteBuf::writeResourceLocation);
+		buf.writeCollection(List.of(ResourceLocation.fromNamespaceAndPath("fabric", "test")), FriendlyByteBuf::writeResourceLocation);
 
 		CommonRegisterPayload payload = CommonRegisterPayload.CODEC.decode(buf);
 		packetHandler.receive(payload, clientContext);
 
 		// Assert the entire packet was read
 		assertEquals(0, buf.readableBytes());
-		assertIterableEquals(List.of(new ResourceLocation("fabric", "test")), channelInfoHolder.fabric_getPendingChannelsNames(ConnectionProtocol.PLAY));
+		assertIterableEquals(List.of(ResourceLocation.fromNamespaceAndPath("fabric", "test")), channelInfoHolder.fabric_getPendingChannelsNames(ConnectionProtocol.PLAY));
 
 		// Check the response we are sending back to the server
 		FriendlyByteBuf response = readResponse(packetSender, REGISTER_PAYLOAD_TYPE);
 		assertEquals(1, response.readVarInt());
 		assertEquals("play", response.readUtf());
-		assertIterableEquals(List.of(new ResourceLocation("fabric", "global_client")), response.readCollection(HashSet::new, FriendlyByteBuf::readResourceLocation));
+		assertIterableEquals(List.of(ResourceLocation.fromNamespaceAndPath("fabric", "global_client")), response.readCollection(HashSet::new, FriendlyByteBuf::readResourceLocation));
 		assertEquals(0, response.readableBytes());
 	}
 
@@ -258,13 +258,13 @@ public class CommonPacketTests {
 		assertNotNull(packetHandler);
 
 		when(clientAddon.getNegotiatedVersion()).thenReturn(1);
-		when(clientAddon.createRegisterPayload()).thenAnswer(i -> new CommonRegisterPayload(1, "configuration", Set.of(new ResourceLocation("fabric", "global_configuration_client"))));
+		when(clientAddon.createRegisterPayload()).thenAnswer(i -> new CommonRegisterPayload(1, "configuration", Set.of(ResourceLocation.fromNamespaceAndPath("fabric", "global_configuration_client"))));
 
 		// Receive a packet from the server
 		FriendlyByteBuf buf = PacketByteBufs.create();
 		buf.writeVarInt(1); // Version
 		buf.writeUtf("configuration"); // Target phase
-		buf.writeCollection(List.of(new ResourceLocation("fabric", "test")), FriendlyByteBuf::writeResourceLocation);
+		buf.writeCollection(List.of(ResourceLocation.fromNamespaceAndPath("fabric", "test")), FriendlyByteBuf::writeResourceLocation);
 
 		CommonRegisterPayload payload = CommonRegisterPayload.CODEC.decode(buf);
 		packetHandler.receive(payload, clientContext);
@@ -277,7 +277,7 @@ public class CommonPacketTests {
 		FriendlyByteBuf response = readResponse(packetSender, REGISTER_PAYLOAD_TYPE);
 		assertEquals(1, response.readVarInt());
 		assertEquals("configuration", response.readUtf());
-		assertIterableEquals(List.of(new ResourceLocation("fabric", "global_configuration_client")), response.readCollection(HashSet::new, FriendlyByteBuf::readResourceLocation));
+		assertIterableEquals(List.of(ResourceLocation.fromNamespaceAndPath("fabric", "global_configuration_client")), response.readCollection(HashSet::new, FriendlyByteBuf::readResourceLocation));
 		assertEquals(0, response.readableBytes());
 	}
 
@@ -293,14 +293,14 @@ public class CommonPacketTests {
 		FriendlyByteBuf buf = PacketByteBufs.create();
 		buf.writeVarInt(1); // Version
 		buf.writeUtf("play"); // Target phase
-		buf.writeCollection(List.of(new ResourceLocation("fabric", "test")), FriendlyByteBuf::writeResourceLocation);
+		buf.writeCollection(List.of(ResourceLocation.fromNamespaceAndPath("fabric", "test")), FriendlyByteBuf::writeResourceLocation);
 
 		CommonRegisterPayload payload = CommonRegisterPayload.CODEC.decode(buf);
 		packetHandler.receive(payload, serverContext);
 
 		// Assert the entire packet was read
 		assertEquals(0, buf.readableBytes());
-		assertIterableEquals(List.of(new ResourceLocation("fabric", "test")), channelInfoHolder.fabric_getPendingChannelsNames(ConnectionProtocol.PLAY));
+		assertIterableEquals(List.of(ResourceLocation.fromNamespaceAndPath("fabric", "test")), channelInfoHolder.fabric_getPendingChannelsNames(ConnectionProtocol.PLAY));
 	}
 
 	// Test handing the configuration registry packet on the server configuration handler
@@ -315,7 +315,7 @@ public class CommonPacketTests {
 		FriendlyByteBuf buf = PacketByteBufs.create();
 		buf.writeVarInt(1); // Version
 		buf.writeUtf("configuration"); // Target phase
-		buf.writeCollection(List.of(new ResourceLocation("fabric", "test")), FriendlyByteBuf::writeResourceLocation);
+		buf.writeCollection(List.of(ResourceLocation.fromNamespaceAndPath("fabric", "test")), FriendlyByteBuf::writeResourceLocation);
 
 		CommonRegisterPayload payload = CommonRegisterPayload.CODEC.decode(buf);
 		packetHandler.receive(payload, serverContext);

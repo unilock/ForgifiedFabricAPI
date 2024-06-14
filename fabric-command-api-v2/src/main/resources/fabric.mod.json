@@ -16,7 +16,7 @@
     "FabricMC"
   ],
   "depends": {
-    "fabricloader": ">=0.15.6",
+    "fabricloader": ">=0.15.11",
     "fabric-api-base": "*",
     "minecraft": ">1.19-alpha.22.11.a"
   },
@@ -34,13 +34,5 @@
     "loom:injected_interfaces": {
       "net/minecraft/class_2303": ["net/fabricmc/fabric/api/command/v2/FabricEntitySelectorReader"]
     }
-  },
-  "entrypoints": {
-    "main": [
-      "org.sinytra.fabric.command_api.FabricCommandApiV2"
-    ],
-    "client": [
-      "org.sinytra.fabric.command_api.client.FabricCommandApiV2Client"
-    ]
   }
 }

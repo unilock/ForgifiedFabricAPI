@@ -87,7 +87,7 @@ public class CustomDataIngredient implements CustomIngredient {
 	}
 
 	private static class Serializer implements CustomIngredientSerializer<CustomDataIngredient> {
-		private static final ResourceLocation ID = new ResourceLocation("fabric", "custom_data");
+		private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("fabric", "custom_data");
 
 		private static final MapCodec<CustomDataIngredient> ALLOW_EMPTY_CODEC = createCodec(Ingredient.CODEC);
 		private static final MapCodec<CustomDataIngredient> DISALLOW_EMPTY_CODEC = createCodec(Ingredient.CODEC_NONEMPTY);

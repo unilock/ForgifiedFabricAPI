@@ -30,16 +30,16 @@ public class EntityModelLayersMixin {
 	@Inject(method = "createSignModelName", at = @At("HEAD"), cancellable = true)
 	private static void createSign(WoodType type, CallbackInfoReturnable<ModelLayerLocation> cir) {
 		if (type.name().indexOf(ResourceLocation.NAMESPACE_SEPARATOR) != -1) {
-			ResourceLocation identifier = new ResourceLocation(type.name());
-			cir.setReturnValue(new ModelLayerLocation(new ResourceLocation(identifier.getNamespace(), "sign/" + identifier.getPath()), "main"));
+			ResourceLocation identifier = ResourceLocation.parse(type.name());
+			cir.setReturnValue(new ModelLayerLocation(identifier.withPrefix("sign/"), "main"));
 		}
 	}
 
 	@Inject(method = "createHangingSignModelName", at = @At("HEAD"), cancellable = true)
 	private static void createHangingSign(WoodType type, CallbackInfoReturnable<ModelLayerLocation> cir) {
 		if (type.name().indexOf(ResourceLocation.NAMESPACE_SEPARATOR) != -1) {
-			ResourceLocation identifier = new ResourceLocation(type.name());
-			cir.setReturnValue(new ModelLayerLocation(new ResourceLocation(identifier.getNamespace(), "hanging_sign/" + identifier.getPath()), "main"));
+			ResourceLocation identifier = ResourceLocation.parse(type.name());
+			cir.setReturnValue(new ModelLayerLocation(identifier.withPrefix("hanging_sign/"), "main"));
 		}
 	}
 }

@@ -16,21 +16,18 @@
 
 package net.fabricmc.fabric.test.model.loading;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
-import net.minecraft.util.Unit;
-import net.minecraft.util.profiling.ProfilerFiller;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 
-public class SpecificModelReloadListener extends SimplePreparableReloadListener<Unit> implements IdentifiableResourceReloadListener {
+public class SpecificModelReloadListener implements SimpleSynchronousResourceReloadListener {
 	public static final SpecificModelReloadListener INSTANCE = new SpecificModelReloadListener();
-	public static final ResourceLocation ID = new ResourceLocation(ModelTestModClient.ID, "specific_model");
+	public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(ModelTestModClient.ID, "specific_model");
 
 	private BakedModel specificModel;
 
@@ -39,13 +36,8 @@ public class SpecificModelReloadListener extends SimplePreparableReloadListener<
 	}
 
 	@Override
-	protected Unit prepare(ResourceManager manager, ProfilerFiller profiler) {
-		return Unit.INSTANCE;
-	}
-
-	@Override
-	protected void apply(Unit loader, ResourceManager manager, ProfilerFiller profiler) {
-		specificModel = Minecraft.getInstance().getModelManager().getModel(ModelTestModClient.MODEL_ID);
+	public void onResourceManagerReload(ResourceManager manager) {
+		specificModel = Minecraft.getInstance().getModelManager().getModel(ModelTestModClient.HALF_RED_SAND_MODEL_ID);
 	}
 
 	@Override
@@ -55,6 +47,6 @@ public class SpecificModelReloadListener extends SimplePreparableReloadListener<
 
 	@Override
 	public Collection<ResourceLocation> getFabricDependencies() {
-		return Arrays.asList(ResourceReloadListenerKeys.MODELS);
+		return List.of(ResourceReloadListenerKeys.MODELS);
 	}
 }

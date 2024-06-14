@@ -72,7 +72,7 @@ public interface RenderMaterial extends MaterialView {
 	 *
 	 * <p>All standard, non-fluid baked models are rendered using this material.
 	 */
-	ResourceLocation MATERIAL_STANDARD = new ResourceLocation("fabric", "standard");
+	ResourceLocation MATERIAL_STANDARD = ResourceLocation.fromNamespaceAndPath("fabric", "standard");
 
 	/**
 	 * Do not use. Always returns 1.

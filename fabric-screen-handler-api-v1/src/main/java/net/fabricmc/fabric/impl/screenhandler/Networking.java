@@ -48,7 +48,7 @@ public final class Networking implements ModInitializer {
 	// syncId: varInt
 	// title: text
 	// customData: buf
-	public static final ResourceLocation OPEN_ID = new ResourceLocation("fabric-screen-handler-api-v1", "open_screen");
+	public static final ResourceLocation OPEN_ID = ResourceLocation.fromNamespaceAndPath("fabric-screen-handler-api-v1", "open_screen");
 	public static final Map<ResourceLocation, StreamCodec<? super RegistryFriendlyByteBuf, ?>> CODEC_BY_ID = new HashMap<>();
 
 	/**

@@ -24,6 +24,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 
 public class UseItemTests implements ModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseItemTests.class);
@@ -40,7 +41,7 @@ public class UseItemTests implements ModInitializer {
 			if (!player.isSpectator()) {
 				if (player.getItemInHand(hand).is(Items.BLAZE_ROD)) {
 					if (!world.isClientSide()) {
-						player.level().addFreshEntity(new LargeFireball(player.level(), player, 0, 0, 0, 0));
+						player.level().addFreshEntity(new LargeFireball(player.level(), player, new Vec3(0, 0, 0), 0));
 					}
 
 					return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), world.isClientSide());

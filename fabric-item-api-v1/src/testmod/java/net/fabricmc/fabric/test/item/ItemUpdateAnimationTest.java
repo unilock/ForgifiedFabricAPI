@@ -25,12 +25,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 
 public class ItemUpdateAnimationTest implements ModInitializer {
-	public static final DataComponentType<Integer> TICKS = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, new ResourceLocation("fabric-item-api-v1-testmod", "ticks"),
-																				DataComponentType.<Integer>builder().persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
+	public static final DataComponentType<Integer> TICKS = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod", "ticks"),
+																			DataComponentType.<Integer>builder().persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
 
 	@Override
 	public void onInitialize() {
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-item-api-v1-testmod", "updating_allowed"), new UpdatingItem(true));
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("fabric-item-api-v1-testmod", "updating_disallowed"), new UpdatingItem(false));
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod", "updating_allowed"), new UpdatingItem(true));
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod", "updating_disallowed"), new UpdatingItem(false));
 	}
 }

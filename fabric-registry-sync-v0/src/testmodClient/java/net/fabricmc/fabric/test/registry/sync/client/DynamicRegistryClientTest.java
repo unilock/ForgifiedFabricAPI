@@ -33,7 +33,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public final class DynamicRegistryClientTest implements ClientModInitializer {
 	private static final Logger LOGGER = LogUtils.getLogger();
-	private static final ResourceLocation SYNCED_ID = new ResourceLocation("fabric-registry-sync-v0-testmod", "synced");
+	private static final ResourceLocation SYNCED_ID = ResourceLocation.fromNamespaceAndPath("fabric-registry-sync-v0-testmod", "synced");
 
 	@Override
 	public void onInitializeClient() {

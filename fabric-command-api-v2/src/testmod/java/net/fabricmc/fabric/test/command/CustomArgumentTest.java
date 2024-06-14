@@ -35,7 +35,7 @@ public class CustomArgumentTest implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ArgumentTypeRegistry.registerArgumentType(new ResourceLocation("fabric-command-test", "smiley"), SmileyArgumentType.class, SingletonArgumentInfo.contextFree(SmileyArgumentType::smiley));
+		ArgumentTypeRegistry.registerArgumentType(ResourceLocation.fromNamespaceAndPath("fabric-command-test", "smiley"), SmileyArgumentType.class, SingletonArgumentInfo.contextFree(SmileyArgumentType::smiley));
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(

@@ -16,16 +16,17 @@
 
 package net.fabricmc.fabric.test.recipe.ingredient;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 
 public class ShapelessRecipeMatchTests {
@@ -34,37 +35,23 @@ public class ShapelessRecipeMatchTests {
 	 */
 	@GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
 	public void testShapelessMatch(GameTestHelper context) {
-		ResourceLocation recipeId = new ResourceLocation("fabric-recipe-api-v1-testmod", "test_shapeless_match");
+		ResourceLocation recipeId = ResourceLocation.fromNamespaceAndPath("fabric-recipe-api-v1-testmod", "test_shapeless_match");
 		ShapelessRecipe recipe = (ShapelessRecipe) context.getLevel().getRecipeManager().byKey(recipeId).get().value();
 
 		ItemStack undamagedPickaxe = new ItemStack(Items.DIAMOND_PICKAXE);
 		ItemStack damagedPickaxe = new ItemStack(Items.DIAMOND_PICKAXE);
 		damagedPickaxe.setDamageValue(100);
 
-		TransientCraftingContainer craftingInv = new TransientCraftingContainer(new AbstractContainerMenu(null, 0) {
-			@Override
-			public ItemStack quickMoveStack(Player player, int slot) {
-				return ItemStack.EMPTY;
-			}
+		List<ItemStack> damagedPickaxes = Collections.nCopies(9, damagedPickaxe);
 
-			@Override
-			public boolean stillValid(Player player) {
-				return false;
-			}
-		}, 3, 3);
-
-		// Test that damaged only doesn't work
-		for (int i = 0; i < 9; ++i) {
-			craftingInv.setItem(i, damagedPickaxe);
-		}
-
-		if (recipe.matches(craftingInv, context.getLevel())) {
+		if (recipe.matches(CraftingInput.of(3, 3, damagedPickaxes), context.getLevel())) {
 			throw new GameTestAssertException("Recipe should not match with only damaged pickaxes");
 		}
 
-		craftingInv.setItem(1, undamagedPickaxe);
+		List<ItemStack> oneUndamagedPickaxe = new LinkedList<>(damagedPickaxes);
+		oneUndamagedPickaxe.set(0, undamagedPickaxe);
 
-		if (!recipe.matches(craftingInv, context.getLevel())) {
+		if (!recipe.matches(CraftingInput.of(3, 3, oneUndamagedPickaxe), context.getLevel())) {
 			throw new GameTestAssertException("Recipe should match with at least one undamaged pickaxe");
 		}
 

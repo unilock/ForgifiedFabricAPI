@@ -18,15 +18,16 @@ package net.fabricmc.fabric.mixin.client.model.loading;
 
 import java.util.function.Function;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Coerce;
+import net.fabricmc.fabric.impl.client.model.loading.BakerImplHooks;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoaderHooks;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingEventDispatcher;
-import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
@@ -37,7 +38,7 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 
 @Mixin(targets = "net/minecraft/client/resources/model/ModelBakery$ModelBakerImpl")
-public class ModelLoaderBakerImplMixin {
+abstract class ModelLoaderBakerImplMixin implements BakerImplHooks {
 	@Shadow
 	@Final
 	private ModelBakery this$0;
@@ -45,23 +46,16 @@ public class ModelLoaderBakerImplMixin {
 	@Final
 	private Function<Material, TextureAtlasSprite> modelTextureGetter;
 
-	@ModifyVariable(method = "bake", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/resources/model/ModelBakery$ModelBakerImpl;getModel(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/resources/model/UnbakedModel;"))
-	private UnbakedModel invokeModifyBeforeBake(UnbakedModel model, ResourceLocation id, ModelState settings) {
+	@WrapOperation(method = "bake(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/resources/model/BakedModel;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelBakery$ModelBakerImpl;bakeUncached(Lnet/minecraft/client/resources/model/UnbakedModel;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/resources/model/BakedModel;"))
+	private BakedModel wrapInnerBake(@Coerce ModelBaker self, UnbakedModel unbakedModel, ModelState settings, Operation<BakedModel> operation, ResourceLocation id) {
 		ModelLoadingEventDispatcher dispatcher = ((ModelLoaderHooks) this.this$0).fabric_getDispatcher();
-		return dispatcher.modifyModelBeforeBake(model, id, modelTextureGetter, settings, (ModelBaker) this);
+		unbakedModel = dispatcher.modifyModelBeforeBake(unbakedModel, id, null, modelTextureGetter, settings, self);
+		BakedModel model = operation.call(self, unbakedModel, settings);
+		return dispatcher.modifyModelAfterBake(model, id, null, unbakedModel, modelTextureGetter, settings, self);
 	}
 
-	@Redirect(method = "bake", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/UnbakedModel;bake(Lnet/minecraft/client/resources/model/ModelBaker;Ljava/util/function/Function;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/resources/model/BakedModel;"))
-	private BakedModel invokeModifyAfterBake(UnbakedModel unbakedModel, ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState settings, ResourceLocation id) {
-		BakedModel model = unbakedModel.bake(baker, textureGetter, settings, id);
-		ModelLoadingEventDispatcher dispatcher = ((ModelLoaderHooks) this.this$0).fabric_getDispatcher();
-		return dispatcher.modifyModelAfterBake(model, id, unbakedModel, textureGetter, settings, baker);
-	}
-
-	@Redirect(method = "bake", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/BlockModel;bake(Lnet/minecraft/client/resources/model/ModelBaker;Lnet/minecraft/client/renderer/block/model/BlockModel;Ljava/util/function/Function;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;Z)Lnet/minecraft/client/resources/model/BakedModel;"))
-	private BakedModel invokeModifyAfterBake(BlockModel unbakedModel, ModelBaker baker, BlockModel parent, Function<Material, TextureAtlasSprite> textureGetter, ModelState settings, ResourceLocation id, boolean hasDepth) {
-		BakedModel model = unbakedModel.bake(baker, parent, textureGetter, settings, id, hasDepth);
-		ModelLoadingEventDispatcher dispatcher = ((ModelLoaderHooks) this.this$0).fabric_getDispatcher();
-		return dispatcher.modifyModelAfterBake(model, id, unbakedModel, textureGetter, settings, baker);
+	@Override
+	public Function<Material, TextureAtlasSprite> fabric_getTextureGetter() {
+		return modelTextureGetter;
 	}
 }

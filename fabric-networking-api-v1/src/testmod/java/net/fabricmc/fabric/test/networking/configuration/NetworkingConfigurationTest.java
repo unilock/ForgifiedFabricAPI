@@ -17,7 +17,11 @@
 package net.fabricmc.fabric.test.networking.configuration;
 
 import java.util.function.Consumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
@@ -28,16 +32,20 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.commands.DebugConfigCommand;
 import net.minecraft.server.network.ConfigurationTask;
 
 /**
  * Also see NetworkingConfigurationClientTest.
  */
 public class NetworkingConfigurationTest implements ModInitializer {
+	private static final Logger LOGGER = LoggerFactory.getLogger(NetworkingConfigurationTest.class);
+
 	@Override
 	public void onInitialize() {
 		PayloadTypeRegistry.configurationS2C().register(ConfigurationPacket.ID, ConfigurationPacket.CODEC);
 		PayloadTypeRegistry.configurationC2S().register(ConfigurationCompletePacket.ID, ConfigurationCompletePacket.CODEC);
+		PayloadTypeRegistry.configurationC2S().register(ConfigurationStartPacket.ID, ConfigurationStartPacket.CODEC);
 
 		ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
 			// You must check to see if the client can handle your config task
@@ -52,10 +60,17 @@ public class NetworkingConfigurationTest implements ModInitializer {
 		ServerConfigurationNetworking.registerGlobalReceiver(ConfigurationCompletePacket.ID, (packet, context) -> {
 			context.networkHandler().completeTask(TestConfigurationTask.KEY);
 		});
+
+		ServerConfigurationNetworking.registerGlobalReceiver(ConfigurationStartPacket.ID, (packet, context) -> {
+			LOGGER.info("Received configuration start packet from client");
+		});
+
+		// Enable the vanilla debugconfig command
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> DebugConfigCommand.register(dispatcher));
 	}
 
 	public record TestConfigurationTask(String data) implements ConfigurationTask {
-		public static final Type KEY = new Type(new ResourceLocation(NetworkingTestmods.ID, "configure").toString());
+		public static final Type KEY = new Type(ResourceLocation.fromNamespaceAndPath(NetworkingTestmods.ID, "configure").toString());
 
 		@Override
 		public void start(Consumer<Packet<?>> sender) {
@@ -70,7 +85,7 @@ public class NetworkingConfigurationTest implements ModInitializer {
 	}
 
 	public record ConfigurationPacket(String data) implements CustomPacketPayload {
-		public static final CustomPacketPayload.Type<ConfigurationPacket> ID = new Type<>(new ResourceLocation(NetworkingTestmods.ID, "configure"));
+		public static final CustomPacketPayload.Type<ConfigurationPacket> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(NetworkingTestmods.ID, "configure"));
 		public static final StreamCodec<FriendlyByteBuf, ConfigurationPacket> CODEC = CustomPacketPayload.codec(ConfigurationPacket::write, ConfigurationPacket::new);
 
 		public ConfigurationPacket(FriendlyByteBuf buf) {
@@ -89,10 +104,24 @@ public class NetworkingConfigurationTest implements ModInitializer {
 
 	public static class ConfigurationCompletePacket implements CustomPacketPayload {
 		public static final ConfigurationCompletePacket INSTANCE = new ConfigurationCompletePacket();
-		public static final CustomPacketPayload.Type<ConfigurationCompletePacket> ID = new Type<>(new ResourceLocation(NetworkingTestmods.ID, "configure_complete"));
+		public static final CustomPacketPayload.Type<ConfigurationCompletePacket> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(NetworkingTestmods.ID, "configure_complete"));
 		public static final StreamCodec<FriendlyByteBuf, ConfigurationCompletePacket> CODEC = StreamCodec.unit(INSTANCE);
 
 		private ConfigurationCompletePacket() {
+		}
+
+		@Override
+		public Type<? extends CustomPacketPayload> type() {
+			return ID;
+		}
+	}
+
+	public static class ConfigurationStartPacket implements CustomPacketPayload {
+		public static final ConfigurationStartPacket INSTANCE = new ConfigurationStartPacket();
+		public static final CustomPacketPayload.Type<ConfigurationStartPacket> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(NetworkingTestmods.ID, "configure_start"));
+		public static final StreamCodec<FriendlyByteBuf, ConfigurationStartPacket> CODEC = StreamCodec.unit(INSTANCE);
+
+		private ConfigurationStartPacket() {
 		}
 
 		@Override

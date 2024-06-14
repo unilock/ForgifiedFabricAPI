@@ -50,7 +50,7 @@ abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
 	void injectElytraStart(CallbackInfo info) {
 		// Note that if fall flying is not ALLOWed, checkFallFlying will return false and nothing will happen.
 		if (this.tryToStartFallFlying()) {
-			connection.sendPacket(new ServerboundPlayerCommandPacket(this, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
+			connection.send(new ServerboundPlayerCommandPacket(this, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
 		}
 	}
 }

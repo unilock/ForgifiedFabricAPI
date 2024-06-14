@@ -22,7 +22,6 @@ import org.jetbrains.annotations.ApiStatus;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingPluginManager;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.block.Block;
@@ -51,13 +50,14 @@ public interface ModelLoadingPlugin {
 	@ApiStatus.NonExtendable
 	interface Context {
 		/**
-		 * Adds one or more models (can be {@link ModelResourceLocation}s) to the list of models that will be loaded and
-		 * baked.
+		 * Adds one or more models that will be loaded, baked, and made available through
+		 * {@link FabricBakedModelManager#getModel(ResourceLocation)}.
 		 */
 		void addModels(ResourceLocation... ids);
 
 		/**
-		 * Adds multiple models (can be {@link ModelResourceLocation}s) to the list of models that will be loaded and baked.
+		 * Adds multiple models that will be loaded, baked, and made available through
+		 * {@link FabricBakedModelManager#getModel(ResourceLocation)}.
 		 */
 		void addModels(Collection<? extends ResourceLocation> ids);
 

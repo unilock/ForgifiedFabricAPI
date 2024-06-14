@@ -33,7 +33,7 @@ import net.minecraft.world.entity.monster.Creeper;
 
 public class FabricEntityApiLookupTest {
 	public static final EntityApiLookup<Inspectable, Void> INSPECTABLE =
-			EntityApiLookup.get(new ResourceLocation(FabricApiLookupTest.MOD_ID, "inspectable"), Inspectable.class, Void.class);
+			EntityApiLookup.get(ResourceLocation.fromNamespaceAndPath(FabricApiLookupTest.MOD_ID, "inspectable"), Inspectable.class, Void.class);
 
 	public static final EntityType<InspectablePigEntity> INSPECTABLE_PIG = FabricEntityTypeBuilder.create()
 			.spawnGroup(MobCategory.CREATURE)
@@ -43,7 +43,7 @@ public class FabricEntityApiLookupTest {
 			.build();
 
 	public static void onInitialize() {
-		Registry.register(BuiltInRegistries.ENTITY_TYPE, new ResourceLocation(FabricApiLookupTest.MOD_ID, "inspectable_pig"), INSPECTABLE_PIG);
+		Registry.register(BuiltInRegistries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(FabricApiLookupTest.MOD_ID, "inspectable_pig"), INSPECTABLE_PIG);
 		FabricDefaultAttributeRegistry.register(INSPECTABLE_PIG, Pig.createAttributes());
 
 		INSPECTABLE.registerSelf(INSPECTABLE_PIG);

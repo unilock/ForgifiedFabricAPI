@@ -114,7 +114,7 @@ public class ComponentsIngredient implements CustomIngredient {
 	}
 
 	private static class Serializer implements CustomIngredientSerializer<ComponentsIngredient> {
-		private static final ResourceLocation ID = new ResourceLocation("fabric", "components");
+		private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("fabric", "components");
 		private static final MapCodec<ComponentsIngredient> ALLOW_EMPTY_CODEC = createCodec(Ingredient.CODEC);
 		private static final MapCodec<ComponentsIngredient> DISALLOW_EMPTY_CODEC = createCodec(Ingredient.CODEC_NONEMPTY);
 		private static final StreamCodec<RegistryFriendlyByteBuf, ComponentsIngredient> PACKET_CODEC = StreamCodec.composite(

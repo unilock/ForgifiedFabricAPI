@@ -166,7 +166,7 @@ public abstract class MinecraftClientMixin {
 		if (result != InteractionResult.PASS) {
 			if (result.consumesAction()) {
 				Vec3 hitVec = hitResult.getLocation().subtract(entity.getX(), entity.getY(), entity.getZ());
-				getConnection().sendPacket(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand, hitVec));
+				getConnection().send(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand, hitVec));
 			}
 
 			if (result.shouldSwing()) {

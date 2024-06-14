@@ -43,7 +43,7 @@ public class FrameBlockEntity extends BlockEntity implements RenderDataBlockEnti
 		super.loadAdditional(tag, wrapperLookup);
 
 		if (tag.contains("block", Tag.TAG_STRING)) {
-			this.block = BuiltInRegistries.BLOCK.get(new ResourceLocation(tag.getString("block")));
+			this.block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(tag.getString("block")));
 		} else {
 			this.block = null;
 		}

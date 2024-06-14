@@ -64,12 +64,12 @@ public final class ServerMessageDecoratorEvent {
 	 * The content phase of the event, passed when registering a message decorator. Use this when
 	 * the decorator modifies the text content of the message.
 	 */
-	public static final ResourceLocation CONTENT_PHASE = new ResourceLocation("fabric", "content");
+	public static final ResourceLocation CONTENT_PHASE = ResourceLocation.fromNamespaceAndPath("fabric", "content");
 	/**
 	 * The styling phase of the event, passed when registering a message decorator. Use this when
 	 * the decorator only modifies the styling of the message with the text intact.
 	 */
-	public static final ResourceLocation STYLING_PHASE = new ResourceLocation("fabric", "styling");
+	public static final ResourceLocation STYLING_PHASE = ResourceLocation.fromNamespaceAndPath("fabric", "styling");
 
 	public static final Event<ChatDecorator> EVENT = EventFactory.createWithPhases(ChatDecorator.class, decorators -> (sender, message) -> {
 		Component decorated = message;

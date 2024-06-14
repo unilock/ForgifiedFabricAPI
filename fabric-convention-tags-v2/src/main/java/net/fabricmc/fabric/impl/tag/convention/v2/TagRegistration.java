@@ -40,10 +40,10 @@ public record TagRegistration<T>(ResourceKey<Registry<T>> registryKey) {
 	public static final TagRegistration<Enchantment> ENCHANTMENT_TAG = new TagRegistration<>(Registries.ENCHANTMENT);
 
 	public TagKey<T> registerFabric(String tagId) {
-		return TagKey.create(registryKey, new ResourceLocation(TagUtil.FABRIC_TAG_NAMESPACE, tagId));
+		return TagKey.create(registryKey, ResourceLocation.fromNamespaceAndPath(TagUtil.FABRIC_TAG_NAMESPACE, tagId));
 	}
 
 	public TagKey<T> registerC(String tagId) {
-		return TagKey.create(registryKey, new ResourceLocation(TagUtil.C_TAG_NAMESPACE, tagId));
+		return TagKey.create(registryKey, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, tagId));
 	}
 }

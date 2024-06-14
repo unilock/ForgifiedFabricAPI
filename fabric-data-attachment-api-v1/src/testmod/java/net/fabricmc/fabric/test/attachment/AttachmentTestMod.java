@@ -49,11 +49,11 @@ public class AttachmentTestMod implements ModInitializer {
 	public static final String MOD_ID = "fabric-data-attachment-api-v1-testmod";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final AttachmentType<String> PERSISTENT = AttachmentRegistry.createPersistent(
-			new ResourceLocation(MOD_ID, "persistent"),
+			ResourceLocation.fromNamespaceAndPath(MOD_ID, "persistent"),
 			Codec.STRING
 	);
 	public static final AttachmentType<String> FEATURE_ATTACHMENT = AttachmentRegistry.create(
-			new ResourceLocation(MOD_ID, "feature")
+			ResourceLocation.fromNamespaceAndPath(MOD_ID, "feature")
 	);
 
 	public static final ChunkPos FAR_CHUNK_POS = new ChunkPos(300, 0);
@@ -63,12 +63,12 @@ public class AttachmentTestMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		Registry.register(BuiltInRegistries.FEATURE, new ResourceLocation(MOD_ID, "set_attachment"), new SetAttachmentFeature(NoneFeatureConfiguration.CODEC));
+		Registry.register(BuiltInRegistries.FEATURE, ResourceLocation.fromNamespaceAndPath(MOD_ID, "set_attachment"), new SetAttachmentFeature(NoneFeatureConfiguration.CODEC));
 
 		BiomeModifications.addFeature(
 				BiomeSelectors.foundInOverworld(),
 				GenerationStep.Decoration.VEGETAL_DECORATION,
-				ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(MOD_ID, "set_attachment"))
+				ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath(MOD_ID, "set_attachment"))
 		);
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {

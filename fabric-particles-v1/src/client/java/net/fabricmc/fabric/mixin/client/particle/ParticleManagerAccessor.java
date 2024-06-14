@@ -33,7 +33,7 @@ public interface ParticleManagerAccessor {
 	@Accessor("textureAtlas")
 	TextureAtlas getParticleAtlasTexture();
 
-	@Accessor("factories")
+	@Accessor("providers")
 	Int2ObjectMap<ParticleProvider<?>> getFactories();
 
 	// NOTE: The field signature is actually Map<Identifier, SimpleSpriteProvider>

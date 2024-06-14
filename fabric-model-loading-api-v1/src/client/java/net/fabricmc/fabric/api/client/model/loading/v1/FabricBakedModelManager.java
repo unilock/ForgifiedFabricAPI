@@ -20,7 +20,6 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Fabric-provided helper methods for {@link ModelManager}.
@@ -29,20 +28,18 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface FabricBakedModelManager {
 	/**
-	 * An alternative to {@link ModelManager#getModel(ModelResourceLocation)} that accepts an
-	 * {@link ResourceLocation} instead. Models loaded using {@link ModelLoadingPlugin.Context#addModels}
-	 * do not have a corresponding {@link ModelResourceLocation}, so the vanilla method cannot be used to
-	 * retrieve them. The {@link ResourceLocation} that was used to load them can be used in this method
-	 * to retrieve them.
+	 * Similar to {@link ModelManager#getModel(ModelResourceLocation)}, but accepts an {@link ResourceLocation} instead of a
+	 * {@link ModelResourceLocation}. Use this method to retrieve models loaded using
+	 * {@link ModelLoadingPlugin.Context#addModels}, since those models do not have corresponding
+	 * {@link ModelResourceLocation}s.
 	 *
 	 * <p><b>This method, as well as its vanilla counterpart, should only be used after the
 	 * {@link ModelManager} has completed reloading.</b> Otherwise, the result will be
-	 * outdated or null.
+	 * outdated or an exception will be thrown.
 	 *
 	 * @param id the id of the model
 	 * @return the model
 	 */
-	@Nullable
 	default BakedModel getModel(ResourceLocation id) {
 		throw new UnsupportedOperationException("Implemented via mixin.");
 	}

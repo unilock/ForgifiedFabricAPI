@@ -33,7 +33,7 @@ import net.minecraft.world.item.component.Fireworks;
 public class DefaultItemComponentTest implements ModInitializer {
 	@Override
 	public void onInitialize() {
-		ResourceLocation latePhase = new ResourceLocation("fabric-item-api-v1-testmod", "late");
+		ResourceLocation latePhase = ResourceLocation.fromNamespaceAndPath("fabric-item-api-v1-testmod", "late");
 		DefaultItemComponentEvents.MODIFY.addPhaseOrdering(Event.DEFAULT_PHASE, latePhase);
 
 		DefaultItemComponentEvents.MODIFY.register(context -> {

@@ -33,4 +33,9 @@ public abstract class ServerWorldMixin {
 	private void startWorldTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		ServerTickEvents.START_WORLD_TICK.invoker().onStartTick((ServerLevel) (Object) this);
 	}
+
+	@Inject(method = "tick", at = @At(value = "TAIL"))
+	private void endWorldTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+		ServerTickEvents.END_WORLD_TICK.invoker().onEndTick((ServerLevel) (Object) this);
+	}
 }

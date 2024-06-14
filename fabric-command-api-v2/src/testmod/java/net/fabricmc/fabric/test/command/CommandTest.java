@@ -36,7 +36,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 public final class CommandTest implements ModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CommandTest.class);
-	static final ResourceLocation SELECTOR_ID = new ResourceLocation("fabric-command-api-v2-testmod", "min_health");
+	static final ResourceLocation SELECTOR_ID = ResourceLocation.fromNamespaceAndPath("fabric-command-api-v2-testmod", "min_health");
 	private static final SimpleCommandExceptionType WRONG_SIDE_SHOULD_BE_INTEGRATED = new SimpleCommandExceptionType(Component.literal("This command was registered incorrectly. Should only be present on an integrated server but was ran on a dedicated server!"));
 	private static final SimpleCommandExceptionType WRONG_SIDE_SHOULD_BE_DEDICATED = new SimpleCommandExceptionType(Component.literal("This command was registered incorrectly. Should only be present on an dedicated server but was ran on an integrated server!"));
 

@@ -22,21 +22,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.fabricmc.fabric.impl.networking.DisconnectPacketSource;
 import net.fabricmc.fabric.impl.networking.NetworkHandlerExtensions;
 import net.fabricmc.fabric.impl.networking.server.ServerPlayNetworkAddon;
 
 // We want to apply a bit earlier than other mods which may not use us in order to prevent refCount issues
 @Mixin(value = ServerGamePacketListenerImpl.class, priority = 999)
-abstract class ServerPlayNetworkHandlerMixin extends ServerCommonPacketListenerImpl implements NetworkHandlerExtensions, DisconnectPacketSource {
+abstract class ServerPlayNetworkHandlerMixin extends ServerCommonPacketListenerImpl implements NetworkHandlerExtensions {
 	@Unique
 	private ServerPlayNetworkAddon addon;
 
@@ -61,10 +57,5 @@ abstract class ServerPlayNetworkHandlerMixin extends ServerCommonPacketListenerI
 	@Override
 	public ServerPlayNetworkAddon getAddon() {
 		return this.addon;
-	}
-
-	@Override
-	public Packet<?> createDisconnectPacket(Component message) {
-		return new ClientboundDisconnectPacket(message);
 	}
 }

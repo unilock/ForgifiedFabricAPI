@@ -98,7 +98,6 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditions;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
@@ -141,7 +140,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 			}
 		}
 
-		FabricDataGenerator.Pack extraPack = dataGenerator.createBuiltinResourcePack(new ResourceLocation(MOD_ID, "extra"));
+		FabricDataGenerator.Pack extraPack = dataGenerator.createBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(MOD_ID, "extra"));
 		CompletableFuture<HolderLookup.Provider> extraRegistries = RegistryPatchGenerator.createLookup(dataGenerator.getRegistries(), new RegistrySetBuilder()
 				.add(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY, c ->
 						c.register(TEST_DYNAMIC_REGISTRY_EXTRA_ITEM_KEY, new DataGeneratorTestContent.TestDatagenObject(":tiny_potato:"))
@@ -185,7 +184,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 			/* Generate test recipes using all types of custom ingredients for easy testing */
 			// Testing procedure for vanilla and fabric clients:
 			// - Create a new fabric server with the ingredient API.
-			// - Copy the generated recipes to a datapack, for example to world/datapacks/<packname>/data/test/recipes/.
+			// - Copy the generated recipes to a datapack, for example to world/datapacks/<packname>/data/test/recipe/.
 			// - Remember to also include a pack.mcmeta file in world/datapacks/<packname>.
 			// (see https://minecraft.wiki/w/Tutorials/Creating_a_data_pack)
 			// - Start the server and connect to it with a vanilla client.
@@ -254,9 +253,9 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		@Override
 		public void generateTranslations(HolderLookup.Provider registryLookup, TranslationBuilder translationBuilder) {
 			translationBuilder.add(SIMPLE_BLOCK, "Simple Block");
-			translationBuilder.add(new ResourceLocation(MOD_ID, "identifier_test"), "Identifier Test");
+			translationBuilder.add(ResourceLocation.fromNamespaceAndPath(MOD_ID, "identifier_test"), "Identifier Test");
 			translationBuilder.add(EntityType.ALLAY, "Allay");
-			translationBuilder.add(Attributes.ARMOR, "Generic Armor");
+			translationBuilder.add(Attributes.GENERIC_ARMOR, "Generic Armor");
 
 			try {
 				Optional<Path> path = dataOutput.getModContainer().findPath("assets/testmod/lang/en_us.base.json");
@@ -342,7 +341,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void addTags(HolderLookup.Provider registries) {
-			tag(TagKey.create(Registries.BIOME, new ResourceLocation(MOD_ID, "biome_tag_test")))
+			tag(TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(MOD_ID, "biome_tag_test")))
 					.add(Biomes.BADLANDS, Biomes.BAMBOO_JUNGLE)
 					.add(Biomes.BASALT_DELTAS);
 		}
@@ -355,7 +354,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void addTags(HolderLookup.Provider registries) {
-			tag(TagKey.create(Registries.GAME_EVENT, new ResourceLocation(MOD_ID, "game_event_tag_test")))
+			tag(TagKey.create(Registries.GAME_EVENT, ResourceLocation.fromNamespaceAndPath(MOD_ID, "game_event_tag_test")))
 					.add(GameEvent.SHRIEK.key());
 		}
 	}
@@ -372,7 +371,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 							SIMPLE_BLOCK,
 							Component.translatable("advancements.test.root.title"),
 							Component.translatable("advancements.test.root.description"),
-							new ResourceLocation("textures/gui/advancements/backgrounds/end.png"),
+							ResourceLocation.withDefaultNamespace("textures/gui/advancements/backgrounds/end.png"),
 							AdvancementType.TASK,
 							false, false, false)
 					.addCriterion("killed_something", KilledTrigger.TriggerInstance.playerKilledEntity())
@@ -382,7 +381,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 							SIMPLE_BLOCK,
 							Component.translatable("advancements.test.root_not_loaded.title"),
 							Component.translatable("advancements.test.root_not_loaded.description"),
-							new ResourceLocation("textures/gui/advancements/backgrounds/end.png"),
+							ResourceLocation.withDefaultNamespace("textures/gui/advancements/backgrounds/end.png"),
 							AdvancementType.TASK,
 							false, false, false)
 					.addCriterion("killed_something", KilledTrigger.TriggerInstance.playerKilledEntity())
@@ -407,13 +406,13 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 	private static class TestBarterLootTableProvider extends SimpleFabricLootTableProvider {
 		private TestBarterLootTableProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
-			super(output, registryLookup, LootContextParamSets.PIGLIN_BARTER);
+			super(output, registryLookup, LootContextParamSets.BARTER);
 		}
 
 		@Override
-		public void generate(HolderLookup.Provider registryLookup, BiConsumer<ResourceKey<LootTable>, LootTable.Builder> consumer) {
+		public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> consumer) {
 			withConditions(consumer, ALWAYS_LOADED).accept(
-					BuiltInLootTables.PIGLIN_BARTERING,
+					BuiltInLootTables.PIGLIN_BARTERING_GAMEPLAY,
 					LootTable.lootTable().withPool(
 							LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).add(LootItem.lootTableItem(SIMPLE_BLOCK))
 					)
@@ -432,7 +431,10 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void configure(HolderLookup.Provider registries, Entries entries) {
-			entries.add(registries.lookupOrThrow(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY), TEST_DYNAMIC_REGISTRY_ITEM_KEY);
+			entries.add(
+					registries.lookupOrThrow(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY), TEST_DYNAMIC_REGISTRY_ITEM_KEY,
+					ResourceConditions.allModsLoaded(MOD_ID)
+			);
 		}
 
 		@Override
@@ -462,13 +464,13 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 	private static class TestPredicateProvider extends FabricCodecDataProvider<LootItemCondition> {
 		private TestPredicateProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture) {
-			super(dataOutput, registriesFuture, PackOutput.Target.DATA_PACK, "predicates", LootItemConditions.DIRECT_CODEC);
+			super(dataOutput, registriesFuture, Registries.PREDICATE, LootItemCondition.DIRECT_CODEC);
 		}
 
 		@Override
 		protected void configure(BiConsumer<ResourceLocation, LootItemCondition> provider, HolderLookup.Provider lookup) {
 			HolderGetter<Block> blocks = lookup.asGetterLookup().lookupOrThrow(Registries.BLOCK);
-			provider.accept(new ResourceLocation(MOD_ID, "predicate_test"), LootItemBlockStatePropertyCondition.hasBlockStateProperties(
+			provider.accept(ResourceLocation.fromNamespaceAndPath(MOD_ID, "predicate_test"), LootItemBlockStatePropertyCondition.hasBlockStateProperties(
 					blocks.getOrThrow(Blocks.MELON).value()).build()); // Pretend this actually does something and we cannot access the blocks directly
 		}
 
@@ -486,7 +488,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		@Override
 		protected void configure(BiConsumer<ResourceLocation, Entry> provider, HolderLookup.Provider lookup) {
 			HolderGetter<Biome> biomes = lookup.asGetterLookup().lookupOrThrow(Registries.BIOME);
-			provider.accept(new ResourceLocation(MOD_ID, "custom_codec_test"), new Entry(biomes.getOrThrow(Biomes.PLAINS)));
+			provider.accept(ResourceLocation.fromNamespaceAndPath(MOD_ID, "custom_codec_test"), new Entry(biomes.getOrThrow(Biomes.PLAINS)));
 		}
 
 		@Override

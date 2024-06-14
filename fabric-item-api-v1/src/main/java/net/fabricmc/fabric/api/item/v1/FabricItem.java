@@ -17,11 +17,11 @@
 package net.fabricmc.fabric.api.item.v1;
 
 import net.fabricmc.fabric.impl.item.FabricItemInternals;
+import net.minecraft.core.Holder;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 /**
@@ -60,19 +60,6 @@ public interface FabricItem {
 	 */
 	default boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
 		return false;
-	}
-
-	/**
-	 * Return the attribute modifiers to apply when this stack is worn in a living entity equipment slot.
-	 * Stack-aware version of {@link Item#getDefaultAttributeModifiers()}.
-	 *
-	 * <p>Note that attribute modifiers are only updated when the stack changes, i.e. when {@code ItemStack.areEqual(old, new)} is false.
-	 *
-	 * @param stack the current stack
-	 * @return the attribute modifiers
-	 */
-	default ItemAttributeModifiers getAttributeModifiers(ItemStack stack) {
-		return ((Item) this).getDefaultAttributeModifiers();
 	}
 
 	/**
@@ -123,8 +110,10 @@ public interface FabricItem {
 	 * @param context the context in which the enchantment is being checked
 	 * @return whether the enchantment is allowed to apply to the stack
 	 */
-	default boolean canBeEnchantedWith(ItemStack stack, Enchantment enchantment, EnchantingContext context) {
-		return enchantment.canEnchant(stack);
+	default boolean canBeEnchantedWith(ItemStack stack, Holder<Enchantment> enchantment, EnchantingContext context) {
+		return context == EnchantingContext.PRIMARY
+				? enchantment.value().isPrimaryItem(stack)
+				: enchantment.value().canEnchant(stack);
 	}
 
 	/**

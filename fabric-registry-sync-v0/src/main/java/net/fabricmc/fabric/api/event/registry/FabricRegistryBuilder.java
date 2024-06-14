@@ -36,7 +36,7 @@ import net.minecraft.resources.ResourceLocation;
  *
  * <pre>
  * {@code
- *  RegistryKey<Registry<String>> registryKey = RegistryKey.ofRegistry(new Identifier("modid", "registry_name"));
+ *  RegistryKey<Registry<String>> registryKey = RegistryKey.ofRegistry(Identifier.of("modid", "registry_name"));
  *  Registry<String> registry = FabricRegistryBuilder.createSimple(registryKey)
  * 													.attribute(RegistryAttribute.SYNCED)
  * 													.buildAndRegister();

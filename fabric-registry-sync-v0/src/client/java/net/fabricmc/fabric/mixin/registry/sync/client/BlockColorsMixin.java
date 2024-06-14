@@ -32,10 +32,10 @@ import net.fabricmc.fabric.impl.registry.sync.trackers.IdListTracker;
 public class BlockColorsMixin {
 	@Final
 	@Shadow
-	private IdMapper<BlockColor> providers;
+	private IdMapper<BlockColor> blockColors;
 
 	@Inject(method = "<init>", at = @At("RETURN"))
 	private void create(CallbackInfo info) {
-		IdListTracker.register(BuiltInRegistries.BLOCK, "BlockColors.providers", providers);
+		IdListTracker.register(BuiltInRegistries.BLOCK, "BlockColors.providers", blockColors);
 	}
 }

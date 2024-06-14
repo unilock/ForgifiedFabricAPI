@@ -24,6 +24,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 
 public class TestBiomeTagProvider extends FabricTagProvider<Biome> {
 	public TestBiomeTagProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
@@ -32,8 +33,13 @@ public class TestBiomeTagProvider extends FabricTagProvider<Biome> {
 
 	@Override
 	protected void addTags(HolderLookup.Provider registries) {
-		tag(TagKey.create(Registries.BIOME, new ResourceLocation(FabricBiomeTest.MOD_ID, "biome_tag_test")))
+		tag(TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "biome_tag_test")))
 				.add(TestBiomes.CUSTOM_PLAINS)
 				.add(TestBiomes.TEST_END_HIGHLANDS);
+		tag(TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "tag_selector_test")))
+				.add(Biomes.BEACH)
+				.add(Biomes.DESERT)
+				.add(Biomes.SAVANNA)
+				.add(Biomes.BADLANDS);
 	}
 }

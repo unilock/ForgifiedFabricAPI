@@ -24,16 +24,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import net.fabricmc.fabric.impl.item.RecipeRemainderHandler;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 @Mixin(Recipe.class)
-public interface RecipeMixin<C extends Container> {
-	@Inject(method = "getRemainingItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/Container;getItem(I)Lnet/minecraft/world/item/ItemStack;"), locals = LocalCapture.CAPTURE_FAILHARD)
-	default void captureStack(C inventory, CallbackInfoReturnable<NonNullList<ItemStack>> cir, NonNullList<ItemStack> defaultedList, int i) {
+public interface RecipeMixin<T extends RecipeInput> {
+	@Inject(method = "getRemainingItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/crafting/RecipeInput;getItem(I)Lnet/minecraft/world/item/ItemStack;"), locals = LocalCapture.CAPTURE_FAILHARD)
+	default void captureStack(T inventory, CallbackInfoReturnable<NonNullList<ItemStack>> cir, NonNullList<ItemStack> defaultedList, int i) {
 		RecipeRemainderHandler.REMAINDER_STACK.set(inventory.getItem(i).getRecipeRemainder());
 	}
 

@@ -92,7 +92,7 @@ public abstract class ServerPlayerEntityMixin extends Player {
 			}
 		} else {
 			// Use vanilla logic for non-extended screen handlers
-			networkHandler.sendPacket(packet);
+			networkHandler.send(packet);
 		}
 	}
 }

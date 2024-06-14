@@ -36,7 +36,7 @@ import net.minecraft.world.level.storage.loot.LootDataType;
 public class JsonDataLoaderMixin {
 	@Inject(method = "scanDirectory", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/resources/FileToIdConverter;fileToId(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;", shift = At.Shift.AFTER))
 	private static void fillSourceMap(ResourceManager manager, String dataType, Gson gson, Map<ResourceLocation, JsonElement> results, CallbackInfo ci, @Local Map.Entry<ResourceLocation, Resource> entry, @Local(ordinal = 1) ResourceLocation id) {
-		if (!LootDataType.TABLE.directory().equals(dataType)) return;
+		if (!LootDataType.TABLE.registryKey().location().getPath().equals(dataType)) return;
 
 		LootUtil.SOURCES.get().put(id, LootUtil.determineSource(entry.getValue()));
 	}

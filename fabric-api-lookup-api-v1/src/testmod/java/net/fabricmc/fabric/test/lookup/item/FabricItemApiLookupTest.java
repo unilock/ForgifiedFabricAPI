@@ -32,12 +32,12 @@ import net.minecraft.world.item.TieredItem;
 
 public class FabricItemApiLookupTest {
 	public static final ItemApiLookup<Inspectable, Void> INSPECTABLE =
-			ItemApiLookup.get(new ResourceLocation("testmod:inspectable"), Inspectable.class, Void.class);
+			ItemApiLookup.get(ResourceLocation.fromNamespaceAndPath("testmod", "inspectable"), Inspectable.class, Void.class);
 
 	public static final InspectableItem HELLO_ITEM = new InspectableItem("Hello Fabric API tester!");
 
 	public static void onInitialize() {
-		Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(FabricApiLookupTest.MOD_ID, "hello"), HELLO_ITEM);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(FabricApiLookupTest.MOD_ID, "hello"), HELLO_ITEM);
 
 		// Diamonds and diamond blocks can be inspected and will also print their name.
 		INSPECTABLE.registerForItems((stack, ignored) -> () -> {
