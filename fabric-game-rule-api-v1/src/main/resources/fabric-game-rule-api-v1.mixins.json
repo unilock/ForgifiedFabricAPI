@@ -3,7 +3,7 @@
   "package": "net.fabricmc.fabric.mixin.gamerule",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "GameRulesBooleanRuleAccessor",
+
     "GameRuleCommandAccessor",
     "GameRuleCommandVisitorMixin",
     "GameRulesAccessor",

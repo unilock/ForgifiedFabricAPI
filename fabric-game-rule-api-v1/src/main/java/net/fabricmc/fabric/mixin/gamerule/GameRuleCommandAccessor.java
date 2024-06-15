@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.mixin.gamerule;
 
-import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.commands.GameRuleCommand;
 import net.minecraft.world.level.GameRules;
@@ -25,12 +24,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(GameRuleCommand.class)
 public interface GameRuleCommandAccessor {
-	@Invoker
-	static <T extends GameRules.Value<T>> int invokeExecuteSet(CommandContext<CommandSourceStack> commandContext, GameRules.Key<T> ruleKey) {
-		throw new AssertionError("This shouldn't happen!");
-	}
-
-	@Invoker
+	@Invoker("queryRule")
 	static <T extends GameRules.Value<T>> int invokeExecuteQuery(CommandSourceStack serverCommandSource, GameRules.Key<T> ruleKey) {
 		throw new AssertionError("This shouldn't happen!");
 	}
