@@ -119,7 +119,7 @@ public class ModResourcePackCreator implements RepositorySource {
 		));
 
 		// Build a list of mod resource packs.
-		registerModPack(consumer, null, BASE_PARENT);
+//		registerModPack(consumer, null, BASE_PARENT);
 
 		if (this.type == PackType.CLIENT_RESOURCES) {
 			// Programmer Art/High Contrast data packs can never be enabled.
