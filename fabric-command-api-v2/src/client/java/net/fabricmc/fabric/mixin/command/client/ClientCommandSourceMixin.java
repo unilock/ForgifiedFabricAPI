@@ -16,9 +16,8 @@
 
 package net.fabricmc.fabric.mixin.command.client;
 
-import org.spongepowered.asm.mixin.Final;
+import net.neoforged.neoforge.client.ClientCommandSourceStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -27,16 +26,12 @@ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
-@Mixin(ClientSuggestionProvider.class)
+@Mixin({ClientSuggestionProvider.class, ClientCommandSourceStack.class})
 abstract class ClientCommandSourceMixin implements FabricClientCommandSource {
-	@Shadow
-	@Final
-	private Minecraft minecraft;
-
 	@Override
 	public void sendFeedback(Component message) {
-		this.minecraft.gui.getChat().addMessage(message);
-		this.minecraft.getNarrator().sayNow(message);
+		getClient().gui.getChat().addMessage(message);
+		getClient().getNarrator().sayNow(message);
 	}
 
 	@Override
@@ -46,16 +41,16 @@ abstract class ClientCommandSourceMixin implements FabricClientCommandSource {
 
 	@Override
 	public Minecraft getClient() {
-		return minecraft;
+		return Minecraft.getInstance();
 	}
 
 	@Override
 	public LocalPlayer getPlayer() {
-		return minecraft.player;
+		return getClient().player;
 	}
 
 	@Override
 	public ClientLevel getWorld() {
-		return minecraft.level;
+		return getClient().level;
 	}
 }

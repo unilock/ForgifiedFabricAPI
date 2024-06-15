@@ -17,11 +17,9 @@
 package net.fabricmc.fabric.api.command.v2;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import net.fabricmc.fabric.mixin.command.ArgumentTypesAccessor;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import org.sinytra.fabric.command_api.FabricCommandApiV2;
 
 public final class ArgumentTypeRegistry {
 	/**
@@ -35,8 +33,7 @@ public final class ArgumentTypeRegistry {
 	 */
 	public static <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>> void registerArgumentType(
 			ResourceLocation id, Class<? extends A> clazz, ArgumentTypeInfo<A, T> serializer) {
-		ArgumentTypesAccessor.fabric_getClassMap().put(clazz, serializer);
-		Registry.register(BuiltInRegistries.COMMAND_ARGUMENT_TYPE, id, serializer);
+		FabricCommandApiV2.registerArgumentType(id, clazz, serializer);
 	}
 
 	private ArgumentTypeRegistry() {
