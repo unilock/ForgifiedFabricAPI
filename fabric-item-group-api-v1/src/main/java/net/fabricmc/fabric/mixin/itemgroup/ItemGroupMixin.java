@@ -23,14 +23,12 @@ import java.util.Set;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.impl.itemgroup.FabricItemGroupImpl;
 import net.fabricmc.fabric.impl.itemgroup.ItemGroupEventsImpl;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -39,15 +37,12 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(CreativeModeTab.class)
-abstract class ItemGroupMixin implements FabricItemGroupImpl {
+abstract class ItemGroupMixin {
 	@Shadow
 	private Collection<ItemStack> displayItems;
 
 	@Shadow
 	private Set<ItemStack> displayItemsSearchTab;
-
-	@Unique
-	private int page = -1;
 
 	@SuppressWarnings("ConstantConditions")
 	@Inject(method = "buildContents", at = @At("TAIL"))
@@ -86,19 +81,5 @@ abstract class ItemGroupMixin implements FabricItemGroupImpl {
 
 		displayItemsSearchTab.clear();
 		displayItemsSearchTab.addAll(mutableSearchTabStacks);
-	}
-
-	@Override
-	public int fabric_getPage() {
-		if (page < 0) {
-			throw new IllegalStateException("Item group has no page");
-		}
-
-		return page;
-	}
-
-	@Override
-	public void fabric_setPage(int page) {
-		this.page = page;
 	}
 }
