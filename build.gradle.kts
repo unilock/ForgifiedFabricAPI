@@ -51,8 +51,13 @@ version = "$upstreamVersion+$implementationVersion+$versionMc"
 println("Version: $version")
 
 allprojects {
-    apply(plugin = "java-library")
     apply(plugin = "maven-publish")
+
+    if (project.name in META_PROJECTS) {
+        return@allprojects
+    }
+
+    apply(plugin = "java-library")
     apply(plugin = "dev.architectury.loom")
 
     java {
@@ -127,6 +132,10 @@ tasks {
 // Subprojects
 
 allprojects {
+    if (project.name in META_PROJECTS) {
+        return@allprojects
+    }
+
     val modDependencies: Configuration by configurations.creating
 
     tasks.register("generate") {
@@ -144,7 +153,7 @@ allprojects {
     }
 
     allprojects.forEach { p ->
-        if (!META_PROJECTS.contains(project.name)) {
+        if (!META_PROJECTS.contains(p.name)) {
             loom.mods.register(p.name) {
                 sourceSet(p.sourceSets.main.get())
             }
@@ -210,11 +219,11 @@ fun getSubprojectVersion(project: Project): String {
         ?: throw NullPointerException("Could not find version for " + project.name)
 
     @Suppress("SENSELESS_COMPARISON")
-    if (grgit == null) {
+    if (rootProject.grgit == null) {
         return "$version+nogit"
     }
 
-    val latestCommits = grgit.log(mapOf("paths" to listOf(project.name), "maxCommits" to 1))
+    val latestCommits = rootProject.grgit.log(mapOf("paths" to listOf(project.name), "maxCommits" to 1))
     if (latestCommits.isEmpty()) {
         return "$version+uncommited"
     }

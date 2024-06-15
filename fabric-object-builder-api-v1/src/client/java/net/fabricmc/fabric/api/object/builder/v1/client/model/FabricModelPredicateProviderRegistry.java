@@ -16,9 +16,8 @@
 
 package net.fabricmc.fabric.api.object.builder.v1.client.model;
 
-import net.fabricmc.fabric.mixin.object.builder.client.ModelPredicateProviderRegistryAccessor;
-import net.fabricmc.fabric.mixin.object.builder.client.ModelPredicateProviderRegistrySpecificAccessor;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
@@ -41,7 +40,7 @@ public final class FabricModelPredicateProviderRegistry {
 	 * @param provider the provider
 	 */
 	public static void register(ResourceLocation id, ClampedItemPropertyFunction provider) {
-		ModelPredicateProviderRegistryAccessor.callRegister(id, provider);
+		ItemProperties.registerGeneric(id, provider);
 	}
 
 	/**
@@ -52,6 +51,6 @@ public final class FabricModelPredicateProviderRegistry {
 	 * @param provider the provider
 	 */
 	public static void register(Item item, ResourceLocation id, ClampedItemPropertyFunction provider) {
-		ModelPredicateProviderRegistrySpecificAccessor.callRegister(item, id, provider);
+		ItemProperties.register(item, id, provider);
 	}
 }

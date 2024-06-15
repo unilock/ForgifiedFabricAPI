@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.api.object.builder.v1.block;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import net.fabricmc.fabric.mixin.object.builder.AbstractBlockAccessor;
 import net.fabricmc.fabric.mixin.object.builder.AbstractBlockSettingsAccessor;
@@ -99,14 +100,6 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	}
 
 	/**
-	 * @deprecated replace with {@link BlockBehaviour.Properties#of()}
-	 */
-	@Deprecated
-	public static FabricBlockSettings of() {
-		return of();
-	}
-
-	/**
 	 * @deprecated replace with {@link BlockBehaviour.Properties#ofFullCopy(BlockBehaviour)}
 	 */
 	@Deprecated
@@ -162,14 +155,6 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	public FabricBlockSettings sound(SoundType group) {
 		super.sound(group);
 		return this;
-	}
-
-	/**
-	 * @deprecated Please use {@link FabricBlockSettings#lightLevel(ToIntFunction)}.
-	 */
-	@Deprecated
-	public FabricBlockSettings lightLevel(ToIntFunction<BlockState> levelFunction) {
-		return this.lightLevel(levelFunction);
 	}
 
 	@Deprecated
@@ -440,6 +425,12 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	@Deprecated
 	public FabricBlockSettings collidable(boolean collidable) {
 		((AbstractBlockSettingsAccessor) this).setHasCollision(collidable);
+		return this;
+	}
+
+	@Override
+	public FabricBlockSettings lootFrom(Supplier<? extends Block> blockIn) {
+		super.lootFrom(blockIn);
 		return this;
 	}
 }

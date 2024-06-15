@@ -14,6 +14,6 @@ loom {
 	accessWidenerPath = file("src/main/resources/fabric-object-builder-api-v1.accesswidener")
 }
 
-validateMixinNames {
-	exclude "**/ModelPredicateProviderRegistrySpecificAccessor.class"
-}
+//validateMixinNames { TODO
+//	exclude "**/ModelPredicateProviderRegistrySpecificAccessor.class"
+//}

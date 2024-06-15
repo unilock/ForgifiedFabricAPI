@@ -30,6 +30,9 @@ gradle.beforeProject {
     }
 }
 
+include("fabric-api-bom")
+include("fabric-api-catalog")
+
 include("fabric-api-base")
 //include 'fabric-api-lookup-api-v1'
 //include 'fabric-biome-api-v1'
@@ -56,7 +59,7 @@ include("fabric-lifecycle-events-v1")
 //include 'fabric-mining-level-api-v1'
 //include 'fabric-model-loading-api-v1'
 //include 'fabric-networking-api-v1'
-//include 'fabric-object-builder-api-v1'
+include("fabric-object-builder-api-v1")
 //include 'fabric-particles-v1'
 //include 'fabric-recipe-api-v1'
 //include 'fabric-registry-sync-v0'

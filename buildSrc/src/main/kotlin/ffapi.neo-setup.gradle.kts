@@ -46,6 +46,10 @@ dependencies {
         isTransitive = false
     }
 
+    if (project.name != "fabric-gametest-api-v1") {
+        "testmodImplementation"(project(":fabric-gametest-api-v1", "namedElements"))
+    }
+
     "testImplementation"(testmod.output)
     "testImplementation"("org.mockito:mockito-core:5.4.0")
     "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.8.1")
