@@ -3,16 +3,18 @@
   "package": "net.fabricmc.fabric.mixin.gametest",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ArgumentTypesMixin",
-    "CommandManagerMixin",
-    "MinecraftServerMixin",
+
+
+
     "StructureTemplateManagerMixin",
     "TestCommandMixin",
-    "TestFunctionsMixin",
-    "TestServerMixin"
+
+    "TestServerMixin",
+    "GameTestHooksMixin",
+    "GameTestRegistryMixin"
   ],
   "server": [
-    "server.MainMixin"
+
   ],
   "injectors": {
     "defaultRequire": 1,

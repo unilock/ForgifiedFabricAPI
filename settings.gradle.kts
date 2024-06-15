@@ -46,7 +46,7 @@ include("fabric-command-api-v2")
 //include 'fabric-entity-events-v1'
 //include 'fabric-events-interaction-v0'
 //include("fabric-game-rule-api-v1")
-//include("fabric-gametest-api-v1")
+include("fabric-gametest-api-v1")
 //include 'fabric-item-api-v1'
 //include 'fabric-item-group-api-v1'
 //include 'fabric-key-binding-api-v1'

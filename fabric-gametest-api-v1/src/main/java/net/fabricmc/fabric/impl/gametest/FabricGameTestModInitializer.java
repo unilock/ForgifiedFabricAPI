@@ -51,12 +51,4 @@ public final class FabricGameTestModInitializer implements ModInitializer {
 			LOGGER.debug("Registered test class {} for mod {}", testClass.getCanonicalName(), modid);
 		}
 	}
-
-	public static String getModIdForTestClass(Class<?> testClass) {
-		if (!GAME_TEST_IDS.containsKey(testClass)) {
-			throw new UnsupportedOperationException("The test class (%s) was not registered using the '%s' entrypoint".formatted(testClass.getCanonicalName(), ENTRYPOINT_KEY));
-		}
-
-		return GAME_TEST_IDS.get(testClass);
-	}
 }
