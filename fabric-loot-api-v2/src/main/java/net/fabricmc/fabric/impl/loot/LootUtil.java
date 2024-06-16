@@ -16,8 +16,6 @@
 
 package net.fabricmc.fabric.impl.loot;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.impl.resource.loader.BuiltinModResourcePackSource;
 import net.fabricmc.fabric.impl.resource.loader.FabricResource;
@@ -25,6 +23,9 @@ import net.fabricmc.fabric.impl.resource.loader.ModResourcePackCreator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.Resource;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class LootUtil {
 	public static final ThreadLocal<Map<ResourceLocation, LootTableSource>> SOURCES = ThreadLocal.withInitial(HashMap::new);
@@ -35,7 +36,7 @@ public final class LootUtil {
 
 			if (packSource == PackSource.BUILT_IN) {
 				return LootTableSource.VANILLA;
-			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModResourcePackSource) {
+			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModResourcePackSource || resource.knownPackInfo().map(p -> !p.isVanilla()).orElse(false)) {
 				return LootTableSource.MOD;
 			}
 		}

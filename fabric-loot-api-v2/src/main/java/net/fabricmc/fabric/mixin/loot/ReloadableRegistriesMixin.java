@@ -68,7 +68,12 @@ abstract class ReloadableRegistriesMixin {
 		LootTable.Builder builder = FabricLootTableBuilder.copyOf(table);
 		LootTableEvents.MODIFY.invoker().modifyLootTable(key, builder, source);
 
-		return builder.build();
+		LootTable newTable = builder.build();
+		ResourceLocation lootTableId = table.getLootTableId();
+		if (lootTableId != null) {
+			newTable.setLootTableId(lootTableId);
+		}
+		return newTable;
 	}
 
 	@SuppressWarnings("unchecked")
