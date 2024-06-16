@@ -37,4 +37,6 @@ dependencies {
     implementation("dev.architectury:at:1.0.1")
 
     implementation("commons-codec:commons-codec:1.17.0")
+    
+    implementation("org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r")
 }

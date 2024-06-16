@@ -3,12 +3,12 @@ import net.fabricmc.loom.build.nesting.JarNester
 import net.fabricmc.loom.util.Constants
 import net.fabricmc.loom.util.GroovyXmlUtil
 import org.apache.commons.codec.digest.DigestUtils
+import org.eclipse.jgit.api.Git
 import java.util.*
 
 plugins {
     java
     `maven-publish`
-    id("org.ajoberstar.grgit") version "4.1.1"
     id("dev.architectury.loom") // Version declared in buildSrc
 }
 
@@ -213,22 +213,23 @@ publishing {
     }
 }
 
+val git: Git? = runCatching { Git.open(rootDir) }.getOrNull()
+
 fun getSubprojectVersion(project: Project): String {
     // Get the version from the gradle.properties file
     val version = properties["${project.name}-version"] as? String
         ?: throw NullPointerException("Could not find version for " + project.name)
 
-    @Suppress("SENSELESS_COMPARISON")
-    if (rootProject.grgit == null) {
+    if (git == null) {
         return "$version+nogit"
     }
 
-    val latestCommits = rootProject.grgit.log(mapOf("paths" to listOf(project.name), "maxCommits" to 1))
+    val latestCommits = git.log().addPath(project.name).setMaxCount(1).call().toList()
     if (latestCommits.isEmpty()) {
         return "$version+uncommited"
     }
 
-    return version + "+" + latestCommits[0].id.substring(0, 8) + DigestUtils.sha256Hex(versionMc).substring(0, 2)
+    return version + "+" + latestCommits[0].id.name.substring(0, 8) + DigestUtils.sha256Hex(versionMc).substring(0, 2)
 }
 
 fun moduleDependencies(project: Project, depNames: List<String>) {
