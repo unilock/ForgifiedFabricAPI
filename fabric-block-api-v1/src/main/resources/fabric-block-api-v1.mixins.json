@@ -3,10 +3,8 @@
   "package": "net.fabricmc.fabric.mixin.block",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BlockMixin",
     "BlockStateMixin",
-    "ChunkSectionBlockStateCounterMixin",
-    "ChunkSectionMixin"
+    "IBlockExtensionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
