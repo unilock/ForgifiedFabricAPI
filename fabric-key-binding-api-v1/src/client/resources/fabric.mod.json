@@ -24,5 +24,10 @@
   ],
   "custom": {
     "fabric-api:module-lifecycle": "stable"
+  },
+  "entrypoints": {
+    "client": [
+      "org.sinytra.fabric.key_binding_api.FabricKeyBindingApiV1"
+    ]
   }
 }

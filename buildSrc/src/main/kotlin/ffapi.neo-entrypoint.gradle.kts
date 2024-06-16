@@ -8,7 +8,7 @@ val versionForge: String by rootProject
 val sourceSets = extensions.getByType<SourceSetContainer>()
 
 // Source sets that can contain the mod entrypoint file
-val masterSourceSets = listOf("main", "testmod").mapNotNull(sourceSets::findByName)
+val masterSourceSets = listOf("main", "testmod").mapNotNull(sourceSets::findByName).filter { it.java.srcDirs.any(File::exists) || it.resources.srcDirs.any(File::exists) }
 
 masterSourceSets.forEach { sourceSet ->
     val baseTaskName = "ForgeModEntrypoint"
@@ -23,7 +23,7 @@ masterSourceSets.forEach { sourceSet ->
         // sources to the source set.
         sourceRoots.from(sourceSet.java.srcDirs)
         outputDir.set(targetDir)
-        fabricModJson.set(file("src/${sourceSet.name}/resources/fabric.mod.json"))
+        fabricModJson.set(sourceSet.java.srcDirs.map { it.parentFile.resolve("resources/fabric.mod.json") }.first(File::exists))
         testEnvironment = sourceSet.name == "testmod"
     }
     sourceSet.java.srcDir(task)
