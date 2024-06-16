@@ -16,10 +16,21 @@
 
 package net.fabricmc.fabric.mixin.client.sound;
 
+import net.minecraft.client.resources.sounds.Sound;
+import net.minecraft.client.sounds.AudioStream;
+import net.minecraft.client.sounds.SoundBufferLibrary;
 import org.spongepowered.asm.mixin.Mixin;
 import net.fabricmc.fabric.api.client.sound.v1.FabricSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+
+import java.util.concurrent.CompletableFuture;
 
 @Mixin(SoundInstance.class)
 public interface SoundInstanceMixin extends FabricSoundInstance {
+    // Override the Neo method in SoundInstance
+    default CompletableFuture<AudioStream> getStream(SoundBufferLibrary soundBuffers, Sound sound, boolean looping) {
+        return getAudioStream(soundBuffers, sound.getLocation(), looping);
+    }
 }
