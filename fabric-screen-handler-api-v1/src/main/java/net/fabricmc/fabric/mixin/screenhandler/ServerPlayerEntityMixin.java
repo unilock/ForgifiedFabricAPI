@@ -16,83 +16,41 @@
 
 package net.fabricmc.fabric.mixin.screenhandler;
 
-import java.util.Objects;
-import java.util.OptionalInt;
-
-import com.mojang.authlib.GameProfile;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
-import net.fabricmc.fabric.impl.screenhandler.Networking;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.level.Level;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
 
 @Mixin(ServerPlayer.class)
-public abstract class ServerPlayerEntityMixin extends Player {
-	@Shadow
-	private int containerCounter;
+public abstract class ServerPlayerEntityMixin {
 
-	private ServerPlayerEntityMixin(Level world, BlockPos pos, float yaw, GameProfile gameProfile) {
-		super(world, pos, yaw, gameProfile);
-	}
+    @ModifyArg(method = "openMenu(Lnet/minecraft/world/MenuProvider;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;openMenu(Lnet/minecraft/world/MenuProvider;Ljava/util/function/Consumer;)Ljava/util/OptionalInt;"), index = 0)
+    private MenuProvider fabric_replaceMenuProvider(@Nullable MenuProvider arg) {
+        if (arg instanceof SimpleMenuProvider simpleFactory && simpleFactory.menuConstructor instanceof ExtendedScreenHandlerFactory<?> extendedFactory) {
+            return extendedFactory;
+        }
+        return arg;
+    }
 
-	@Shadow
-	public abstract void closeContainer();
-
-	@Redirect(method = "openMenu(Lnet/minecraft/world/MenuProvider;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;closeContainer()V"))
-	private void fabric_closeHandledScreenIfAllowed(ServerPlayer player, MenuProvider factory) {
-		if (factory.shouldCloseCurrentScreen()) {
-			this.closeContainer();
-		} else {
-			// Called by closeHandledScreen in vanilla
-			this.doCloseContainer();
+    @ModifyVariable(method = "openMenu(Lnet/minecraft/world/MenuProvider;Ljava/util/function/Consumer;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/MenuProvider;createMenu(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/inventory/AbstractContainerMenu;"), argsOnly = true)
+    private Consumer<RegistryFriendlyByteBuf> fabric_replaceExtraDataWriter(@Nullable Consumer<RegistryFriendlyByteBuf> extraDataWriter, MenuProvider arg, @Local @Nullable AbstractContainerMenu menu) {
+		if (menu != null && arg instanceof ExtendedScreenHandlerFactory<?> extendedFactory && menu.getType() instanceof ExtendedScreenHandlerType extendedType) {
+			return buf -> {
+				Object data = extendedFactory.getScreenOpeningData((ServerPlayer) (Object) this);
+                extendedType.getPacketCodec().encode(buf, data);
+			};
 		}
-	}
-
-	@Inject(method = "openMenu(Lnet/minecraft/world/MenuProvider;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;sendPacket(Lnet/minecraft/network/protocol/Packet;)V"), locals = LocalCapture.CAPTURE_FAILHARD)
-	private void fabric_storeOpenedScreenHandler(MenuProvider factory, CallbackInfoReturnable<OptionalInt> info, AbstractContainerMenu handler) {
-		if (factory instanceof ExtendedScreenHandlerFactory || (factory instanceof SimpleMenuProvider simpleFactory && simpleFactory.menuConstructor instanceof ExtendedScreenHandlerFactory)) {
-			// Set the screen handler, so the factory method can access it through the player.
-			containerMenu = handler;
-		} else if (handler.getType() instanceof ExtendedScreenHandlerType<?, ?>) {
-			ResourceLocation id = BuiltInRegistries.MENU.getKey(handler.getType());
-			throw new IllegalArgumentException("[Fabric] Extended screen handler " + id + " must be opened with an ExtendedScreenHandlerFactory!");
-		}
-	}
-
-	@Redirect(method = "openMenu(Lnet/minecraft/world/MenuProvider;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;sendPacket(Lnet/minecraft/network/protocol/Packet;)V"))
-	private void fabric_replaceVanillaScreenPacket(ServerGamePacketListenerImpl networkHandler, Packet<?> packet, MenuProvider factory) {
-		if (factory instanceof SimpleMenuProvider simpleFactory && simpleFactory.menuConstructor instanceof ExtendedScreenHandlerFactory<?> extendedFactory) {
-			factory = extendedFactory;
-		}
-
-		if (factory instanceof ExtendedScreenHandlerFactory<?> extendedFactory) {
-			AbstractContainerMenu handler = Objects.requireNonNull(containerMenu);
-
-			if (handler.getType() instanceof ExtendedScreenHandlerType<?, ?>) {
-				Networking.sendOpenPacket((ServerPlayer) (Object) this, extendedFactory, handler, containerCounter);
-			} else {
-				ResourceLocation id = BuiltInRegistries.MENU.getKey(handler.getType());
-				throw new IllegalArgumentException("[Fabric] Non-extended screen handler " + id + " must not be opened with an ExtendedScreenHandlerFactory!");
-			}
-		} else {
-			// Use vanilla logic for non-extended screen handlers
-			networkHandler.send(packet);
-		}
-	}
+        return extraDataWriter;
+    }
 }

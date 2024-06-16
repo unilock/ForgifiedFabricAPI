@@ -16,10 +16,15 @@
 
 package net.fabricmc.fabric.mixin.screenhandler;
 
+import net.neoforged.neoforge.client.extensions.IMenuProviderExtension;
 import org.spongepowered.asm.mixin.Mixin;
 import net.fabricmc.fabric.api.screenhandler.v1.FabricScreenHandlerFactory;
 import net.minecraft.world.MenuProvider;
 
 @Mixin(MenuProvider.class)
-public interface NamedScreenHandlerFactoryMixin extends FabricScreenHandlerFactory {
+public interface NamedScreenHandlerFactoryMixin extends IMenuProviderExtension, FabricScreenHandlerFactory {
+    @Override
+    default boolean shouldTriggerClientSideContainerClosingOnOpen() {
+        return shouldCloseCurrentScreen();
+    }
 }

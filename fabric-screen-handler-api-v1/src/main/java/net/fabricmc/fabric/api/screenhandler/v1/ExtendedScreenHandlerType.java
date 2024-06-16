@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.neoforged.neoforge.network.IContainerFactory;
 
 /**
  * A {@link MenuType} for an extended screen handler that
@@ -81,7 +82,7 @@ public class ExtendedScreenHandlerType<T extends AbstractContainerMenu, D> exten
 	 * @param factory the screen handler factory used for {@link #create(int, Inventory, Object)}
 	 */
 	public ExtendedScreenHandlerType(ExtendedFactory<T, D> factory, StreamCodec<? super RegistryFriendlyByteBuf, D> packetCodec) {
-		super(null, FeatureFlags.VANILLA_SET);
+		super(new ExtendedMenuContainerFactory<>(factory, packetCodec), FeatureFlags.VANILLA_SET);
 		this.factory = Objects.requireNonNull(factory, "screen handler factory cannot be null");
 		this.packetCodec = Objects.requireNonNull(packetCodec, "packet codec cannot be null");
 	}
@@ -136,5 +137,13 @@ public class ExtendedScreenHandlerType<T extends AbstractContainerMenu, D> exten
 		 * @return the created screen handler
 		 */
 		T create(int syncId, Inventory inventory, D data);
+	}
+
+	private record ExtendedMenuContainerFactory<T extends AbstractContainerMenu, D>(ExtendedFactory<T, D> factory, StreamCodec<? super RegistryFriendlyByteBuf, D> packetCodec) implements IContainerFactory<T> {
+		@Override
+		public T create(int syncId, Inventory inventory, RegistryFriendlyByteBuf buf) {
+			D data = buf == null ? null : packetCodec.decode(buf);
+			return factory.create(syncId, inventory, data);
+		}
 	}
 }

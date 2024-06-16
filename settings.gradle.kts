@@ -67,7 +67,7 @@ include("fabric-object-builder-api-v1")
 include("fabric-resource-conditions-api-v1")
 include("fabric-resource-loader-v0")
 //include 'fabric-screen-api-v1'
-//include 'fabric-screen-handler-api-v1'
+include("fabric-screen-handler-api-v1")
 include("fabric-sound-api-v1")
 //include 'fabric-transfer-api-v1'
 //include 'fabric-transitive-access-wideners-v1'
