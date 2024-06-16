@@ -43,7 +43,6 @@ include("fabric-block-api-v1")
 include("fabric-command-api-v2")
 //include 'fabric-content-registries-v0'
 //include 'fabric-convention-tags-v1'
-//include 'fabric-crash-report-info-v1'
 //include 'fabric-data-generation-api-v1'
 //include 'fabric-dimensions-v1'
 //include 'fabric-entity-events-v1'
@@ -56,7 +55,6 @@ include("fabric-item-group-api-v1")
 include("fabric-lifecycle-events-v1")
 //include 'fabric-loot-api-v2'
 //include 'fabric-message-api-v1'
-//include 'fabric-mining-level-api-v1'
 //include 'fabric-model-loading-api-v1'
 //include 'fabric-networking-api-v1'
 include("fabric-object-builder-api-v1")
@@ -67,7 +65,7 @@ include("fabric-object-builder-api-v1")
 //include 'fabric-renderer-indigo'
 //include 'fabric-rendering-fluids-v1'
 //include 'fabric-rendering-v1'
-//include 'fabric-resource-conditions-api-v1'
+include("fabric-resource-conditions-api-v1")
 include("fabric-resource-loader-v0")
 //include 'fabric-screen-api-v1'
 //include 'fabric-screen-handler-api-v1'
