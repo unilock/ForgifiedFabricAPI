@@ -7,6 +7,7 @@ import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.NetworkRegistry;
@@ -55,6 +56,11 @@ public class NeoServerConfigurationNetworking {
     }
 
     private record ServerConfigNeoContextWrapper(IPayloadContext context) implements ServerConfigurationNetworking.Context {
+        @Override
+        public MinecraftServer server() {
+            return networkHandler().server;
+        }
+
         @Override
         public ServerConfigurationPacketListenerImpl networkHandler() {
             return (ServerConfigurationPacketListenerImpl) context.listener();

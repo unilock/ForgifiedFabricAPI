@@ -3,13 +3,13 @@ package org.sinytra.fabric.networking_api.client;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.impl.networking.PayloadTypeRegistryImpl;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.registration.NetworkRegistry;
 import org.sinytra.fabric.networking_api.NeoCommonNetworking;
 
 import java.util.Objects;
@@ -79,6 +79,11 @@ public class NeoClientConfigurationNetworking {
     }
 
     private record ClientConfigNeoContextWrapper(IPayloadContext context) implements ClientConfigurationNetworking.Context {
+        @Override
+        public Minecraft client() {
+            return Minecraft.getInstance();
+        }
+
         @Override
         public PacketSender responseSender() {
             return new NeoClientPacketSender(context.connection());

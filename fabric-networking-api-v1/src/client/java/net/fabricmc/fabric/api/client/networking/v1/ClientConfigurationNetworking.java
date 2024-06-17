@@ -24,6 +24,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.thread.BlockableEventLoop;
@@ -207,10 +208,11 @@ public final class ClientConfigurationNetworking {
 		 * <p>Unlike {@link ClientPlayNetworking.PlayPayloadHandler} this method is executed on {@linkplain io.netty.channel.EventLoop netty's event loops}.
 		 * Modification to the game should be {@linkplain BlockableEventLoop#submit(Runnable) scheduled}.
 		 *
-		 * <p>An example usage of this is to display an overlay message:
+		 * <p>An example usage of this:
 		 * <pre>{@code
-		 * // See FabricPacket for creating the packet
-		 * ClientConfigurationNetworking.registerReceiver(OVERLAY_PACKET_TYPE, (packet, responseSender) -> {
+		 * // use PayloadTypeRegistry for registering the payload
+		 * ClientConfigurationNetworking.registerReceiver(OVERLAY_PACKET_TYPE, (payload, context) -> {
+		 *
 		 * });
 		 * }</pre>
 		 *
@@ -223,6 +225,11 @@ public final class ClientConfigurationNetworking {
 
 	@ApiStatus.NonExtendable
 	public interface Context {
+		/**
+		 * @return The MinecraftClient instance
+		 */
+		Minecraft client();
+
 		/**
 		 * @return The packet sender
 		 */
