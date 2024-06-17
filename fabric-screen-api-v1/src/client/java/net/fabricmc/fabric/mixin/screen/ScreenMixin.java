@@ -39,7 +39,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 
-@Mixin(Screen.class)
+@Mixin(value = Screen.class, priority = 500)
 abstract class ScreenMixin implements ScreenExtensions {
 	@Shadow
 	@Final
