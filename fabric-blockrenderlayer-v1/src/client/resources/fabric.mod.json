@@ -26,5 +26,10 @@
   ],
   "custom": {
     "fabric-api:module-lifecycle": "stable"
+  },
+  "entrypoints": {
+    "client": [
+      "org.sinytra.fabric.blockrenderlayer.FabricBlockrenderlayerApiV1"
+    ]
   }
 }

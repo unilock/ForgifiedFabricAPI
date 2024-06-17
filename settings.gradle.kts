@@ -38,7 +38,7 @@ include("fabric-api-base")
 //include 'fabric-biome-api-v1'
 include("fabric-block-api-v1")
 //include 'fabric-block-view-api-v2'
-//include 'fabric-blockrenderlayer-v1'
+include("fabric-blockrenderlayer-v1")
 //include 'fabric-client-tags-api-v1'
 include("fabric-command-api-v2")
 //include 'fabric-content-registries-v0'

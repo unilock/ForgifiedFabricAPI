@@ -16,31 +16,32 @@
 
 package net.fabricmc.fabric.mixin.blockrenderlayer;
 
-import java.util.Map;
-
+import net.fabricmc.fabric.impl.blockrenderlayer.ExtendedChunkRenderTypeSet;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.fabricmc.fabric.impl.blockrenderlayer.BlockRenderLayerMapImpl;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.material.Fluid;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.Map;
 
 @Mixin(ItemBlockRenderTypes.class)
 public class RenderLayersMixin {
-	@Shadow
-	@Final
-	private static Map<Block, RenderType> TYPE_BY_BLOCK;
-	@Shadow
-	@Final
-	private static Map<Fluid, RenderType> TYPE_BY_FLUID;
+    @Shadow
+    @Final
+    private static Map<Block, ChunkRenderTypeSet> BLOCK_RENDER_TYPES;
 
-	@Inject(method = "<clinit>*", at = @At("RETURN"))
-	private static void onInitialize(CallbackInfo info) {
-		BlockRenderLayerMapImpl.initialize(TYPE_BY_BLOCK::put, TYPE_BY_FLUID::put);
-	}
+    /**
+     * @author embeddedt
+     * @reason Make getBlockLayer behave correctly (so that it can be used by Fabric mods) as long as the block has
+     * only a single render type
+     */
+    @Redirect(method = {"getChunkRenderType", "getMovingBlockRenderType"}, at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0))
+    private static Object getRenderLayerViaForge(Map instance, Object block) {
+        ChunkRenderTypeSet renderTypeSet = BLOCK_RENDER_TYPES.get((Block) block);
+        return ((ExtendedChunkRenderTypeSet) (Object) renderTypeSet).sinytra$firstLayer();
+    }
 }
