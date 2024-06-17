@@ -45,8 +45,8 @@ public abstract class ChunkRendererRegionBuilderMixin {
 	private static final AtomicInteger ERROR_COUNTER = new AtomicInteger();
 	private static final Logger LOGGER = LoggerFactory.getLogger(ChunkRendererRegionBuilderMixin.class);
 
-	@Inject(method = "createRegion", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/RenderRegionCache$ChunkInfo;renderChunk()Lnet/minecraft/client/renderer/chunk/RenderChunk;"))
-	private void copyDataForChunk(Level world, SectionPos chunkSectionPos, CallbackInfoReturnable<RenderChunkRegion> cir, @Local(ordinal = 1) RenderRegionCache.ChunkInfo clientChunk, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef) {
+	@Inject(method = "createRegion(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/SectionPos;Z)Lnet/minecraft/client/renderer/chunk/RenderChunkRegion;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/RenderRegionCache$ChunkInfo;renderChunk()Lnet/minecraft/client/renderer/chunk/RenderChunk;"))
+	private void copyDataForChunk(Level world, SectionPos chunkSectionPos, boolean nullForEmpty, CallbackInfoReturnable<RenderChunkRegion> cir, @Local(ordinal = 1) RenderRegionCache.ChunkInfo clientChunk, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef) {
 		// Hash maps in chunks should generally not be modified outside of client thread
 		// but does happen in practice, due to mods or inconsistent vanilla behaviors, causing
 		// CMEs when we iterate the map. (Vanilla does not iterate these maps when it builds
@@ -71,8 +71,8 @@ public abstract class ChunkRendererRegionBuilderMixin {
 		}
 	}
 
-	@Inject(method = "createRegion", at = @At(value = "RETURN", ordinal = 1))
-	private void createDataMap(Level world, SectionPos chunkSectionPos, CallbackInfoReturnable<RenderChunkRegion> cir, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef) {
+	@Inject(method = "createRegion(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/SectionPos;Z)Lnet/minecraft/client/renderer/chunk/RenderChunkRegion;", at = @At(value = "RETURN", ordinal = 1))
+	private void createDataMap(Level world, SectionPos chunkSectionPos, boolean nullForEmpty, CallbackInfoReturnable<RenderChunkRegion> cir, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef) {
 		RenderChunkRegion rendererRegion = cir.getReturnValue();
 		Long2ObjectOpenHashMap<Object> map = mapRef.get();
 

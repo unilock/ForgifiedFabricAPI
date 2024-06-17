@@ -37,7 +37,7 @@ include("fabric-api-base")
 //include 'fabric-api-lookup-api-v1'
 //include 'fabric-biome-api-v1'
 include("fabric-block-api-v1")
-//include 'fabric-block-view-api-v2'
+include("fabric-block-view-api-v2")
 include("fabric-blockrenderlayer-v1")
 //include 'fabric-client-tags-api-v1'
 include("fabric-command-api-v2")
@@ -71,7 +71,7 @@ include("fabric-screen-handler-api-v1")
 include("fabric-sound-api-v1")
 //include 'fabric-transfer-api-v1'
 //include 'fabric-transitive-access-wideners-v1'
-//
+
 //include 'deprecated'
 //include 'deprecated:fabric-command-api-v1'
 //include 'deprecated:fabric-commands-v0'
