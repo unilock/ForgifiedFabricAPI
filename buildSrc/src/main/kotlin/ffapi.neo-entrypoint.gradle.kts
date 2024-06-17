@@ -11,6 +11,7 @@ val sourceSets = extensions.getByType<SourceSetContainer>()
 val masterSourceSets = listOf("main", "testmod").mapNotNull(sourceSets::findByName).filter { it.java.srcDirs.any(File::exists) || it.resources.srcDirs.any(File::exists) }
 
 masterSourceSets.forEach { sourceSet ->
+    val modMetadataJson = sourceSet.java.srcDirs.map { it.parentFile.resolve("resources/fabric.mod.json") }.firstOrNull(File::exists) ?: return@forEach
     val baseTaskName = "ForgeModEntrypoint"
     val taskName = sourceSet.getTaskName("generate", baseTaskName)
     val targetDir = project.file("src/generated/${sourceSet.name}/java")
@@ -23,7 +24,7 @@ masterSourceSets.forEach { sourceSet ->
         // sources to the source set.
         sourceRoots.from(sourceSet.java.srcDirs)
         outputDir.set(targetDir)
-        fabricModJson.set(sourceSet.java.srcDirs.map { it.parentFile.resolve("resources/fabric.mod.json") }.first(File::exists))
+        fabricModJson.set(modMetadataJson)
         testEnvironment = sourceSet.name == "testmod"
     }
     sourceSet.java.srcDir(task)
