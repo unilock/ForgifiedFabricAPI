@@ -4,9 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "PlayerAdvancementTrackerMixin",
-    "ServerPlayerEntityMixin",
-    "ServerPlayerInteractionManagerMixin",
-    "ServerPlayNetworkHandlerMixin"
+    "ServerPlayerInteractionManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
