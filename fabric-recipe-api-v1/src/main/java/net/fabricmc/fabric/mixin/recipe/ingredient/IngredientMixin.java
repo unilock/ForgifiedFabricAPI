@@ -16,47 +16,26 @@
 
 package net.fabricmc.fabric.mixin.recipe.ingredient;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Codec;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
-import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientImpl;
-import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientPacketCodec;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.fabricmc.fabric.impl.recipe.ingredient.compat.FabricICustomIngredientWrapper;
+import net.fabricmc.fabric.impl.recipe.ingredient.compat.NeoCustomIngredientWrapper;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.common.crafting.ICustomIngredient;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Ingredient.class)
-public class IngredientMixin implements FabricIngredient {
-	@Inject(method = "codec", at = @At("RETURN"), cancellable = true)
-	private static void injectCodec(boolean allowEmpty, CallbackInfoReturnable<Codec<Ingredient>> cir) {
-		Codec<CustomIngredient> customIngredientCodec = CustomIngredientImpl.CODEC.dispatch(
-				CustomIngredientImpl.TYPE_KEY,
-				CustomIngredient::getSerializer,
-				serializer -> serializer.getCodec(allowEmpty));
+public class IngredientMixin implements FabricIngredient { 
+	@Nullable
+	@Shadow
+ 	private ICustomIngredient customIngredient;
 
-		cir.setReturnValue(Codec.either(customIngredientCodec, cir.getReturnValue()).xmap(
-				either -> either.map(CustomIngredient::toVanilla, ingredient -> ingredient),
-				ingredient -> {
-					CustomIngredient customIngredient = ingredient.getCustomIngredient();
-					return customIngredient == null ? Either.right(ingredient) : Either.left(customIngredient);
-				}
-		));
-	}
-
-	@ModifyExpressionValue(
-			method = "<clinit>",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/network/codec/StreamCodec;map(Ljava/util/function/Function;Ljava/util/function/Function;)Lnet/minecraft/network/codec/StreamCodec;"
-			)
-	)
-	private static StreamCodec<RegistryFriendlyByteBuf, Ingredient> useCustomIngredientPacketCodec(StreamCodec<RegistryFriendlyByteBuf, Ingredient> original) {
-		return new CustomIngredientPacketCodec(original);
+	@Override
+	public @Nullable CustomIngredient getCustomIngredient() {
+		return customIngredient != null
+			? customIngredient instanceof NeoCustomIngredientWrapper wrapper ? wrapper.ingredient() : new FabricICustomIngredientWrapper(customIngredient)
+			: null; 
 	}
 }

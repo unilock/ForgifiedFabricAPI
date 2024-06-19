@@ -22,6 +22,7 @@ import java.util.function.Function;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -45,7 +46,7 @@ abstract class CombinedIngredient implements CustomIngredient {
 	@Override
 	public boolean requiresTesting() {
 		for (Ingredient ingredient : ingredients) {
-			if (ingredient.requiresTesting()) {
+			if (((FabricIngredient) ingredient).requiresTesting()) {
 				return true;
 			}
 		}

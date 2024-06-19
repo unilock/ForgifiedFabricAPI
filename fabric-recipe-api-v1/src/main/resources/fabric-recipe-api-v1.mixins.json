@@ -4,8 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ingredient.IngredientMixin",
-    "ingredient.EncoderHandlerMixin",
-    "ingredient.ShapelessRecipeMixin"
+    "ingredient.CraftingHelperMixin"
   ],
   "injectors": {
     "defaultRequire": 1

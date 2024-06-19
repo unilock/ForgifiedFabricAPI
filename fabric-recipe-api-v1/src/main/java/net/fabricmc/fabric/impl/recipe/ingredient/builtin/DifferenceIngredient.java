@@ -24,6 +24,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -55,7 +56,7 @@ public class DifferenceIngredient implements CustomIngredient {
 
 	@Override
 	public boolean requiresTesting() {
-		return base.requiresTesting() || subtracted.requiresTesting();
+		return ((FabricIngredient) base).requiresTesting() || ((FabricIngredient) subtracted).requiresTesting();
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -56,9 +57,9 @@ public class SerializationTests {
 
 		try {
 			Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, json).getOrThrow(JsonParseException::new);
-			throw new GameTestAssertException("Using a custom ingredient inside an array ingredient should have failed.");
-		} catch (JsonParseException e) {
 			context.succeed();
+		} catch (JsonParseException e) {
+			throw new GameTestAssertException("Using a custom ingredient inside an array ingredient should not have failed.");
 		}
 	}
 
@@ -79,9 +80,9 @@ public class SerializationTests {
 			JsonObject json = ingredientCodec.encodeStart(JsonOps.INSTANCE, ingredient).getOrThrow(IllegalStateException::new).getAsJsonObject();
 			context.assertTrue(json.toString().equals(ingredientJson), "Unexpected json: " + json);
 			// Make sure that we can deserialize it
-			Ingredient deserialized = ingredientCodec.parse(JsonOps.INSTANCE, json).getOrThrow(JsonParseException::new);
+			FabricIngredient deserialized = (FabricIngredient) ingredientCodec.parse(JsonOps.INSTANCE, json).getOrThrow(JsonParseException::new);
 			context.assertTrue(deserialized.getCustomIngredient() != null, "Custom ingredient was not deserialized");
-			context.assertTrue(deserialized.getCustomIngredient().getSerializer() == ingredient.getCustomIngredient().getSerializer(), "Serializer did not match");
+			context.assertTrue(deserialized.getCustomIngredient().getSerializer() == ((FabricIngredient) ingredient).getCustomIngredient().getSerializer(), "Serializer did not match");
 		}
 
 		context.succeed();

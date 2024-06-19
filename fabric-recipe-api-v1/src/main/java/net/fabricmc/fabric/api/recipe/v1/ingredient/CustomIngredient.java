@@ -18,6 +18,7 @@ package net.fabricmc.fabric.api.recipe.v1.ingredient;
 
 import java.util.List;
 
+import net.fabricmc.fabric.impl.recipe.ingredient.compat.NeoCustomIngredientWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientImpl;
 import net.minecraft.world.item.Item;
@@ -91,6 +92,6 @@ public interface CustomIngredient {
 	 */
 	@ApiStatus.NonExtendable
 	default Ingredient toVanilla() {
-		return new CustomIngredientImpl(this);
+		return new NeoCustomIngredientWrapper(this).toVanilla();
 	}
 }

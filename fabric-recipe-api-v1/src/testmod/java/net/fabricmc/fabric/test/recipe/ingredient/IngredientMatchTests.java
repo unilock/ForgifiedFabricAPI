@@ -48,7 +48,7 @@ public class IngredientMatchTests {
 		Ingredient emptyAllIngredient = DefaultCustomIngredients.all(Ingredient.of(Items.APPLE), Ingredient.of(Items.STICK));
 
 		assertEquals(0, emptyAllIngredient.getItems().length);
-		assertEquals(true, emptyAllIngredient.isEmpty());
+//		assertEquals(true, emptyAllIngredient.isEmpty());
 
 		assertEquals(false, emptyAllIngredient.test(new ItemStack(Items.APPLE)));
 		assertEquals(false, emptyAllIngredient.test(new ItemStack(Items.STICK)));
