@@ -27,8 +27,8 @@ val DEV_ONLY_MODULES: List<String> = listOf(
 )
 
 ext["getSubprojectVersion"] = object : groovy.lang.Closure<Unit>(this) {
-    fun doCall(project: Project) {
-        getSubprojectVersion(project)
+    fun doCall(project: Project): String {
+        return getSubprojectVersion(project)
     }
 }
 ext["moduleDependencies"] = object : groovy.lang.Closure<Unit>(this) {
