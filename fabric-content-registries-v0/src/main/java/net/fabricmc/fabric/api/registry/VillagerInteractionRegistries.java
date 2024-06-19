@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.api.registry;
 
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +42,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * villagers have with the world.
  */
 public final class VillagerInteractionRegistries {
+	public static final Map<VillagerProfession, ResourceKey<LootTable>> MODIFIED_GIFTS = new IdentityHashMap<>();
 	private static final Logger LOGGER = LoggerFactory.getLogger(VillagerInteractionRegistries.class);
 
 	private VillagerInteractionRegistries() {
@@ -96,11 +98,13 @@ public final class VillagerInteractionRegistries {
 	public static void registerGiftLootTable(VillagerProfession profession, ResourceKey<LootTable> lootTable) {
 		Objects.requireNonNull(profession, "Profession cannot be null!");
 		Objects.requireNonNull(lootTable, "Loot table identifier cannot be null!");
-		ResourceKey<LootTable> oldValue = GiveGiftsToHeroTaskAccessor.fabric_getGifts().put(profession, lootTable);
+		ResourceKey<LootTable> oldValue = GiveGiftsToHeroTaskAccessor.fabric_getGifts().get(profession);
 
 		if (oldValue != null) {
 			LOGGER.info("Overriding previous gift loot table of {} profession, was: {}, now: {}", profession.name(), oldValue, lootTable);
 		}
+
+		MODIFIED_GIFTS.put(profession, lootTable);
 	}
 
 	private static Set<Item> getCollectableRegistry() {

@@ -116,6 +116,11 @@ allprojects {
             )
         }
     }
+
+    // Run this task after updating minecraft to regenerate any required resources
+    tasks.register("generateResources") {
+
+    }
 }
 
 dependencies {

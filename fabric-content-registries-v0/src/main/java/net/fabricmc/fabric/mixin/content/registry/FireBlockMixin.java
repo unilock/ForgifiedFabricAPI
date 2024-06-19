@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.mixin.content.registry;
 
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -45,7 +46,7 @@ public class FireBlockMixin implements FireBlockHooks {
 	}
 
 	@Inject(at = @At("RETURN"), method = "<init>")
-	private void afterConstruct(Block.Settings settings, CallbackInfo info) {
+	private void afterConstruct(BlockBehaviour.Properties settings, CallbackInfo info) {
 		fabric_registry = FlammableBlockRegistryImpl.getInstance((Block) (Object) this);
 	}
 

@@ -21,16 +21,26 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.ComposterBlock;
+import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public class CompostingChanceRegistryImpl implements CompostingChanceRegistry {
+	static final Map<Item, Float> CUSTOM = new IdentityHashMap<>();
 	@Override
 	public Float get(ItemLike item) {
-		return ComposterBlock.COMPOSTABLES.getOrDefault(item.asItem(), 0.0F);
+		var fromCustom = CUSTOM.get(item.asItem());
+		if (fromCustom == null) {
+			var dmap = item.asItem().builtInRegistryHolder().getData(NeoForgeDataMaps.COMPOSTABLES);
+			return dmap == null ? 0 : dmap.chance();
+		}
+		return fromCustom < 0 ? 0 : fromCustom;
 	}
 
 	@Override
 	public void add(ItemLike item, Float value) {
-		ComposterBlock.COMPOSTABLES.put(item.asItem(), value);
+		CUSTOM.put(item.asItem(), value);
 	}
 
 	@Override
@@ -40,7 +50,7 @@ public class CompostingChanceRegistryImpl implements CompostingChanceRegistry {
 
 	@Override
 	public void remove(ItemLike item) {
-		ComposterBlock.COMPOSTABLES.removeFloat(item.asItem());
+		CUSTOM.put(item.asItem(), -1f);
 	}
 
 	@Override

@@ -16,10 +16,17 @@
 
 package net.fabricmc.fabric.impl.content.registry;
 
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
+import net.neoforged.neoforge.registries.datamaps.DataMapsUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
@@ -31,10 +38,12 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 
 // TODO: Clamp values to 32767 (+ add hook for mods which extend the limit to disable the check?)
+@EventBusSubscriber
 public final class FuelRegistryImpl implements FuelRegistry {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FuelRegistryImpl.class);
 	private final Object2IntMap<ItemLike> itemCookTimes = new Object2IntLinkedOpenHashMap<>();
 	private final Object2IntMap<TagKey<Item>> tagCookTimes = new Object2IntLinkedOpenHashMap<>();
+	private final Map<Item, Integer> finalTimes = new IdentityHashMap<>();
 
 	public FuelRegistryImpl() {
 	}
@@ -93,38 +102,43 @@ public final class FuelRegistryImpl implements FuelRegistry {
 		resetCache();
 	}
 
-	public void apply(Map<Item, Integer> map) {
+	public void resetCache() {
+		resetCache(BuiltInRegistries.ITEM);
+	}
+
+	public void resetCache(Registry<Item> registry) {
+		finalTimes.clear();
 		// tags take precedence before blocks
 		for (TagKey<Item> tag : tagCookTimes.keySet()) {
 			int time = tagCookTimes.getInt(tag);
 
-			if (time <= 0) {
-				for (Holder<Item> key : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {
-					final Item item = key.value();
-					map.remove(item);
-				}
-			} else {
-				AbstractFurnaceBlockEntity.add(map, tag, time);
+			for (Holder<Item> key : registry.getTagOrEmpty(tag)) {
+				final Item item = key.value();
+				finalTimes.put(item, time);
 			}
 		}
 
 		for (ItemLike item : itemCookTimes.keySet()) {
 			int time = itemCookTimes.getInt(item);
+			finalTimes.put(item.asItem(), time);
+		}
+	}
 
-			if (time <= 0) {
-				map.remove(item.asItem());
-			} else {
-				AbstractFurnaceBlockEntity.add(map, item, time);
-			}
+	@SubscribeEvent
+	static void reload(DataMapsUpdatedEvent event) {
+		event.ifRegistry(Registries.ITEM, registry -> ((FuelRegistryImpl) FuelRegistry.INSTANCE).resetCache(registry));
+	}
+
+	@SubscribeEvent
+	static void getBurnTime(FurnaceFuelBurnTimeEvent event) {
+		var registry = (FuelRegistryImpl) FuelRegistry.INSTANCE;
+		var modified = registry.finalTimes.get(event.getItemStack().getItem());
+		if (modified != null) {
+			event.setBurnTime(modified < 0 ? 0 : modified);
 		}
 	}
 
 	private static String getTagName(TagKey<?> tag) {
 		return tag.location().toString();
-	}
-
-	public void resetCache() {
-		// Note: tag reload is already handled by vanilla, see DataPackContents#refresh
-		AbstractFurnaceBlockEntity.invalidateCache();
 	}
 }
