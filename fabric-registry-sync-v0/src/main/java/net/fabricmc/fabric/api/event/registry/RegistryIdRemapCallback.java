@@ -18,7 +18,6 @@ package net.fabricmc.fabric.api.event.registry;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.impl.registry.sync.ListenableRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 
@@ -47,6 +46,6 @@ public interface RegistryIdRemapCallback<T> {
 	}
 
 	static <T> Event<RegistryIdRemapCallback<T>> event(Registry<T> registry) {
-		return ListenableRegistry.get(registry).fabric_getRemapEvent();
+		throw new UnsupportedOperationException("Not implemented on NeoForge");
 	}
 }

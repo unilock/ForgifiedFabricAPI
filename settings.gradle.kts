@@ -59,7 +59,7 @@ include("fabric-message-api-v1")
 include("fabric-object-builder-api-v1")
 //include 'fabric-particles-v1'
 include("fabric-recipe-api-v1")
-//include 'fabric-registry-sync-v0'
+include("fabric-registry-sync-v0")
 //include 'fabric-renderer-api-v1'
 //include 'fabric-renderer-indigo'
 //include 'fabric-rendering-fluids-v1'

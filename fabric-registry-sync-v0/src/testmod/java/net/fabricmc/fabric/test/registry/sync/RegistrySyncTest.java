@@ -19,7 +19,6 @@ package net.fabricmc.fabric.test.registry.sync;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.mojang.logging.LogUtils;
@@ -34,8 +33,6 @@ import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.event.registry.RegistryAttributeHolder;
-import net.fabricmc.fabric.impl.registry.sync.RegistrySyncManager;
-import net.fabricmc.fabric.impl.registry.sync.RemapException;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
@@ -43,7 +40,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -118,17 +114,17 @@ public class RegistrySyncTest implements ModInitializer {
 							Registries.ITEM.location(), createFakeRegistryEntries()
 					);
 
-					try {
-						RegistrySyncManager.checkRemoteRemap(registryData);
-					} catch (RemapException e) {
-						final ServerPlayer player = context.getSource().getPlayer();
-
-						if (player != null) {
-							player.connection.disconnect(Objects.requireNonNull(e.getText()));
-						}
-
-						return 1;
-					}
+//					try {
+//						RegistrySyncManager.checkRemoteRemap(registryData);
+//					} catch (RemapException e) {
+//						final ServerPlayer player = context.getSource().getPlayer();
+//
+//						if (player != null) {
+//							player.connection.disconnect(Objects.requireNonNull(e.getText()));
+//						}
+//
+//						return 1;
+//					}
 
 					throw new IllegalStateException();
 				})));

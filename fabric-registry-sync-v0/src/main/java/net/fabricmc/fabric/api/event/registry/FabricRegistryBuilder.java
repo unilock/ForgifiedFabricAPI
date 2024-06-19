@@ -19,7 +19,8 @@ package net.fabricmc.fabric.api.event.registry;
 import java.util.EnumSet;
 
 import com.mojang.serialization.Lifecycle;
-import net.fabricmc.fabric.mixin.registry.sync.RegistriesAccessor;
+import net.fabricmc.fabric.impl.registry.sync.FabricRegistryInit;
+import net.fabricmc.fabric.mixin.registry.sync.BaseMappedRegistryAccessor;
 import net.minecraft.core.DefaultedMappedRegistry;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.MappedRegistry;
@@ -28,6 +29,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.registries.RegistryManager;
 
 /**
  * Used to create custom registries, with specified registry attributes.
@@ -139,12 +141,11 @@ public final class FabricRegistryBuilder<T, R extends WritableRegistry<T>> {
 	public R buildAndRegister() {
 		final ResourceKey<?> key = registry.key();
 
-		for (RegistryAttribute attribute : attributes) {
-			RegistryAttributeHolder.get(key).addAttribute(attribute);
+		if (attributes.contains(RegistryAttribute.SYNCED)) {
+			((BaseMappedRegistryAccessor) registry).setSync(true);
 		}
 
-		//noinspection unchecked
-		RegistriesAccessor.getWRITABLE_REGISTRY().register((ResourceKey<WritableRegistry<?>>) key, registry, RegistrationInfo.BUILT_IN);
+		FabricRegistryInit.addRegistry(registry);
 
 		return registry;
 	}

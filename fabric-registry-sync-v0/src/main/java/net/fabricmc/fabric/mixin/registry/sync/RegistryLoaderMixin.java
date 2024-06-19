@@ -30,13 +30,11 @@ import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
-import net.fabricmc.fabric.impl.registry.sync.DynamicRegistriesImpl;
 import net.fabricmc.fabric.impl.registry.sync.DynamicRegistryViewImpl;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 @Mixin(RegistryDataLoader.class)
 public class RegistryLoaderMixin {
@@ -75,28 +73,5 @@ public class RegistryLoaderMixin {
 		}
 
 		DynamicRegistrySetupCallback.EVENT.invoker().onRegistrySetup(new DynamicRegistryViewImpl(registries));
-	}
-
-	// Vanilla doesn't mark namespaces in the directories of dynamic registries at all,
-	// so we prepend the directories with the namespace if it's a modded registry registered using the Fabric API.
-	@WrapOperation(
-			method = {
-					"loadContentsFromNetwork(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceProvider;Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;Lnet/minecraft/core/WritableRegistry;Lcom/mojang/serialization/Decoder;Ljava/util/Map;)V",
-					"loadContentsFromManager(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;Lnet/minecraft/core/WritableRegistry;Lcom/mojang/serialization/Decoder;Ljava/util/Map;)V"
-			},
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/core/registries/Registries;elementsDirPath(Lnet/minecraft/resources/ResourceKey;)Ljava/lang/String;"
-			)
-	)
-	private static String prependDirectoryWithNamespace(ResourceKey<? extends Registry<?>> registryKey, Operation<String> original) {
-		String originalDirectory = original.call(registryKey);
-		ResourceLocation id = registryKey.location();
-		if (!id.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)
-				&& DynamicRegistriesImpl.FABRIC_DYNAMIC_REGISTRY_KEYS.contains(registryKey)) {
-			return id.getNamespace() + "/" + originalDirectory;
-		}
-
-		return originalDirectory;
 	}
 }
