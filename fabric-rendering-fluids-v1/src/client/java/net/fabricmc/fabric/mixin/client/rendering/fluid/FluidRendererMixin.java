@@ -16,15 +16,6 @@
 
 package net.fabricmc.fabric.mixin.client.rendering.fluid;
 
-import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
@@ -38,6 +29,12 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LiquidBlockRenderer.class)
 public class FluidRendererMixin {
@@ -49,8 +46,6 @@ public class FluidRendererMixin {
 	private TextureAtlasSprite[] waterIcons;
 	@Shadow
 	private TextureAtlasSprite waterOverlay;
-
-	private final ThreadLocal<Block> fabric_neighborBlock = new ThreadLocal<>();
 
 	@Inject(at = @At("RETURN"), method = "setupSprites")
 	public void onResourceReloadReturn(CallbackInfo info) {
@@ -70,60 +65,5 @@ public class FluidRendererMixin {
 				ci.cancel();
 			}
 		}
-	}
-
-	@ModifyVariable(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;isNeighborSameFluid(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/material/FluidState;)Z"), method = "tesselate", ordinal = 0)
-	public boolean modLavaCheck(boolean chk) {
-		// First boolean local is set by vanilla according to 'matches lava'
-		// but uses the negation consistent with 'matches water'
-		// for determining if overlay water sprite should be used behind glass.
-
-		// Has other uses but those are overridden by this mixin and have
-		// already happened by the time this hook is called.
-
-		// If this fluid has an overlay texture, set this boolean to false.
-		final FluidRenderHandlerInfo info = FluidRenderingImpl.getCurrentInfo();
-		return info.handler != null ? !info.hasOverlay : chk;
-	}
-
-	@ModifyVariable(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;isNeighborSameFluid(Lnet/minecraft/world/level/material/FluidState;Lnet/minecraft/world/level/material/FluidState;)Z"), method = "tesselate", ordinal = 0)
-	public TextureAtlasSprite[] modSpriteArray(TextureAtlasSprite[] chk) {
-		FluidRenderHandlerInfo info = FluidRenderingImpl.getCurrentInfo();
-		return info.handler != null ? info.sprites : chk;
-	}
-
-	@ModifyVariable(at = @At(value = "CONSTANT", args = "intValue=16", ordinal = 0, shift = At.Shift.BEFORE), method = "tesselate", ordinal = 0)
-	public int modTintColor(int chk, BlockAndTintGetter world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState) {
-		FluidRenderHandlerInfo info = FluidRenderingImpl.getCurrentInfo();
-		return info.handler != null ? info.handler.getFluidColor(world, pos, fluidState) : chk;
-	}
-
-	// Redirect redirects all 'waterOverlaySprite' gets in 'render' to this method, this is correct
-	@Redirect(at = @At(value = "FIELD", opcode = Opcodes.GETFIELD, target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;waterOverlay:Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;"), method = "tesselate")
-	public TextureAtlasSprite modWaterOverlaySprite(LiquidBlockRenderer self) {
-		FluidRenderHandlerInfo info = FluidRenderingImpl.getCurrentInfo();
-		return info.handler != null && info.hasOverlay ? info.overlaySprite : waterOverlay;
-	}
-
-	@Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getBlock()Lnet/minecraft/world/level/block/Block;"), method = "tesselate")
-	public Block getOverlayBlock(BlockState state) {
-		Block block = state.getBlock();
-		fabric_neighborBlock.set(block);
-
-		// An if-statement follows, we don't want this anymore and 'null' makes
-		// its condition always false (due to instanceof)
-		return null;
-	}
-
-	@ModifyVariable(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getBlock()Lnet/minecraft/world/level/block/Block;", shift = At.Shift.BY, by = 2), method = "tesselate", ordinal = 0)
-	public TextureAtlasSprite modSideSpriteForOverlay(TextureAtlasSprite chk) {
-		Block block = fabric_neighborBlock.get();
-
-		if (FluidRenderHandlerRegistry.INSTANCE.isBlockTransparent(block)) {
-			FluidRenderHandlerInfo info = FluidRenderingImpl.getCurrentInfo();
-			return info.handler != null && info.hasOverlay ? info.overlaySprite : waterOverlay;
-		}
-
-		return chk;
 	}
 }

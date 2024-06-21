@@ -35,6 +35,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.fluids.FluidType;
 
 public abstract class OverlayFluid extends FlowingFluid {
 	public OverlayFluid() {
@@ -106,6 +108,11 @@ public abstract class OverlayFluid extends FlowingFluid {
 		return Optional.of(SoundEvents.BUCKET_FILL);
 	}
 
+	@Override
+	public FluidType getFluidType() {
+		return NeoForgeMod.EMPTY_TYPE.value();
+	}
+	
 	public static class Flowing extends OverlayFluid {
 		public Flowing() {
 		}

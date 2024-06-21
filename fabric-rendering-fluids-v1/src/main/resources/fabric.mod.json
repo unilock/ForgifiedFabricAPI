@@ -27,5 +27,10 @@
   ],
   "custom": {
     "fabric-api:module-lifecycle": "stable"
+  },
+  "entrypoints": {
+    "client": [
+      "org.sinytra.fabric.rendering_fluids.FabricRenderingFabricV1"
+    ]
   }
 }

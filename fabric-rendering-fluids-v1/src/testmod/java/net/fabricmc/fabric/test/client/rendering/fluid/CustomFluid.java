@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.test.client.rendering.fluid;
 
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvent;
@@ -35,6 +34,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.fluids.FluidType;
+
+import java.util.Optional;
 
 public abstract class CustomFluid extends FlowingFluid {
 	public CustomFluid() {
@@ -104,6 +107,11 @@ public abstract class CustomFluid extends FlowingFluid {
 	@Override
 	public Optional<SoundEvent> getPickupSound() {
 		return Optional.of(SoundEvents.BUCKET_FILL);
+	}
+
+	@Override
+	public FluidType getFluidType() {
+		return NeoForgeMod.EMPTY_TYPE.value();
 	}
 
 	public static class Flowing extends CustomFluid {
