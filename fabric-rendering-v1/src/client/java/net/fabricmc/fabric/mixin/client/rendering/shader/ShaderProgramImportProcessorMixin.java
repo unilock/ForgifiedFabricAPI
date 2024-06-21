@@ -16,14 +16,11 @@
 
 package net.fabricmc.fabric.mixin.client.rendering.shader;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.fabricmc.fabric.impl.client.rendering.FabricShaderProgram;
+import net.fabricmc.fabric.impl.client.rendering.ClientRenderingEventHooks;
 import net.minecraft.resources.ResourceLocation;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 /**
  * Lets modded shaders {@code #moj_import} shaders from any namespace with the
@@ -31,25 +28,8 @@ import net.minecraft.resources.ResourceLocation;
  */
 @Mixin(targets = "net.minecraft.client.renderer.ShaderInstance$1")
 abstract class ShaderProgramImportProcessorMixin {
-	@Unique
-	private String capturedImport;
-
-	@Inject(method = "applyImport", at = @At("HEAD"))
-	private void captureImport(boolean inline, String name, CallbackInfoReturnable<String> info) {
-		capturedImport = name;
-	}
-
-	@ModifyVariable(method = "applyImport", at = @At("STORE"), ordinal = 0, argsOnly = true)
-	private String modifyImportId(String id, boolean inline) {
-		if (!inline && capturedImport.contains(String.valueOf(ResourceLocation.NAMESPACE_SEPARATOR))) {
-			return FabricShaderProgram.rewriteAsId(id, capturedImport).toString();
-		}
-
-		return id;
-	}
-
-	@Inject(method = "applyImport", at = @At("RETURN"))
-	private void uncaptureImport(boolean inline, String name, CallbackInfoReturnable<String> info) {
-		capturedImport = null;
-	}
+    @ModifyArg(method = "applyImport", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/ClientHooks;getShaderImportLocation(Ljava/lang/String;ZLjava/lang/String;)Lnet/minecraft/resources/ResourceLocation;"), index = 2)
+    private String modifyImportNamespace(String basePath, boolean isRelative, String name) {
+        return isRelative && ClientRenderingEventHooks.FABRIC_PROGRAM_NAMESPACE.get() != null ? ClientRenderingEventHooks.FABRIC_PROGRAM_NAMESPACE.get() + ResourceLocation.NAMESPACE_SEPARATOR + name : name;
+    }
 }

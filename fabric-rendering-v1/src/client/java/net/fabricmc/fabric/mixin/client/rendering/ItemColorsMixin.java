@@ -16,31 +16,21 @@
 
 package net.fabricmc.fabric.mixin.client.rendering;
 
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.client.color.block.BlockColors;
+import net.fabricmc.fabric.impl.client.rendering.ColorProviderRegistryImpl;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.core.IdMapper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.ItemLike;
-import net.fabricmc.fabric.impl.client.rendering.ColorProviderRegistryImpl;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(ItemColors.class)
 public class ItemColorsMixin implements ColorProviderRegistryImpl.ColorMapperHolder<ItemLike, ItemColor> {
 	@Shadow
 	@Final
 	private IdMapper<ItemColor> itemColors;
-
-	@Inject(method = "createDefault", at = @At("RETURN"))
-	private static void create(BlockColors blockMap, CallbackInfoReturnable<ItemColors> info) {
-		ColorProviderRegistryImpl.ITEM.initialize(info.getReturnValue());
-	}
 
 	@Override
 	public ItemColor get(ItemLike item) {

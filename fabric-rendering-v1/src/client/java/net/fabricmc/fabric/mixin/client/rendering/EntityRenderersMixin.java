@@ -16,18 +16,8 @@
 
 package net.fabricmc.fabric.mixin.client.rendering;
 
-import java.util.Map;
-
 import com.google.common.collect.ImmutableMap;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
-import net.fabricmc.fabric.impl.client.rendering.EntityRendererRegistryImpl;
 import net.fabricmc.fabric.impl.client.rendering.RegistrationHelperImpl;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -36,19 +26,12 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EntityRenderers.class)
 public abstract class EntityRenderersMixin {
-	@Shadow()
-	@Final
-	private static Map<EntityType<?>, EntityRendererProvider<?>> PROVIDERS;
-
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	@Inject(method = "<clinit>*", at = @At(value = "RETURN"))
-	private static void onRegisterRenderers(CallbackInfo info) {
-		EntityRendererRegistryImpl.setup(((t, factory) -> PROVIDERS.put(t, factory)));
-	}
-
 	// synthetic lambda in reloadEntityRenderers
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Redirect(method = "lambda$createEntityRenderers$26", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRendererProvider;create(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Lnet/minecraft/client/renderer/entity/EntityRenderer;"))

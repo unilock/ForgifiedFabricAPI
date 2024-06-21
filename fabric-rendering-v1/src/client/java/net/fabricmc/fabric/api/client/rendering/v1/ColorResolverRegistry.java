@@ -18,6 +18,9 @@ package net.fabricmc.fabric.api.client.rendering.v1;
 
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import net.neoforged.neoforge.client.ColorResolverManager;
 import org.jetbrains.annotations.UnmodifiableView;
 import net.fabricmc.fabric.impl.client.rendering.ColorResolverRegistryImpl;
 import net.minecraft.client.renderer.BiomeColors;
@@ -54,7 +57,7 @@ public final class ColorResolverRegistry {
 	 */
 	@UnmodifiableView
 	public static Set<ColorResolver> getAllResolvers() {
-		return ColorResolverRegistryImpl.getAllResolvers();
+		return ImmutableSet.copyOf(ColorResolverManager.getRegisteredResolvers());
 	}
 
 	/**

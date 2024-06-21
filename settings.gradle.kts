@@ -63,7 +63,7 @@ include("fabric-registry-sync-v0")
 //include 'fabric-renderer-api-v1'
 //include 'fabric-renderer-indigo'
 include("fabric-rendering-fluids-v1")
-//include 'fabric-rendering-v1'
+include("fabric-rendering-v1")
 include("fabric-resource-conditions-api-v1")
 include("fabric-resource-loader-v0")
 include("fabric-screen-api-v1")
