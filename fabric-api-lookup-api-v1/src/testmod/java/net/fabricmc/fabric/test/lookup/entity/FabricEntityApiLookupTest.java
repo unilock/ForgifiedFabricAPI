@@ -30,6 +30,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Creeper;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class FabricEntityApiLookupTest {
 	public static final EntityApiLookup<Inspectable, Void> INSPECTABLE =
@@ -44,7 +46,8 @@ public class FabricEntityApiLookupTest {
 
 	public static void onInitialize() {
 		Registry.register(BuiltInRegistries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(FabricApiLookupTest.MOD_ID, "inspectable_pig"), INSPECTABLE_PIG);
-		FabricDefaultAttributeRegistry.register(INSPECTABLE_PIG, Pig.createAttributes());
+		ModLoadingContext.get().getActiveContainer().getEventBus()
+				.addListener(FMLCommonSetupEvent.class, e -> FabricDefaultAttributeRegistry.register(INSPECTABLE_PIG, Pig.createAttributes()));
 
 		INSPECTABLE.registerSelf(INSPECTABLE_PIG);
 		INSPECTABLE.registerForTypes(
