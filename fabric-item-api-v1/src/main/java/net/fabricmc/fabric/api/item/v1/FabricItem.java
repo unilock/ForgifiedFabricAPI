@@ -17,12 +17,14 @@
 package net.fabricmc.fabric.api.item.v1;
 
 import net.fabricmc.fabric.impl.item.FabricItemInternals;
+import net.fabricmc.fabric.impl.item.RecursivityHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.neoforged.neoforge.common.extensions.IItemExtension;
 
 /**
  * General-purpose Fabric-provided extensions for {@link Item} subclasses.
@@ -45,7 +47,7 @@ public interface FabricItem {
 	 * @return true to run the vanilla animation, false to cancel it.
 	 */
 	default boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
-		return true;
+		return !RecursivityHelper.allowForgeCall() || ((IItemExtension) this).shouldCauseReequipAnimation(oldStack, newStack, false);
 	}
 
 	/**
@@ -91,7 +93,7 @@ public interface FabricItem {
 	 * @return the leftover item stack
 	 */
 	default ItemStack getRecipeRemainder(ItemStack stack) {
-		return ((Item) this).hasCraftingRemainingItem() ? ((Item) this).getCraftingRemainingItem().getDefaultInstance() : ItemStack.EMPTY;
+        return RecursivityHelper.allowForgeCall() ? ((IItemExtension) this).getCraftingRemainingItem(stack) : ItemStack.EMPTY;
 	}
 
 	/**
@@ -112,7 +114,7 @@ public interface FabricItem {
 	 */
 	default boolean canBeEnchantedWith(ItemStack stack, Holder<Enchantment> enchantment, EnchantingContext context) {
 		return context == EnchantingContext.PRIMARY
-				? enchantment.value().isPrimaryItem(stack)
+				? stack.isPrimaryItemFor(enchantment)
 				: enchantment.value().canEnchant(stack);
 	}
 

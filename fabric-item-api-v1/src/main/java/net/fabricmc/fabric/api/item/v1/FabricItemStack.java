@@ -21,12 +21,13 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.neoforged.neoforge.common.extensions.IItemStackExtension;
 
 /*
  * Fabric-provided extensions for {@link ItemStack}.
  * This interface is automatically implemented on all item stacks via Mixin and interface injection.
  */
-public interface FabricItemStack {
+public interface FabricItemStack extends IItemStackExtension {
 	/**
 	 * Return a leftover item for use in recipes.
 	 *
@@ -37,7 +38,7 @@ public interface FabricItemStack {
 	 * @return the leftover item
 	 */
 	default ItemStack getRecipeRemainder() {
-		return ((ItemStack) this).getItem().getRecipeRemainder((ItemStack) this);
+		return IItemStackExtension.super.getCraftingRemainingItem();
 	}
 
 	/**

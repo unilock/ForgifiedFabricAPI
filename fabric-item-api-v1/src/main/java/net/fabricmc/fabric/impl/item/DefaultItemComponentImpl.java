@@ -23,9 +23,16 @@ import net.fabricmc.fabric.mixin.item.ItemAccessor;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
+import org.sinytra.fabric.item_api.generated.GeneratedEntryPoint;
 
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = GeneratedEntryPoint.MOD_ID)
 public class DefaultItemComponentImpl {
-	public static void modifyItemComponents() {
+
+	@SubscribeEvent
+	public static void modifyItemComponents(ModifyDefaultComponentsEvent event) {
 		DefaultItemComponentEvents.MODIFY.invoker().modify(ModifyContextImpl.INSTANCE);
 	}
 

@@ -71,7 +71,7 @@ public class BrewingStandGameTest implements FabricGameTest {
 				setPotion(new ItemStack(Items.LINGERING_POTION), Potions.AWKWARD),
 				setPotion(new ItemStack(Items.LINGERING_POTION), Potions.AWKWARD),
 				setPotion(new ItemStack(Items.LINGERING_POTION), Potions.AWKWARD),
-				ItemStack.EMPTY,
+				new ItemStack(Items.GLASS_BOTTLE),
 				ItemStack.EMPTY);
 
 		context.succeed();
