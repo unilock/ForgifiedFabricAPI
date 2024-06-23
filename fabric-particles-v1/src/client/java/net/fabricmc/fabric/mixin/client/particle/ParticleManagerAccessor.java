@@ -16,30 +16,18 @@
 
 package net.fabricmc.fabric.mixin.client.particle;
 
-import java.util.List;
-import java.util.Map;
 import net.minecraft.client.particle.ParticleEngine;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+
+import java.util.List;
 
 @Mixin(ParticleEngine.class)
 public interface ParticleManagerAccessor {
 	@Accessor("textureAtlas")
 	TextureAtlas getParticleAtlasTexture();
-
-	@Accessor("providers")
-	Int2ObjectMap<ParticleProvider<?>> getFactories();
-
-	// NOTE: The field signature is actually Map<Identifier, SimpleSpriteProvider>
-	// This still works due to type erasure
-	@Accessor("spriteSets")
-	Map<ResourceLocation, SpriteSet> getSpriteAwareFactories();
 
 	@Mixin(ParticleEngine.MutableSpriteSet.class)
 	interface SimpleSpriteProviderAccessor {

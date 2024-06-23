@@ -16,17 +16,15 @@
 
 package net.fabricmc.fabric.impl.client.particle;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
 import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteProvider;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.fabricmc.fabric.mixin.client.particle.ParticleManagerAccessor;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.registries.BuiltInRegistries;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public final class ParticleFactoryRegistryImpl implements ParticleFactoryRegistry {
 	public static final ParticleFactoryRegistryImpl INSTANCE = new ParticleFactoryRegistryImpl();
@@ -70,15 +68,15 @@ public final class ParticleFactoryRegistryImpl implements ParticleFactoryRegistr
 
 		@Override
 		public <T extends ParticleOptions> void register(ParticleType<T> type, ParticleProvider<T> factory) {
-			((ParticleManagerAccessor) particleManager).getFactories().put(BuiltInRegistries.PARTICLE_TYPE.getId(type), factory);
+			particleManager.register(type, factory);
 		}
 
 		@Override
 		public <T extends ParticleOptions> void register(ParticleType<T> type, PendingParticleFactory<T> constructor) {
-			SpriteSet delegate = new ParticleEngine.MutableSpriteSet();
-			FabricSpriteProvider fabricSpriteProvider = new FabricSpriteProviderImpl(particleManager, delegate);
-			((ParticleManagerAccessor) particleManager).getSpriteAwareFactories().put(BuiltInRegistries.PARTICLE_TYPE.getKey(type), delegate);
-			register(type, constructor.create(fabricSpriteProvider));
+			particleManager.register(type, delegate -> {
+				FabricSpriteProvider fabricSpriteProvider = new FabricSpriteProviderImpl(particleManager, delegate);
+				return constructor.create(fabricSpriteProvider);
+			});
 		}
 	}
 

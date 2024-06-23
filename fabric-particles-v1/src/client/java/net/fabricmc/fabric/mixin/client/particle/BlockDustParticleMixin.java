@@ -16,18 +16,17 @@
 
 package net.fabricmc.fabric.mixin.client.particle;
 
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Slice;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleRenderEvents;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
 
 // Implements ParticleRenderEvents.ALLOW_BLOCK_DUST_TINT
 @Mixin(TerrainParticle.class)
@@ -40,22 +39,11 @@ abstract class BlockDustParticleMixin extends TextureSheetParticle {
 		super(null, 0, 0, 0);
 	}
 
-	@ModifyVariable(
-			method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDDLnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V",
-			at = @At("LOAD"),
-			argsOnly = true,
-			slice = @Slice(
-					from = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/TerrainParticle;bCol:F", ordinal = 0),
-					to = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;isOf(Lnet/minecraft/world/level/block/Block;)Z")
-			),
-			allow = 1
+	@ModifyExpressionValue(
+		method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDDLnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V",
+		at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/extensions/common/IClientBlockExtensions;areBreakingParticlesTinted(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/core/BlockPos;)Z")
 	)
-	private BlockState removeUntintableParticles(BlockState state) {
-		if (!ParticleRenderEvents.ALLOW_BLOCK_DUST_TINT.invoker().allowBlockDustTint(state, level, pos)) {
-			// As of 1.20.1, vanilla hardcodes grass block particles to not get tinted.
-			return Blocks.GRASS_BLOCK.defaultBlockState();
-		}
-
-		return state;
+	private boolean removeUntintableParticles(boolean result, @Local(argsOnly = true) BlockState state) {
+		return ParticleRenderEvents.ALLOW_BLOCK_DUST_TINT.invoker().allowBlockDustTint(state, level, pos) && result;
 	}
 }
