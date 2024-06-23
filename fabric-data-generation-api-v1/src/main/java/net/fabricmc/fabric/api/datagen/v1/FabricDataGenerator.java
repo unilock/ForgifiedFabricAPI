@@ -20,6 +20,8 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+import com.mojang.datafixers.util.Pair;
+import net.fabricmc.fabric.impl.datagen.DataGeneratorExtension;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.SharedConstants;
@@ -36,14 +38,16 @@ import net.fabricmc.loader.api.ModContainer;
  * An extension to vanilla's {@link DataGenerator} providing mod specific data, and helper functions.
  */
 public final class FabricDataGenerator extends DataGenerator {
+	private final DataGenerator parent;
 	private final ModContainer modContainer;
 	private final boolean strictValidation;
 	private final FabricDataOutput fabricOutput;
 	private final CompletableFuture<HolderLookup.Provider> registriesFuture;
 
 	@ApiStatus.Internal
-	public FabricDataGenerator(Path output, ModContainer mod, boolean strictValidation, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+	public FabricDataGenerator(DataGenerator parent, Path output, ModContainer mod, boolean strictValidation, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 		super(output, SharedConstants.getCurrentVersion(), true);
+		this.parent = parent;
 		this.modContainer = Objects.requireNonNull(mod);
 		this.strictValidation = strictValidation;
 		this.fabricOutput = new FabricDataOutput(mod, output, strictValidation);
@@ -54,7 +58,8 @@ public final class FabricDataGenerator extends DataGenerator {
 	 * Create a default {@link Pack} instance for generating a mod's data.
 	 */
 	public Pack createPack() {
-		return new Pack(true, modContainer.getMetadata().getName(), this.fabricOutput);
+		DataGenerator.PackGenerator parentPack = ((DataGeneratorExtension) this.parent).createPack(modContainer.getMetadata().getName(), this.fabricOutput);
+		return new Pack(parentPack);
 	}
 
 	/**
@@ -66,8 +71,8 @@ public final class FabricDataGenerator extends DataGenerator {
 	 * in the identifier.
 	 */
 	public Pack createBuiltinResourcePack(ResourceLocation id) {
-		Path path = this.vanillaPackOutput.getOutputFolder().resolve("resourcepacks").resolve(id.getPath());
-		return new Pack(true, id.toString(), new FabricDataOutput(modContainer, path, strictValidation));
+		Pair<DataGenerator.PackGenerator, Path> parentPack = ((DataGeneratorExtension) this.parent).createBuiltinResourcePack(true, id, modContainer, strictValidation);
+		return new Pack(parentPack.getFirst());
 	}
 
 	/**
@@ -133,8 +138,11 @@ public final class FabricDataGenerator extends DataGenerator {
 	 * Represents a pack of generated data (i.e. data pack or resource pack). Providers are added to a pack.
 	 */
 	public final class Pack extends DataGenerator.PackGenerator {
-		private Pack(boolean shouldRun, String name, FabricDataOutput output) {
-			super(shouldRun, name, output);
+		private final DataGenerator.PackGenerator parent;
+
+		private Pack(DataGenerator.PackGenerator parent) {
+			super(false, null, null);
+			this.parent = parent;
 		}
 
 		/**
@@ -143,7 +151,7 @@ public final class FabricDataGenerator extends DataGenerator {
 		 * @return the {@link DataProvider}
 		 */
 		public <T extends DataProvider> T addProvider(Factory<T> factory) {
-			return super.addProvider(output -> factory.create((FabricDataOutput) output));
+			return this.parent.addProvider(output -> factory.create((FabricDataOutput) output));
 		}
 
 		/**
@@ -153,7 +161,12 @@ public final class FabricDataGenerator extends DataGenerator {
 		 * @return the {@link DataProvider}
 		 */
 		public <T extends DataProvider> T addProvider(RegistryDependentFactory<T> factory) {
-			return super.addProvider(output -> factory.create((FabricDataOutput) output, registriesFuture));
+			return this.parent.addProvider(output -> factory.create((FabricDataOutput) output, registriesFuture));
+		}
+
+		@Override
+		public <T extends DataProvider> T addProvider(DataProvider.Factory<T> factory) {
+			return this.parent.addProvider(factory);
 		}
 
 		/**

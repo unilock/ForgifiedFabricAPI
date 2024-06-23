@@ -118,6 +118,7 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
                 public $className(net.neoforged.bus.api.IEventBus bus) {
                     $testEnvSetup$entrypointInitializers
                     ${addGametests(modMetadata)}
+                    ${addDatagen(modMetadata)}
                 }
             }
         """.trimIndent()
@@ -131,6 +132,13 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
         return """bus.addListener(net.neoforged.neoforge.event.RegisterGameTestsEvent.class, event -> {
                         $lines
                     });"""
+    }
+
+    private fun addDatagen(modMetadata: LoaderModMetadata): String {
+        val entrypoints = modMetadata.getEntrypoints("fabric-datagen").map(EntrypointMetadata::getValue).takeIf { it.isNotEmpty() } ?: return ""
+        return entrypoints.joinToString(separator = "\n                        ") {
+            "net.fabricmc.fabric.impl.datagen.FabricDataGenHelper.registerDatagenEntrypoint(MOD_ID, new $it());"
+        }
     }
 
     private fun packageNameForEntryPoint(modid: String): String {

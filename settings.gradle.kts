@@ -44,7 +44,7 @@ include("fabric-command-api-v2")
 include("fabric-content-registries-v0")
 include("fabric-convention-tags-v2")
 //include 'fabric-data-attachment-api-v1'
-//include 'fabric-data-generation-api-v1'
+include("fabric-data-generation-api-v1")
 //include 'fabric-entity-events-v1'
 include("fabric-events-interaction-v0")
 include("fabric-game-rule-api-v1")

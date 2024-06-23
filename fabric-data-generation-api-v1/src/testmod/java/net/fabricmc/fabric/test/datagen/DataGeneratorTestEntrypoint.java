@@ -169,7 +169,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		public void buildRecipes(RecipeOutput exporter) {
-			planksFromLog(exporter, SIMPLE_BLOCK, ItemTags.ACACIA_LOGS, 1);
+			planksFromLog(exporter, SIMPLE_BLOCK.value(), ItemTags.ACACIA_LOGS, 1);
 
 			ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.DIAMOND_ORE, 4).requires(Items.ITEM_FRAME)
 					.unlockedBy("has_frame", has(Items.ITEM_FRAME))
@@ -252,7 +252,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generateTranslations(HolderLookup.Provider registryLookup, TranslationBuilder translationBuilder) {
-			translationBuilder.add(SIMPLE_BLOCK, "Simple Block");
+			translationBuilder.add(SIMPLE_BLOCK.value(), "Simple Block");
 			translationBuilder.add(ResourceLocation.fromNamespaceAndPath(MOD_ID, "identifier_test"), "Identifier Test");
 			translationBuilder.add(EntityType.ALLAY, "Allay");
 			translationBuilder.add(Attributes.ARMOR, "Generic Armor");
@@ -284,7 +284,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generateTranslations(HolderLookup.Provider registryLookup, TranslationBuilder translationBuilder) {
-			translationBuilder.add(SIMPLE_BLOCK, "シンプルブロック");
+			translationBuilder.add(SIMPLE_BLOCK.value(), "シンプルブロック");
 			translationBuilder.add(SIMPLE_ITEM_GROUP, "データ生成項目");
 			translationBuilder.add("this.is.a.test", "こんにちは");
 		}
@@ -297,7 +297,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generateBlockStateModels(BlockModelGenerators blockStateModelGenerator) {
-			blockStateModelGenerator.createTrivialCube(SIMPLE_BLOCK);
+			blockStateModelGenerator.createTrivialCube(SIMPLE_BLOCK.value());
 			blockStateModelGenerator.createTrivialCube(BLOCK_WITHOUT_ITEM);
 			blockStateModelGenerator.createTrivialCube(BLOCK_WITHOUT_LOOT_TABLE);
 			blockStateModelGenerator.createTrivialCube(BLOCK_WITH_VANILLA_LOOT_TABLE);
@@ -317,8 +317,8 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void addTags(HolderLookup.Provider registries) {
-			tag(BlockTags.FIRE).setReplace(true).add(SIMPLE_BLOCK);
-			tag(BlockTags.DIRT).add(SIMPLE_BLOCK);
+			tag(BlockTags.FIRE).setReplace(true).add(SIMPLE_BLOCK.value());
+			tag(BlockTags.DIRT).add(SIMPLE_BLOCK.value());
 			tag(BlockTags.ACACIA_LOGS).forceAddTag(BlockTags.ANIMALS_SPAWNABLE_ON);
 		}
 	}
@@ -368,7 +368,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		public void generateAdvancement(HolderLookup.Provider registryLookup, Consumer<AdvancementHolder> consumer) {
 			AdvancementHolder root = Advancement.Builder.advancement()
 					.display(
-							SIMPLE_BLOCK,
+							SIMPLE_BLOCK.value(),
 							Component.translatable("advancements.test.root.title"),
 							Component.translatable("advancements.test.root.description"),
 							ResourceLocation.withDefaultNamespace("textures/gui/advancements/backgrounds/end.png"),
@@ -378,7 +378,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 					.save(consumer, MOD_ID + ":test/root");
 			AdvancementHolder rootNotLoaded = Advancement.Builder.advancement()
 					.display(
-							SIMPLE_BLOCK,
+							SIMPLE_BLOCK.value(),
 							Component.translatable("advancements.test.root_not_loaded.title"),
 							Component.translatable("advancements.test.root_not_loaded.description"),
 							ResourceLocation.withDefaultNamespace("textures/gui/advancements/backgrounds/end.png"),
@@ -397,8 +397,8 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		@Override
 		public void generate() {
 			// Same condition twice to test recursive condition adding
-			withConditions(ALWAYS_LOADED).withConditions(ResourceConditions.not(NEVER_LOADED)).dropSelf(SIMPLE_BLOCK);
-			add(BLOCK_WITHOUT_ITEM, createSingleItemTable(SIMPLE_BLOCK));
+			withConditions(ALWAYS_LOADED).withConditions(ResourceConditions.not(NEVER_LOADED)).dropSelf(SIMPLE_BLOCK.value());
+			add(BLOCK_WITHOUT_ITEM, createSingleItemTable(SIMPLE_BLOCK.value()));
 
 			excludeFromStrictValidation(BLOCK_WITHOUT_LOOT_TABLE);
 		}
@@ -414,7 +414,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 			withConditions(consumer, ALWAYS_LOADED).accept(
 					BuiltInLootTables.PIGLIN_BARTERING,
 					LootTable.lootTable().withPool(
-							LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).add(LootItem.lootTableItem(SIMPLE_BLOCK))
+							LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).add(LootItem.lootTableItem(SIMPLE_BLOCK.value()))
 					)
 			);
 		}

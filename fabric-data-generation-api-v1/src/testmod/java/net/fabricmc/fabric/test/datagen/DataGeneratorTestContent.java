@@ -22,6 +22,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -36,11 +37,19 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class DataGeneratorTestContent implements ModInitializer {
 	public static final String MOD_ID = "fabric-data-gen-api-v1-testmod";
 
-	public static Block SIMPLE_BLOCK;
+	private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MOD_ID);
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, MOD_ID);
+
+	public static Holder<Block> SIMPLE_BLOCK;
 	public static Block BLOCK_WITHOUT_ITEM;
 	public static Block BLOCK_WITHOUT_LOOT_TABLE;
 	public static Block BLOCK_WITH_VANILLA_LOOT_TABLE;
@@ -64,13 +73,13 @@ public class DataGeneratorTestContent implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		SIMPLE_BLOCK = createBlock("simple_block", true, BlockBehaviour.Properties.of());
+		SIMPLE_BLOCK = register("simple_block", true, BlockBehaviour.Properties.of());
 		BLOCK_WITHOUT_ITEM = createBlock("block_without_item", false, BlockBehaviour.Properties.of());
 		BLOCK_WITHOUT_LOOT_TABLE = createBlock("block_without_loot_table", false, BlockBehaviour.Properties.of());
 		BLOCK_WITH_VANILLA_LOOT_TABLE = createBlock("block_with_vanilla_loot_table", false, BlockBehaviour.Properties.of().dropsLike(Blocks.STONE));
 		BLOCK_THAT_DROPS_NOTHING = createBlock("block_that_drops_nothing", false, BlockBehaviour.Properties.of().noLootTable());
 
-		ItemGroupEvents.modifyEntriesEvent(SIMPLE_ITEM_GROUP).register(entries -> entries.accept(SIMPLE_BLOCK));
+		ItemGroupEvents.modifyEntriesEvent(SIMPLE_ITEM_GROUP).register(entries -> entries.accept(SIMPLE_BLOCK.value()));
 
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, SIMPLE_ITEM_GROUP, FabricItemGroup.builder()
 				.icon(() -> new ItemStack(Items.DIAMOND_PICKAXE))
@@ -79,6 +88,10 @@ public class DataGeneratorTestContent implements ModInitializer {
 
 		DynamicRegistries.register(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY, TestDatagenObject.CODEC);
 		DynamicRegistries.register(TEST_DATAGEN_DYNAMIC_EMPTY_REGISTRY_KEY, TestDatagenObject.CODEC);
+
+		IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
+		BLOCKS.register(bus);
+		ITEMS.register(bus);
 	}
 
 	private static Block createBlock(String name, boolean hasItem, BlockBehaviour.Properties settings) {
@@ -89,6 +102,14 @@ public class DataGeneratorTestContent implements ModInitializer {
 			Registry.register(BuiltInRegistries.ITEM, identifier, new BlockItem(block, new Item.Properties()));
 		}
 
+		return block;
+	}
+
+	private static DeferredBlock<Block> register(String name, boolean hasItem, BlockBehaviour.Properties settings) {
+		DeferredBlock<Block> block = BLOCKS.register(name, () -> new Block(settings));
+		if (hasItem) {
+			ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+		}
 		return block;
 	}
 

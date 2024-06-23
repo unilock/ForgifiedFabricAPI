@@ -305,3 +305,4 @@ transitive-extendable	method	net/minecraft/data/advancements/AdvancementProvider
 transitive-extendable	method	net/minecraft/data/loot/LootTableProvider	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/recipes/RecipeProvider	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/tags/TagsProvider	getName	()Ljava/lang/String;
+accessible method net/minecraft/data/DataGenerator$PackGenerator <init> (Lnet/minecraft/data/DataGenerator;ZLjava/lang/String;Lnet/minecraft/data/PackOutput;)V

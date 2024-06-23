@@ -26,6 +26,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
+import net.neoforged.neoforge.common.conditions.ICondition;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
@@ -71,9 +72,9 @@ public abstract class FabricRecipeProvider extends RecipeProvider {
 		Preconditions.checkArgument(conditions.length > 0, "Must add at least one condition.");
 		return new RecipeOutput() {
 			@Override
-			public void accept(ResourceLocation identifier, Recipe<?> recipe, @Nullable AdvancementHolder advancementEntry) {
+			public void accept(ResourceLocation identifier, Recipe<?> recipe, @Nullable AdvancementHolder advancementEntry, ICondition... recipeConditions) {
 				FabricDataGenHelper.addConditions(recipe, conditions);
-				exporter.accept(identifier, recipe, advancementEntry);
+				exporter.accept(identifier, recipe, advancementEntry, recipeConditions);
 			}
 
 			@Override
@@ -89,7 +90,7 @@ public abstract class FabricRecipeProvider extends RecipeProvider {
 		List<CompletableFuture<?>> list = new ArrayList<>();
 		buildRecipes(new RecipeOutput() {
 			@Override
-			public void accept(ResourceLocation recipeId, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
+			public void accept(ResourceLocation recipeId, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... recipeConditions) {
 				ResourceLocation identifier = getRecipeIdentifier(recipeId);
 
 				if (!generatedRecipes.add(identifier)) {

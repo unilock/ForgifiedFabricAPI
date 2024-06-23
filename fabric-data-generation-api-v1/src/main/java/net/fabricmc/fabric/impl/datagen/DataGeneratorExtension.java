@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.datagen;
+package net.fabricmc.fabric.impl.datagen;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
-import net.minecraft.tags.TagBuilder;
+import com.mojang.datafixers.util.Pair;
+import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 
-/**
- * Extends Tag.Builder to support setting the replace field.
- */
-@Mixin(TagBuilder.class)
-public class TagBuilderMixin implements FabricTagBuilder {
-	@Unique
-	private boolean replace = false;
+import java.nio.file.Path;
 
-	@Override
-	public void fabric_setReplace(boolean replace) {
-		this.replace = replace;
-	}
+public interface DataGeneratorExtension {
+	DataGenerator.PackGenerator createPack(String name, PackOutput output);
 
-	@Override
-	public boolean fabric_isReplaced() {
-		return replace;
-	}
+	Pair<DataGenerator.PackGenerator, Path> createBuiltinResourcePack(boolean shouldRun, ResourceLocation packName, ModContainer modInfo, boolean strictValidation);
 }

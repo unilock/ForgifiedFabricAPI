@@ -27,6 +27,7 @@ import java.util.*;
 
 public final class DynamicRegistriesImpl {
 	private static final List<RegistryDataLoader.RegistryData<?>> DYNAMIC_REGISTRIES = new ArrayList<>();
+	public static final Set<ResourceKey<?>> FABRIC_DYNAMIC_REGISTRY_KEYS = new HashSet<>();
 	public static final Set<ResourceKey<? extends Registry<?>>> DYNAMIC_REGISTRY_KEYS = new HashSet<>();
 	public static final Map<ResourceKey<? extends Registry<?>>, Codec<?>> NETWORK_CODECS = new HashMap<>();
 
@@ -49,6 +50,7 @@ public final class DynamicRegistriesImpl {
 
 		var entry = new RegistryDataLoader.RegistryData<>(key, codec, false);
 		DYNAMIC_REGISTRIES.add(entry);
+		FABRIC_DYNAMIC_REGISTRY_KEYS.add(key);
 		return entry;
 	}
 
@@ -58,6 +60,7 @@ public final class DynamicRegistriesImpl {
 		Objects.requireNonNull(options, "Options cannot be null");
 
         NETWORK_CODECS.put(key, networkCodec);
+		FABRIC_DYNAMIC_REGISTRY_KEYS.add(key);
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})

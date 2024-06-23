@@ -233,7 +233,7 @@ public abstract class FabricTagProvider<T> extends TagsProvider<T> {
 		private final TagsProvider.TagAppender<T> parent;
 
 		private FabricTagBuilder(TagAppender<T> parent) {
-			super(parent.builder);
+			super(parent.builder, "fabric");
 			this.parent = parent;
 		}
 
@@ -245,7 +245,7 @@ public abstract class FabricTagProvider<T> extends TagsProvider<T> {
 		 * @return the {@link FabricTagBuilder} instance
 		 */
 		public FabricTagBuilder setReplace(boolean replace) {
-			((net.fabricmc.fabric.impl.datagen.FabricTagBuilder) builder).fabric_setReplace(replace);
+			replace(replace);
 			return this;
 		}
 

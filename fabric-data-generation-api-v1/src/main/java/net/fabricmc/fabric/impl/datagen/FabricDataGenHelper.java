@@ -16,37 +16,10 @@
 
 package net.fabricmc.fabric.impl.datagen;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-
 import com.google.gson.JsonObject;
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import net.minecraft.Util;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.RegistrySetBuilder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.DataProvider;
-import net.minecraft.data.registries.VanillaRegistries;
-import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.RegistryDataLoader;
-import net.minecraft.resources.ResourceKey;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
@@ -54,8 +27,28 @@ import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.registries.RegistryPatchGenerator;
+import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.RegistryDataLoader;
+import net.minecraft.resources.ResourceKey;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.registries.DataPackRegistriesHooks;
+import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.Nullable;
+import org.sinytra.fabric.data_generation_api.generated.GeneratedEntryPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+
+@EventBusSubscriber(modid = GeneratedEntryPoint.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class FabricDataGenHelper {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FabricDataGenHelper.class);
 
@@ -84,55 +77,26 @@ public final class FabricDataGenHelper {
 	 * Entrypoint key to register classes implementing {@link DataGeneratorEntrypoint}.
 	 */
 	private static final String ENTRYPOINT_KEY = "fabric-datagen";
+	
+	private static final Map<ModContainer, DataGeneratorEntrypoint> DATAGEN_ENTRYPOINTS = new HashMap<>();
+
+	public static void registerDatagenEntrypoint(String modid, DataGeneratorEntrypoint entrypoint) {
+		ModContainer modContainer =  FabricLoader.getInstance().getModContainer(modid).orElseThrow(() -> new RuntimeException("Failed to find effective mod container for mod id (%s)".formatted(modid)));
+		DATAGEN_ENTRYPOINTS.put(modContainer, entrypoint);
+	}
 
 	private FabricDataGenHelper() {
 	}
 
-	public static void run() {
-		try {
-			runInternal();
-		} catch (Throwable t) {
-			LOGGER.error(LogUtils.FATAL_MARKER, "Failed to run data generation", t);
-
-			// Ensure we exit with a none zero exit code.
-			System.exit(-1);
-		}
-	}
-
-	private static void runInternal() {
-		Path outputDir = Paths.get(Objects.requireNonNull(OUTPUT_DIR, "No output dir provided with the 'fabric-api.datagen.output-dir' property"));
-
-		List<EntrypointContainer<DataGeneratorEntrypoint>> dataGeneratorInitializers = FabricLoader.getInstance()
-				.getEntrypointContainers(ENTRYPOINT_KEY, DataGeneratorEntrypoint.class);
-
-		if (dataGeneratorInitializers.isEmpty()) {
-			LOGGER.warn("No data generator entrypoints are defined. Implement {} and add your class to the '{}' entrypoint key in your fabric.mod.json.",
-					DataGeneratorEntrypoint.class.getName(), ENTRYPOINT_KEY);
-		}
-
-		// Ensure that the DataGeneratorEntrypoint is constructed on the main thread.
-		final List<DataGeneratorEntrypoint> entrypoints = dataGeneratorInitializers.stream().map(EntrypointContainer::getEntrypoint).toList();
-		CompletableFuture<HolderLookup.Provider> registriesFuture = CompletableFuture.supplyAsync(() -> createRegistryWrapper(entrypoints), Util.backgroundExecutor());
-
+	@SubscribeEvent
+	public static void onGatherData(GatherDataEvent event) {
 		Object2IntOpenHashMap<String> jsonKeySortOrders = (Object2IntOpenHashMap<String>) DataProvider.FIXED_ORDER_FIELDS;
 		Object2IntOpenHashMap<String> defaultJsonKeySortOrders = new Object2IntOpenHashMap<>(jsonKeySortOrders);
 
-		for (EntrypointContainer<DataGeneratorEntrypoint> entrypointContainer : dataGeneratorInitializers) {
-			final String id = entrypointContainer.getProvider().getMetadata().getId();
-
-			if (MOD_ID_FILTER != null) {
-				if (!id.equals(MOD_ID_FILTER)) {
-					continue;
-				}
-			}
-
-			LOGGER.info("Running data generator for {}", id);
+		DATAGEN_ENTRYPOINTS.forEach((modContainer, entrypoint) -> {
+			LOGGER.info("Running data generator for {}", modContainer.getMetadata().getId());
 
 			try {
-				final DataGeneratorEntrypoint entrypoint = entrypointContainer.getEntrypoint();
-				final String effectiveModId = entrypoint.getEffectiveModId();
-				ModContainer modContainer = entrypointContainer.getProvider();
-
 				HashSet<String> keys = new HashSet<>();
 				entrypoint.addJsonKeySortOrders((key, value) -> {
 					Objects.requireNonNull(key, "Tried to register a priority for a null key");
@@ -140,32 +104,27 @@ public final class FabricDataGenHelper {
 					keys.add(key);
 				});
 
-				if (effectiveModId != null) {
-					modContainer = FabricLoader.getInstance().getModContainer(effectiveModId).orElseThrow(() -> new RuntimeException("Failed to find effective mod container for mod id (%s)".formatted(effectiveModId)));
-				}
+				final RegistrySetBuilder builder = new RegistrySetBuilder();
+				entrypoint.buildRegistry(builder);
 
-				FabricDataGenerator dataGenerator = new FabricDataGenerator(outputDir, modContainer, STRICT_VALIDATION, registriesFuture);
+				CompletableFuture<HolderLookup.Provider> registriesFuture = FabricDataGenHelper.createRegistryWrapper(event.getLookupProvider(), builder);
+				FabricDataGenerator dataGenerator = new FabricDataGenerator(event.getGenerator(), event.getGenerator().getPackOutput().getOutputFolder(), modContainer, STRICT_VALIDATION, registriesFuture);
 				entrypoint.onInitializeDataGenerator(dataGenerator);
-				dataGenerator.run();
 
 				jsonKeySortOrders.keySet().removeAll(keys);
 				jsonKeySortOrders.putAll(defaultJsonKeySortOrders);
 			} catch (Throwable t) {
-				throw new RuntimeException("Failed to run data generator from mod (%s)".formatted(id), t);
+				throw new RuntimeException("Failed to run data generator from mod (%s)".formatted(modContainer.getMetadata().getId()), t);
 			}
-		}
+		});
 	}
 
-	private static HolderLookup.Provider createRegistryWrapper(List<DataGeneratorEntrypoint> dataGeneratorInitializers) {
+	private static CompletableFuture<HolderLookup.Provider> createRegistryWrapper(CompletableFuture<HolderLookup.Provider> original, RegistrySetBuilder registryBuilder) {
 		// Build a list of all the RegistryBuilder's including vanilla's
 		List<RegistrySetBuilder> builders = new ArrayList<>();
 		builders.add(VanillaRegistries.BUILDER);
 
-		for (DataGeneratorEntrypoint entrypoint : dataGeneratorInitializers) {
-			final var registryBuilder = new RegistrySetBuilder();
-			entrypoint.buildRegistry(registryBuilder);
-			builders.add(registryBuilder);
-		}
+		builders.add(registryBuilder);
 
 		// Collect all the bootstrap functions, and merge the lifecycles.
 		class BuilderData {
@@ -215,10 +174,15 @@ public final class FabricDataGenHelper {
 		for (BuilderData value : builderDataMap.values()) {
 			value.apply(merged);
 		}
+		var builderKeys = new HashSet<>(merged.getEntryKeys());
+		DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().filter(data -> !builderKeys.contains(data.key())).forEach(data -> merged.add(data.key(), context -> {}));
 
-		HolderLookup.Provider wrapperLookup = merged.build(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY));
-		VanillaRegistries.validateThatAllBiomeFeaturesHaveBiomeFilter(wrapperLookup);
-		return wrapperLookup;
+		return RegistryPatchGenerator.createLookup(original, merged)
+			.thenApply(RegistrySetBuilder.PatchedRegistries::full)
+			.thenApply(provider -> {
+				VanillaRegistries.validateThatAllBiomeFeaturesHaveBiomeFilter(provider);
+				return provider;
+			});
 	}
 
 	/**
