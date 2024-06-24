@@ -36,11 +36,11 @@ public class BiomeSelectionContextImpl implements BiomeSelectionContext {
 	private final Biome biome;
 	private final Holder<Biome> entry;
 
-	public BiomeSelectionContextImpl(RegistryAccess dynamicRegistries, ResourceKey<Biome> key, Biome biome) {
+	public BiomeSelectionContextImpl(RegistryAccess dynamicRegistries, ResourceKey<Biome> key, Holder<Biome> biome) {
 		this.dynamicRegistries = dynamicRegistries;
 		this.key = key;
-		this.biome = biome;
-		this.entry = dynamicRegistries.registryOrThrow(Registries.BIOME).getHolder(this.key).orElseThrow();
+		this.biome = biome.value();
+		this.entry = biome;
 	}
 
 	@Override

@@ -137,7 +137,7 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
     private fun addDatagen(modMetadata: LoaderModMetadata): String {
         val entrypoints = modMetadata.getEntrypoints("fabric-datagen").map(EntrypointMetadata::getValue).takeIf { it.isNotEmpty() } ?: return ""
         return entrypoints.joinToString(separator = "\n                        ") {
-            "net.fabricmc.fabric.impl.datagen.FabricDataGenHelper.registerDatagenEntrypoint(MOD_ID, new $it());"
+            "bus.addListener(net.neoforged.neoforge.data.event.GatherDataEvent.class, event -> net.fabricmc.fabric.impl.datagen.FabricDataGenHelper.runDatagenForMod(MOD_ID, RAW_MOD_ID, new $it(), event));"
         }
     }
 

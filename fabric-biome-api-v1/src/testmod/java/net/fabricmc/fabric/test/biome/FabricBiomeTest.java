@@ -33,6 +33,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.neoforged.neoforge.data.loading.DatagenModLoader;
 
 /**
  * <b>NOTES FOR TESTING:</b>
@@ -49,6 +50,9 @@ public class FabricBiomeTest implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		if (DatagenModLoader.isRunningDataGen()) {
+			return;
+		}
 		Preconditions.checkArgument(NetherBiomes.canGenerateInNether(Biomes.NETHER_WASTES));
 		Preconditions.checkArgument(!NetherBiomes.canGenerateInNether(Biomes.END_HIGHLANDS));
 

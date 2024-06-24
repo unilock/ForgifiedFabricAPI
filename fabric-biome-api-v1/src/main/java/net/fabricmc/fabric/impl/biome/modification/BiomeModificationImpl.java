@@ -16,30 +16,28 @@
 
 package net.fabricmc.fabric.impl.biome.modification;
 
+import com.mojang.serialization.MapCodec;
+import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
+import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
+import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
+import net.neoforged.neoforge.common.world.BiomeModifier;
+import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import com.google.common.base.Stopwatch;
-import com.google.common.base.Suppliers;
-import org.jetbrains.annotations.TestOnly;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
-import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.FeatureSorter;
 
 public class BiomeModificationImpl {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BiomeModificationImpl.class);
@@ -71,26 +69,7 @@ public class BiomeModificationImpl {
 		modifiersUnsorted = true;
 	}
 
-	/**
-	 * This is currently not publicly exposed but likely useful for modpack support mods.
-	 */
-	void changeOrder(ResourceLocation id, int order) {
-		modifiersUnsorted = true;
-
-		for (ModifierRecord modifierRecord : modifiers) {
-			if (id.equals(modifierRecord.id)) {
-				modifierRecord.setOrder(order);
-			}
-		}
-	}
-
-	@TestOnly
-	void clearModifiers() {
-		modifiers.clear();
-		modifiersUnsorted = true;
-	}
-
-	private List<ModifierRecord> getSortedModifiers() {
+	public List<ModifierRecord> getSortedModifiers() {
 		if (modifiersUnsorted) {
 			// Resort modifiers
 			modifiers.sort(MODIFIER_ORDER_COMPARATOR);
@@ -100,78 +79,33 @@ public class BiomeModificationImpl {
 		return modifiers;
 	}
 
-	public void finalizeWorldGen(RegistryAccess impl) {
-		Stopwatch sw = Stopwatch.createStarted();
+    public record FabricBiomeModifier(List<ModifierRecord> modifiers) implements BiomeModifier {
+        @Override
+        public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+            RegistryAccess.Frozen registryAccess = ServerLifecycleHooks.getCurrentServer().registryAccess();
+            ResourceKey<Biome> key = biome.unwrapKey().orElseThrow();
+            BiomeSelectionContext selectionContext = new BiomeSelectionContextImpl(registryAccess, key, biome);
+            BiomeModificationContextImpl modificationContext = new BiomeModificationContextImpl(registryAccess, builder);
+            for (ModifierRecord modifier : this.modifiers) {
+                if (isInPhase(phase, modifier.phase) && modifier.selector.test(selectionContext)) {
+                    LOGGER.trace("Applying modifier {} to {}", modifier, key);
+                    modifier.apply(selectionContext, modificationContext);
+                }
+            }
+        }
 
-		// Now that we apply biome modifications inside the MinecraftServer constructor, we should only ever do
-		// this once for a dynamic registry manager. Marking the dynamic registry manager as modified ensures a crash
-		// if the precondition is violated.
-		BiomeModificationMarker modificationTracker = (BiomeModificationMarker) impl;
-		modificationTracker.fabric_markModified();
+        @Override
+        public MapCodec<? extends BiomeModifier> codec() {
+            return MapCodec.unit(this);
+        }
 
-		Registry<Biome> biomes = impl.registryOrThrow(Registries.BIOME);
-
-		// Build a list of all biome keys in ascending order of their raw-id to get a consistent result in case
-		// someone does something stupid.
-		List<ResourceKey<Biome>> keys = biomes.entrySet().stream()
-				.map(Map.Entry::getKey)
-				.sorted(Comparator.comparingInt(key -> biomes.getId(biomes.getOrThrow(key))))
-				.toList();
-
-		List<ModifierRecord> sortedModifiers = getSortedModifiers();
-
-		int biomesChanged = 0;
-		int biomesProcessed = 0;
-		int modifiersApplied = 0;
-
-		for (ResourceKey<Biome> key : keys) {
-			Biome biome = biomes.getOrThrow(key);
-
-			biomesProcessed++;
-
-			// Make a copy of the biome to allow selection contexts to see it unmodified,
-			// But do so only once it's known anything wants to modify the biome at all
-			BiomeSelectionContext context = new BiomeSelectionContextImpl(impl, key, biome);
-			BiomeModificationContextImpl modificationContext = null;
-
-			for (ModifierRecord modifier : sortedModifiers) {
-				if (modifier.selector.test(context)) {
-					LOGGER.trace("Applying modifier {} to {}", modifier, key.location());
-
-					// Create the copy only if at least one modifier applies, since it's pretty costly
-					if (modificationContext == null) {
-						biomesChanged++;
-						modificationContext = new BiomeModificationContextImpl(impl, biome);
-					}
-
-					modifier.apply(context, modificationContext);
-					modifiersApplied++;
-				}
-			}
-
-			// Re-freeze and apply certain cleanup actions
-			if (modificationContext != null) {
-				modificationContext.freeze();
-
-				if (modificationContext.shouldRebuildFeatures()) {
-					impl.registryOrThrow(Registries.LEVEL_STEM).stream().forEach(dimensionOptions -> {
-						dimensionOptions.generator().featuresPerStep = Suppliers.memoize(
-							() -> FeatureSorter.buildFeaturesPerStep(
-									List.copyOf(dimensionOptions.generator().getBiomeSource().possibleBiomes()),
-									biomeEntry -> dimensionOptions.generator().getBiomeGenerationSettings(biomeEntry).features(),
-									true
-							)
-						);
-					});
-				}
-			}
-		}
-
-		if (biomesProcessed > 0) {
-			LOGGER.info("Applied {} biome modifications to {} of {} new biomes in {}", modifiersApplied, biomesChanged,
-					biomesProcessed, sw);
-		}
-	}
+        private boolean isInPhase(Phase phase, ModificationPhase modificationPhase) {
+            return phase == Phase.ADD && modificationPhase == ModificationPhase.ADDITIONS
+                || phase == Phase.REMOVE && modificationPhase == ModificationPhase.REMOVALS
+                || phase == Phase.MODIFY && modificationPhase == ModificationPhase.REPLACEMENTS
+                || phase == Phase.AFTER_EVERYTHING && modificationPhase == ModificationPhase.POST_PROCESSING;
+        }
+    }
 
 	private static class ModifierRecord {
 		private final ModificationPhase phase;

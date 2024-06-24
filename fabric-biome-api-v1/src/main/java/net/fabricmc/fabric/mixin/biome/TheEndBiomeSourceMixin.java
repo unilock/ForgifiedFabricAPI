@@ -42,7 +42,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.TheEndBiomeSource;
 
-@Mixin(TheEndBiomeSource.class)
+@Mixin(value = TheEndBiomeSource.class, priority = 1500)
 public class TheEndBiomeSourceMixin extends BiomeSourceMixin {
 	@Shadow
 	@Mutable

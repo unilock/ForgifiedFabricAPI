@@ -1,7 +1,5 @@
 accessWidener	v1	named
 accessible	class	net/minecraft/world/level/biome/Biome$ClimateSettings
-accessible	field	net/minecraft/world/level/biome/Biome	climateSettings	Lnet/minecraft/world/level/biome/Biome$ClimateSettings;
-mutable	field	net/minecraft/world/level/biome/Biome	climateSettings	Lnet/minecraft/world/level/biome/Biome$ClimateSettings;
 accessible	field	net/minecraft/world/level/biome/Biome	generationSettings	Lnet/minecraft/world/level/biome/BiomeGenerationSettings;
 accessible	field	net/minecraft/world/level/biome/Biome	mobSettings	Lnet/minecraft/world/level/biome/MobSpawnSettings;
 accessible	method	net/minecraft/world/level/biome/Biome$ClimateSettings	<init>	(ZFLnet/minecraft/world/level/biome/Biome$TemperatureModifier;F)V
