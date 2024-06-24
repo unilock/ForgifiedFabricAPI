@@ -14,6 +14,8 @@ jobs:
         with:
           fetch-depth: 0
       - uses: gradle/wrapper-validation-action@v2
+      - name: Create placeholder assets dir
+        run: mkdir -p ${{ env.GRADLE_USER_HOME }}/caches/fabric-loom/assets
       - run: ./gradlew check build publishToMavenLocal --stacktrace
       - uses: Juuxel/publish-checkstyle-report@v1
         if: ${{ failure() }}
