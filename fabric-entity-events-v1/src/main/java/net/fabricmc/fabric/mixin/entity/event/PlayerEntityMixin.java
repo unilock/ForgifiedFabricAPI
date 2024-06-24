@@ -16,47 +16,15 @@
 
 package net.fabricmc.fabric.mixin.entity.event;
 
-import com.mojang.datafixers.util.Either;
+import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Unit;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 
 @Mixin(Player.class)
 abstract class PlayerEntityMixin {
-	@Inject(method = "startSleepInBed", at = @At("HEAD"), cancellable = true)
-	private void onTrySleep(BlockPos pos, CallbackInfoReturnable<Either<Player.BedSleepingProblem, Unit>> info) {
-		Player.BedSleepingProblem failureReason = EntitySleepEvents.ALLOW_SLEEPING.invoker().allowSleep((Player) (Object) this, pos);
-
-		if (failureReason != null) {
-			info.setReturnValue(Either.left(failureReason));
-		}
-	}
-
-	@Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isDay()Z"))
-	private boolean redirectDaySleepCheck(Level world) {
-		boolean day = world.isDay();
-
-		if (((LivingEntity) (Object) this).getSleepingPos().isPresent()) {
-			BlockPos pos = ((LivingEntity) (Object) this).getSleepingPos().get();
-			InteractionResult result = EntitySleepEvents.ALLOW_SLEEP_TIME.invoker().allowSleepTime((Player) (Object) this, pos, !day);
-
-			if (result != InteractionResult.PASS) {
-				return !result.consumesAction(); // true from the event = night-like conditions, so we have to invert
-			}
-		}
-
-		return day;
-	}
-
 	@Inject(method = "isSleepingLongEnough", at = @At("RETURN"), cancellable = true)
 	private void onIsSleepingLongEnough(CallbackInfoReturnable<Boolean> info) {
 		if (info.getReturnValueZ()) {

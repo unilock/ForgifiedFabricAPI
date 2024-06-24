@@ -88,13 +88,13 @@ abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 		ServerPlayerEvents.COPY_FROM.invoker().copyFromPlayer(oldPlayer, (ServerPlayer) (Object) this, alive);
 	}
 
-	@Redirect(method = "startSleepInBed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;get(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;"))
+	@Redirect(method = "lambda$startSleepInBed$13", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getValue(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;"))
 	private Comparable<?> redirectSleepDirection(BlockState state, Property<?> property, BlockPos pos) {
 		Direction initial = state.hasProperty(property) ? (Direction) state.getValue(property) : null;
 		return EntitySleepEvents.MODIFY_SLEEPING_DIRECTION.invoker().modifySleepDirection((LivingEntity) (Object) this, pos, initial);
 	}
 
-	@Inject(method = "startSleepInBed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;get(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;", shift = At.Shift.BY, by = 3), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+	@Inject(method = "lambda$startSleepInBed$13", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getValue(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;", shift = At.Shift.BY, by = 3), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
 	private void onTrySleepDirectionCheck(BlockPos pos, CallbackInfoReturnable<Either<Player.BedSleepingProblem, Unit>> info, @Nullable Direction sleepingDirection) {
 		// This checks the result from the event call above.
 		if (sleepingDirection == null) {
@@ -102,21 +102,21 @@ abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 		}
 	}
 
-	@Redirect(method = "startSleepInBed", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FZZ)V"))
+	@Redirect(method = "lambda$startSleepInBed$13", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FZZ)V"))
 	private void onSetSpawnPoint(ServerPlayer player, ResourceKey<Level> dimension, BlockPos pos, float angle, boolean spawnPointSet, boolean sendMessage) {
 		if (EntitySleepEvents.ALLOW_SETTING_SPAWN.invoker().allowSettingSpawn(player, pos)) {
 			player.setRespawnPosition(dimension, pos, angle, spawnPointSet, sendMessage);
 		}
 	}
 
-	@Redirect(method = "startSleepInBed", at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z", remap = false))
+	@Redirect(method = "lambda$startSleepInBed$13", at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z", remap = false))
 	private boolean hasNoMonstersNearby(List<Monster> monsters, BlockPos pos) {
 		boolean vanillaResult = monsters.isEmpty();
 		InteractionResult result = EntitySleepEvents.ALLOW_NEARBY_MONSTERS.invoker().allowNearbyMonsters((Player) (Object) this, pos, vanillaResult);
 		return result != InteractionResult.PASS ? result.consumesAction() : vanillaResult;
 	}
 
-	@Redirect(method = "startSleepInBed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isDay()Z"))
+	@Redirect(method = "lambda$startSleepInBed$13", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isDay()Z"))
 	private boolean redirectDaySleepCheck(Level world, BlockPos pos) {
 		boolean day = world.isDay();
 		InteractionResult result = EntitySleepEvents.ALLOW_SLEEP_TIME.invoker().allowSleepTime((Player) (Object) this, pos, !day);
