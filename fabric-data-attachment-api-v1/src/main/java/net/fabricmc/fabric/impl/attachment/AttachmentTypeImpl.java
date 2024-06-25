@@ -24,6 +24,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.resources.ResourceLocation;
 
 public record AttachmentTypeImpl<A>(
+		net.neoforged.neoforge.attachment.AttachmentType<A> internalType,
 		ResourceLocation identifier,
 		@Nullable Supplier<A> initializer,
 		@Nullable Codec<A> persistenceCodec,

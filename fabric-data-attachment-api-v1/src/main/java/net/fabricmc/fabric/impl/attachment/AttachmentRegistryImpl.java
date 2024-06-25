@@ -16,74 +16,85 @@
 
 package net.fabricmc.fabric.impl.attachment;
 
+import com.mojang.serialization.Codec;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.fabricmc.fabric.mixin.attachment.BaseMappedRegistryAccessor;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import com.mojang.serialization.Codec;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.minecraft.resources.ResourceLocation;
-
 public final class AttachmentRegistryImpl {
-	private static final Logger LOGGER = LoggerFactory.getLogger("fabric-data-attachment-api-v1");
-	private static final Map<ResourceLocation, AttachmentType<?>> attachmentRegistry = new HashMap<>();
+    private static final Map<net.neoforged.neoforge.attachment.AttachmentType<?>, AttachmentType<?>> FABRIC_ATTACHMENT_TYPES = new HashMap<>();
 
-	public static <A> void register(ResourceLocation id, AttachmentType<A> attachmentType) {
-		AttachmentType<?> existing = attachmentRegistry.put(id, attachmentType);
+    public static <A> net.neoforged.neoforge.attachment.AttachmentType<A> register(ResourceLocation id, net.neoforged.neoforge.attachment.AttachmentType<A> attachmentType) {
+        ((BaseMappedRegistryAccessor) NeoForgeRegistries.ATTACHMENT_TYPES).invokeUnfreeze();
+        Registry.register(NeoForgeRegistries.ATTACHMENT_TYPES, id, attachmentType);
+        NeoForgeRegistries.ATTACHMENT_TYPES.freeze();
+        return attachmentType;
+    }
 
-		if (existing != null) {
-			LOGGER.warn("Encountered duplicate type registration for id " + id);
-		}
-	}
+    public static <A> AttachmentRegistry.Builder<A> builder() {
+        return new BuilderImpl<>();
+    }
 
-	@Nullable
-	public static AttachmentType<?> get(ResourceLocation id) {
-		return attachmentRegistry.get(id);
-	}
+    @SuppressWarnings("unchecked")
+    public static <A> AttachmentType<A> getFabricAttachmentType(net.neoforged.neoforge.attachment.AttachmentType<A> neoType) {
+        return (AttachmentType<A>) FABRIC_ATTACHMENT_TYPES.get(neoType);
+    }
 
-	public static <A> AttachmentRegistry.Builder<A> builder() {
-		return new BuilderImpl<>();
-	}
+    public static class BuilderImpl<A> implements AttachmentRegistry.Builder<A> {
+        @Nullable
+        private Supplier<A> defaultInitializer = null;
+        @Nullable
+        private Codec<A> persistenceCodec = null;
+        private boolean copyOnDeath = false;
 
-	public static class BuilderImpl<A> implements AttachmentRegistry.Builder<A> {
-		@Nullable
-		private Supplier<A> defaultInitializer = null;
-		@Nullable
-		private Codec<A> persistenceCodec = null;
-		private boolean copyOnDeath = false;
+        @Override
+        public AttachmentRegistry.Builder<A> persistent(Codec<A> codec) {
+            Objects.requireNonNull(codec, "codec cannot be null");
 
-		@Override
-		public AttachmentRegistry.Builder<A> persistent(Codec<A> codec) {
-			Objects.requireNonNull(codec, "codec cannot be null");
+            this.persistenceCodec = codec;
+            return this;
+        }
 
-			this.persistenceCodec = codec;
-			return this;
-		}
+        @Override
+        public AttachmentRegistry.Builder<A> copyOnDeath() {
+            this.copyOnDeath = true;
+            return this;
+        }
 
-		@Override
-		public AttachmentRegistry.Builder<A> copyOnDeath() {
-			this.copyOnDeath = true;
-			return this;
-		}
+        @Override
+        public AttachmentRegistry.Builder<A> initializer(Supplier<A> initializer) {
+            Objects.requireNonNull(initializer, "initializer cannot be null");
 
-		@Override
-		public AttachmentRegistry.Builder<A> initializer(Supplier<A> initializer) {
-			Objects.requireNonNull(initializer, "initializer cannot be null");
+            this.defaultInitializer = initializer;
+            return this;
+        }
 
-			this.defaultInitializer = initializer;
-			return this;
-		}
+        @Override
+        public AttachmentType<A> buildAndRegister(ResourceLocation id) {
+            net.neoforged.neoforge.attachment.AttachmentType<A> neoType = register(id, toNeoForgeAttachmentType()); 
+            AttachmentType<A> attachmentType = new AttachmentTypeImpl<>(neoType, id, defaultInitializer, persistenceCodec, copyOnDeath);
+            FABRIC_ATTACHMENT_TYPES.put(neoType, attachmentType);
+            return attachmentType;
+        }
 
-		@Override
-		public AttachmentType<A> buildAndRegister(ResourceLocation id) {
-			var attachment = new AttachmentTypeImpl<>(id, defaultInitializer, persistenceCodec, copyOnDeath);
-			register(id, attachment);
-			return attachment;
-		}
-	}
+        private net.neoforged.neoforge.attachment.AttachmentType<A> toNeoForgeAttachmentType() {
+            net.neoforged.neoforge.attachment.AttachmentType.Builder<A> builder = net.neoforged.neoforge.attachment.AttachmentType.builder(this.defaultInitializer != null ? this.defaultInitializer : () -> null);
+            if (this.persistenceCodec != null) {
+                builder.serialize(this.persistenceCodec);
+                if (this.copyOnDeath) {
+                    builder.copyOnDeath();
+                }
+            }
+            return builder.build();
+        }
+    }
 }

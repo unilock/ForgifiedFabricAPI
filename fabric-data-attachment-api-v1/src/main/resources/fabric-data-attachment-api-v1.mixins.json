@@ -3,14 +3,11 @@
   "package": "net.fabricmc.fabric.mixin.attachment",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "AttachmentTargetsMixin",
-    "BannerBlockEntityMixin",
-    "BlockEntityMixin",
-    "ChunkSerializerMixin",
-    "EntityMixin",
-    "ServerWorldMixin",
-    "WorldChunkMixin",
-    "WrapperProtoChunkMixin"
+    "AttachmentHolderAccessor",
+    "AttachmentTypeAccessor",
+    "BaseMappedRegistryAccessor",
+    "IAttachmentHolderMixin",
+    "WorldChunkMixin"
   ],
   "injectors": {
     "defaultRequire": 1

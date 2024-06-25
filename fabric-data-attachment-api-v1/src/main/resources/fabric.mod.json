@@ -22,11 +22,7 @@
   },
   "description": "Allows conveniently attaching data to existing game objects",
   "mixins": [
-    "fabric-data-attachment-api-v1.mixins.json",
-    {
-      "config": "fabric-data-attachment-api-v1.client.mixins.json",
-      "environment": "client"
-    }
+    "fabric-data-attachment-api-v1.mixins.json"
   ],
   "entrypoints": {
     "main": [

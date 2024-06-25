@@ -16,23 +16,23 @@
 
 package net.fabricmc.fabric.mixin.attachment;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.fabricmc.fabric.impl.attachment.AttachmentEntrypoint;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.neoforged.neoforge.attachment.AttachmentHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
-import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.ProtoChunk;
 
 @Mixin(LevelChunk.class)
 public class WorldChunkMixin {
-	@Inject(
+	@WrapOperation(
 			method = "<init>(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ProtoChunk;Lnet/minecraft/world/level/chunk/LevelChunk$PostLoadProcessor;)V",
-			at = @At("TAIL")
+			at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/attachment/AttachmentInternals;copyChunkAttachmentsOnPromotion(Lnet/minecraft/core/HolderLookup$Provider;Lnet/neoforged/neoforge/attachment/AttachmentHolder$AsField;Lnet/neoforged/neoforge/attachment/AttachmentHolder$AsField;)V")
 	)
-	public void transferProtoChunkAttachement(ServerLevel world, ProtoChunk protoChunk, LevelChunk.PostLoadProcessor entityLoader, CallbackInfo ci) {
-		AttachmentTargetImpl.transfer(protoChunk, (AttachmentTarget) this, false);
+	private void transferProtoChunkAttachement(HolderLookup.Provider provider, AttachmentHolder.AsField from, AttachmentHolder.AsField to, Operation<Void> operation) {
+		operation.call(provider, from, to);
+		AttachmentEntrypoint.transfer(from, to, true, false);
 	}
 }
