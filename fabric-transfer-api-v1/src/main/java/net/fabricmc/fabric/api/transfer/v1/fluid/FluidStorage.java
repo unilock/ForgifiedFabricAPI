@@ -29,7 +29,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.fabricmc.fabric.impl.transfer.fluid.CombinedProvidersImpl;
 import net.fabricmc.fabric.impl.transfer.fluid.EmptyBucketStorage;
 import net.fabricmc.fabric.impl.transfer.fluid.WaterPotionStorage;
-import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +40,8 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+
+import org.sinytra.fabric.transfer_api.TransferApiNeoCompat;
 
 /**
  * Access to {@link Storage Storage&lt;FluidVariant&gt;} instances.
@@ -146,7 +147,7 @@ public final class FluidStorage {
 		// Register full bucket storage
 		GENERAL_COMBINED_PROVIDER.register(context -> {
 			if (context.getItemVariant().getItem() instanceof BucketItem bucketItem) {
-				Fluid bucketFluid = ((BucketItemAccessor) bucketItem).fabric_getFluid();
+				Fluid bucketFluid = bucketItem.content;
 
 				// Make sure the mapping is bidirectional.
 				if (bucketFluid != null && bucketFluid.getBucket() == bucketItem) {
@@ -166,5 +167,7 @@ public final class FluidStorage {
 		});
 		// Register water potion storage
 		combinedItemApiProvider(Items.POTION).register(WaterPotionStorage::find);
+
+		TransferApiNeoCompat.registerTransferApiFluidNeoBridge();
 	}
 }

@@ -4,13 +4,13 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "AbstractFurnaceBlockEntityMixin",
-    "BucketItemAccessor",
+
     "BucketItemMixin",
-    "ChiseledBookshelfBlockEntityMixin",
+
     "DoubleInventoryAccessor",
-    "DropperBlockMixin",
+
     "FluidMixin",
-    "HopperBlockEntityMixin",
+
     "ItemMixin",
     "JukeboxBlockEntityMixin",
     "LockableContainerBlockEntityMixin",

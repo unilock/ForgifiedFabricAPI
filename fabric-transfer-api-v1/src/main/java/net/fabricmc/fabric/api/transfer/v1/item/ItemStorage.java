@@ -37,6 +37,7 @@ import net.minecraft.world.WorldlyContainerHolder;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import org.sinytra.fabric.transfer_api.TransferApiNeoCompat;
 
 /**
  * Access to {@link Storage Storage&lt;ItemVariant&gt;} instances.
@@ -83,7 +84,7 @@ public final class ItemStorage {
 
 	static {
 		// Composter support.
-		ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> ComposterWrapper.get(world, pos, direction), Blocks.COMPOSTER);
+		ItemStorage.SIDED.registerForBlocks(TransferApiNeoCompat.wrapProviderSafely((world, pos, state, blockEntity, direction) -> ComposterWrapper.get(world, pos, direction)), Blocks.COMPOSTER);
 
 		// Support for SidedStorageBlockEntity.
 		ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
@@ -95,7 +96,7 @@ public final class ItemStorage {
 		});
 
 		// Register Inventory fallback.
-		ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
+		ItemStorage.SIDED.registerFallback(TransferApiNeoCompat.wrapProviderSafely((world, pos, state, blockEntity, direction) -> {
 			Container inventoryToWrap = null;
 
 			if (state.getBlock() instanceof WorldlyContainerHolder provider) {
@@ -125,6 +126,8 @@ public final class ItemStorage {
 			}
 
 			return inventoryToWrap != null ? InventoryStorage.of(inventoryToWrap, direction) : null;
-		});
+		}));
+
+		TransferApiNeoCompat.registerTransferApiItemNeoBridge();
 	}
 }
