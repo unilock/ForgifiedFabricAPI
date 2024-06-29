@@ -19,6 +19,8 @@ package net.fabricmc.fabric.api.renderer.v1.render;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import net.minecraft.client.renderer.RenderType;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
@@ -176,5 +178,13 @@ public interface RenderContext {
 		 * Otherwise, use {@linkplain #accept(BakedModel)} the other overload} to render the usual item quads.
 		 */
 		void accept(BakedModel model, @Nullable BlockState state);
+	}
+
+	default ModelData getModelData() {
+		return ModelData.EMPTY;
+	}
+
+	default RenderType getRenderType() {
+		return null;
 	}
 }

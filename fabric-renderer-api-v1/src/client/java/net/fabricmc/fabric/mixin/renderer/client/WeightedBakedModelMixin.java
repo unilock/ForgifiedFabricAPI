@@ -51,8 +51,8 @@ public class WeightedBakedModelMixin implements FabricBakedModel {
 
 	@Inject(at = @At("RETURN"), method = "<init>")
 	private void onInit(List<WeightedEntry.Wrapper<BakedModel>> models, CallbackInfo cb) {
-		for (int i = 0; i < models.size(); i++) {
-			if (!models.get(i).data().isVanillaAdapter()) {
+		for (WeightedEntry.Wrapper<BakedModel> model : models) {
+			if (!model.data().isVanillaAdapter()) {
 				isVanilla = false;
 				break;
 			}

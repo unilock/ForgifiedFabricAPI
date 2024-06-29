@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.api.client.model.loading.v1;
 
+import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingConstants;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -41,6 +42,6 @@ public interface FabricBakedModelManager {
 	 * @return the model
 	 */
 	default BakedModel getModel(ResourceLocation id) {
-		throw new UnsupportedOperationException("Implemented via mixin.");
+		return ((ModelManager) this).getModel(ModelLoadingConstants.toResourceModelId(id));
 	}
 }

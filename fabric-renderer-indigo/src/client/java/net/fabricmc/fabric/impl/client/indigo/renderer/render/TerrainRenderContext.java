@@ -34,6 +34,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
 /**
  * Implementation of {@link RenderContext} used during terrain rendering.
@@ -81,7 +82,7 @@ public class TerrainRenderContext extends AbstractBlockRenderContext {
 	}
 
 	/** Called from chunk renderer hook. */
-	public void tessellateBlock(BlockState blockState, BlockPos blockPos, final BakedModel model, PoseStack matrixStack) {
+	public void tessellateBlock(BlockState blockState, BlockPos blockPos, final BakedModel model, PoseStack matrixStack, ModelData modelData, RenderType renderType) {
 		try {
 			Vec3 offset = blockState.getOffset(chunkInfo.blockView, blockPos);
 			matrixStack.translate(offset.x, offset.y, offset.z);
@@ -92,7 +93,7 @@ public class TerrainRenderContext extends AbstractBlockRenderContext {
 			blockInfo.recomputeSeed = true;
 
 			aoCalc.clear();
-			blockInfo.prepareForBlock(blockState, blockPos, model.useAmbientOcclusion());
+			blockInfo.prepareForBlock(blockState, blockPos, model.useAmbientOcclusion(), modelData, renderType);
 			model.emitBlockQuads(blockInfo.blockView, blockInfo.blockState, blockInfo.blockPos, blockInfo.randomSupplier, this);
 		} catch (Throwable throwable) {
 			CrashReport crashReport = CrashReport.forThrowable(throwable, "Tessellating block in world - Indigo Renderer");

@@ -17,8 +17,12 @@
 package net.fabricmc.fabric.impl.client.indigo.renderer.render;
 
 import java.util.function.Consumer;
+
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -108,24 +112,42 @@ abstract class AbstractRenderContext implements RenderContext {
 			normalVec.set(quad.faceNormal());
 			normalVec.mul(normalMatrix);
 		}
+		// Use fast track for the default vanilla implementation
+		if (vertexConsumer instanceof BufferBuilder) {
+			for (int i = 0; i < 4; i++) {
+				posVec.set(quad.x(i), quad.y(i), quad.z(i), 1.0f);
+				posVec.mul(matrix);
+				vertexConsumer.addVertex(posVec.x(), posVec.y(), posVec.z());
 
-		for (int i = 0; i < 4; i++) {
-			posVec.set(quad.x(i), quad.y(i), quad.z(i), 1.0f);
-			posVec.mul(matrix);
-			vertexConsumer.addVertex(posVec.x(), posVec.y(), posVec.z());
+				final int color = quad.color(i);
+				vertexConsumer.setColor((color >>> 16) & 0xFF, (color >>> 8) & 0xFF, color & 0xFF, (color >>> 24) & 0xFF);
+				vertexConsumer.setUv(quad.u(i), quad.v(i));
+				vertexConsumer.setOverlay(overlay);
+				vertexConsumer.setLight(quad.lightmap(i));
 
-			final int color = quad.color(i);
-			vertexConsumer.setColor((color >>> 16) & 0xFF, (color >>> 8) & 0xFF, color & 0xFF, (color >>> 24) & 0xFF);
-			vertexConsumer.setUv(quad.u(i), quad.v(i));
-			vertexConsumer.setOverlay(overlay);
-			vertexConsumer.setLight(quad.lightmap(i));
+				if (useNormals) {
+					quad.copyNormal(i, normalVec);
+					normalVec.mul(normalMatrix);
+				}
 
-			if (useNormals) {
-				quad.copyNormal(i, normalVec);
-				normalVec.mul(normalMatrix);
+				vertexConsumer.setNormal(normalVec.x(), normalVec.y(), normalVec.z());
 			}
-
-			vertexConsumer.setNormal(normalVec.x(), normalVec.y(), normalVec.z());
+		}
+		// Other implementations (namely Flywheel's ShadeSeparatingVertexConsumer) only support calling putBulkData
+		// However, this results in a few additional operations made, so we only use it when necessary
+		else {
+			PoseStack.Pose pose = new PoseStack().last();
+			pose.pose().set(matrix);
+			pose.normal().set(normalMatrix);
+			BakedQuad bakedQuad = quad.toBakedQuad(null);
+			vertexConsumer.putBulkData(
+				pose,
+				bakedQuad,
+				1.0F, 1.0F, 1.0F, 1.0F,
+				0,
+				overlay,
+				true
+			);
 		}
 	}
 }

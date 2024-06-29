@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.mixin.client.indigo.renderer;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +25,8 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexSorting;
+import net.neoforged.neoforge.client.event.AddSectionGeometryEvent;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -65,11 +68,11 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 @Mixin(SectionCompiler.class)
 public abstract class SectionBuilderMixin {
-	@Inject(method = "compile",
+	@Inject(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderChunkRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;betweenClosed(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;)Ljava/lang/Iterable;"),
 			locals = LocalCapture.CAPTURE_FAILHARD)
 	private void hookChunkBuild(SectionPos sectionPos, RenderChunkRegion region, VertexSorting sorter,
-								SectionBufferBuilderPack builder,
+								SectionBufferBuilderPack builder, List<AddSectionGeometryEvent.AdditionalSectionRenderer> additionalRenderers,
 								CallbackInfoReturnable<SectionCompiler.Results> ci,
 								@Local(ordinal = 0) Map<RenderType, BufferBuilder> builderMap) {
 		// hook just before iterating over the render chunk's chunks blocks, captures the buffer builder map
@@ -95,25 +98,25 @@ public abstract class SectionBuilderMixin {
 	 * Normally this does nothing but will allow mods to create rendering hooks that are
 	 * driven off of render type. (Not recommended or encouraged, but also not prevented.)
 	 */
-	@Redirect(method = "compile", require = 1, at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/block/BlockRenderDispatcher;renderBatched(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZLnet/minecraft/util/RandomSource;)V"))
-	private void hookChunkBuildTessellate(BlockRenderDispatcher renderManager, BlockState blockState, BlockPos blockPos, BlockAndTintGetter blockView, PoseStack matrix, VertexConsumer bufferBuilder, boolean checkSides, RandomSource random) {
+	@Redirect(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderChunkRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", require = 1, at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/block/BlockRenderDispatcher;renderBatched(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZLnet/minecraft/util/RandomSource;Lnet/neoforged/neoforge/client/model/data/ModelData;Lnet/minecraft/client/renderer/RenderType;)V"))
+	private void hookChunkBuildTessellate(BlockRenderDispatcher renderManager, BlockState blockState, BlockPos blockPos, BlockAndTintGetter blockView, PoseStack matrix, VertexConsumer bufferBuilder, boolean checkSides, RandomSource random, ModelData modelData, RenderType renderType) {
 		if (blockState.getRenderShape() == RenderShape.MODEL) {
 			final BakedModel model = renderManager.getBlockModel(blockState);
 
 			if (Indigo.ALWAYS_TESSELATE_INDIGO || !model.isVanillaAdapter()) {
-				((AccessChunkRendererRegion) blockView).fabric_getRenderer().tessellateBlock(blockState, blockPos, model, matrix);
+				((AccessChunkRendererRegion) blockView).fabric_getRenderer().tessellateBlock(blockState, blockPos, model, matrix, modelData, renderType);
 				return;
 			}
 		}
 
-		renderManager.renderBatched(blockState, blockPos, blockView, matrix, bufferBuilder, checkSides, random);
+		renderManager.renderBatched(blockState, blockPos, blockView, matrix, bufferBuilder, checkSides, random, modelData, renderType);
 	}
 
 	/**
 	 * Release all references. Probably not necessary but would be $#%! to debug if it is.
 	 */
-	@Inject(method = "compile",
+	@Inject(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderChunkRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/ModelBlockRenderer;clearCache()V"))
 	private void hookRebuildChunkReturn(CallbackInfoReturnable<Set<BlockEntity>> ci) {
 		// hook after iterating over the render chunk's chunks blocks, must be called if and only if hookChunkBuild happened

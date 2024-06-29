@@ -18,10 +18,10 @@ package net.fabricmc.fabric.impl.client.indigo.renderer.render;
 
 import java.util.function.Supplier;
 
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -49,6 +49,7 @@ public class BlockRenderInfo {
 	boolean useAo;
 	boolean defaultAo;
 	RenderType defaultLayer;
+	ModelData blockModelData;
 
 	RandomSource random;
 	long seed;
@@ -76,14 +77,15 @@ public class BlockRenderInfo {
 		this.enableCulling = enableCulling;
 	}
 
-	public void prepareForBlock(BlockState blockState, BlockPos blockPos, boolean modelAo) {
+	public void prepareForBlock(BlockState blockState, BlockPos blockPos, boolean modelAo, ModelData modelData, RenderType renderType) {
 		this.blockPos = blockPos;
 		this.blockState = blockState;
 
 		useAo = Minecraft.useAmbientOcclusion();
-		defaultAo = useAo && modelAo && blockState.getLightEmission() == 0;
+		defaultAo = useAo && modelAo && blockState.getLightEmission(this.blockView, blockPos) == 0;
 
-		defaultLayer = ItemBlockRenderTypes.getChunkRenderType(blockState);
+		blockModelData = modelData;
+		defaultLayer = renderType;
 
 		cullCompletionFlags = 0;
 		cullResultFlags = 0;

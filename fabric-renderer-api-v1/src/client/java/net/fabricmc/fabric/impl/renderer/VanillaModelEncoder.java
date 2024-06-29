@@ -54,7 +54,7 @@ public class VanillaModelEncoder {
 				continue;
 			}
 
-			final List<BakedQuad> quads = model.getQuads(state, cullFace, randomSupplier.get());
+			final List<BakedQuad> quads = model.getQuads(state, cullFace, randomSupplier.get(), context.getModelData(), context.getRenderType());
 			final int count = quads.size();
 
 			for (int j = 0; j < count; j++) {
@@ -70,7 +70,7 @@ public class VanillaModelEncoder {
 
 		for (int i = 0; i <= ModelHelper.NULL_FACE_ID; i++) {
 			final Direction cullFace = ModelHelper.faceFromIndex(i);
-			final List<BakedQuad> quads = model.getQuads(state, cullFace, randomSupplier.get());
+			final List<BakedQuad> quads = model.getQuads(state, cullFace, randomSupplier.get(), context.getModelData(), context.getRenderType());
 			final int count = quads.size();
 
 			for (int j = 0; j < count; j++) {

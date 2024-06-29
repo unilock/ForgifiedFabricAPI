@@ -24,19 +24,15 @@ import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import net.fabricmc.fabric.api.client.model.loading.v1.FabricBakedModelManager;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingConstants;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingPluginManager;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockStateModelLoader;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -45,13 +41,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 
 @Mixin(ModelManager.class)
 abstract class BakedModelManagerMixin implements FabricBakedModelManager {
-	@Shadow
-	private Map<ModelResourceLocation, BakedModel> bakedRegistry;
-
-	@Override
-	public BakedModel getModel(ResourceLocation id) {
-		return bakedRegistry.get(ModelLoadingConstants.toResourceModelId(id));
-	}
 
 	@Redirect(
 			method = "reload",

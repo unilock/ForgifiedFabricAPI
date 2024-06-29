@@ -20,6 +20,7 @@ import static net.fabricmc.fabric.impl.client.indigo.renderer.helper.GeometryHel
 import static net.fabricmc.fabric.impl.client.indigo.renderer.helper.GeometryHelper.LIGHT_FACE_FLAG;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
@@ -106,6 +107,16 @@ public abstract class AbstractBlockRenderContext extends AbstractRenderContext {
 		return vanillaModelConsumer;
 	}
 
+	@Override
+	public ModelData getModelData() {
+		return blockInfo.blockModelData;
+	}
+
+	@Override
+	public RenderType getRenderType() {
+		return blockInfo.defaultLayer;
+	}
+	
 	private void renderQuad(MutableQuadViewImpl quad, boolean isVanilla) {
 		if (!transform(quad)) {
 			return;

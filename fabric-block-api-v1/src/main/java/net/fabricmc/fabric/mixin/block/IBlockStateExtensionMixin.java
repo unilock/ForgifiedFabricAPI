@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.client.model.loading;
+package net.fabricmc.fabric.mixin.block;
 
-import net.fabricmc.fabric.api.client.model.loading.v1.BlockStateResolver;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
+import net.fabricmc.fabric.api.block.v1.FabricBlockState;
+import net.neoforged.neoforge.common.extensions.IBlockStateExtension;
+import org.spongepowered.asm.mixin.Mixin;
 
-record BlockStateResolverHolder(BlockStateResolver resolver, Block block, ResourceLocation blockId) {
+@Mixin(IBlockStateExtension.class)
+public interface IBlockStateExtensionMixin extends FabricBlockState {
+    
 }

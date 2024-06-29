@@ -58,7 +58,7 @@ import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingConstants;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingEventDispatcher;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingPluginManager;
 
-@Mixin(ModelBakery.class)
+@Mixin(value = ModelBakery.class, priority = 2000)
 abstract class ModelLoaderMixin implements ModelLoaderHooks {
 	@Final
 	@Shadow

@@ -30,6 +30,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
 /**
  * Context for non-terrain block rendering.
@@ -57,7 +58,7 @@ public class BlockRenderContext extends AbstractBlockRenderContext {
 		return vertexConsumer;
 	}
 
-	public void render(BlockAndTintGetter blockView, BakedModel model, BlockState state, BlockPos pos, PoseStack matrixStack, VertexConsumer buffer, boolean cull, RandomSource random, long seed, int overlay) {
+	public void render(BlockAndTintGetter blockView, BakedModel model, BlockState state, BlockPos pos, PoseStack matrixStack, VertexConsumer buffer, boolean cull, RandomSource random, long seed, int overlay, ModelData modelData, RenderType renderType) {
 		try {
 			Vec3 offset = state.getOffset(blockView, pos);
 			matrixStack.translate(offset.x, offset.y, offset.z);
@@ -73,7 +74,7 @@ public class BlockRenderContext extends AbstractBlockRenderContext {
 
 			aoCalc.clear();
 			blockInfo.prepareForWorld(blockView, cull);
-			blockInfo.prepareForBlock(state, pos, model.useAmbientOcclusion());
+			blockInfo.prepareForBlock(state, pos, model.useAmbientOcclusion(), modelData, renderType);
 
 			model.emitBlockQuads(blockView, state, pos, blockInfo.randomSupplier, this);
 		} catch (Throwable throwable) {

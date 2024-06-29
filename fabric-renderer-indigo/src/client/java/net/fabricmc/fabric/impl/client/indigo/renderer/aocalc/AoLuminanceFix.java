@@ -36,6 +36,6 @@ public interface AoLuminanceFix {
 	}
 
 	static float fixed(BlockGetter view, BlockPos pos, BlockState state) {
-		return state.getLightEmission() == 0 ? state.getShadeBrightness(view, pos) : 1f;
+		return state.getLightEmission(view, pos) == 0 ? state.getShadeBrightness(view, pos) : 1f;
 	}
 }
