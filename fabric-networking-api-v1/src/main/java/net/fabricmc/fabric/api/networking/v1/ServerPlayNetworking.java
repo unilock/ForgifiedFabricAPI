@@ -28,6 +28,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import org.sinytra.fabric.networking_api.server.NeoServerPlayNetworking;
 
 /**
  * Offers access to play stage server-side networking functionalities.
@@ -72,7 +73,7 @@ public final class ServerPlayNetworking {
 	 * @see ServerPlayNetworking#unregisterGlobalReceiver(ResourceLocation)
 	 */
 	public static <T extends CustomPacketPayload> boolean registerGlobalReceiver(CustomPacketPayload.Type<T> type, PlayPayloadHandler<T> handler) {
-		return ServerNetworkingImpl.PLAY.registerGlobalReceiver(type.id(), handler);
+		return NeoServerPlayNetworking.registerGlobalReceiver(type, handler);
 	}
 
 	/**
@@ -89,7 +90,7 @@ public final class ServerPlayNetworking {
 	 */
 	@Nullable
 	public static ServerPlayNetworking.PlayPayloadHandler<?> unregisterGlobalReceiver(ResourceLocation id) {
-		return ServerNetworkingImpl.PLAY.unregisterGlobalReceiver(id);
+		return NeoServerPlayNetworking.unregisterGlobalReceiver(id);
 	}
 
 	/**
@@ -99,7 +100,7 @@ public final class ServerPlayNetworking {
 	 * @return all channel names which global receivers are registered for.
 	 */
 	public static Set<ResourceLocation> getGlobalReceivers() {
-		return ServerNetworkingImpl.PLAY.getChannels();
+		return NeoServerPlayNetworking.getGlobalReceivers();
 	}
 
 	/**
@@ -121,7 +122,7 @@ public final class ServerPlayNetworking {
 	 * @see ServerPlayConnectionEvents#INIT
 	 */
 	public static <T extends CustomPacketPayload> boolean registerReceiver(ServerGamePacketListenerImpl networkHandler, CustomPacketPayload.Type<T> type, PlayPayloadHandler<T> handler) {
-		return ServerNetworkingImpl.getAddon(networkHandler).registerChannel(type.id(), handler);
+		return NeoServerPlayNetworking.registerReceiver(networkHandler, type, handler);
 	}
 
 	/**
@@ -135,7 +136,7 @@ public final class ServerPlayNetworking {
 	 */
 	@Nullable
 	public static ServerPlayNetworking.PlayPayloadHandler<?> unregisterReceiver(ServerGamePacketListenerImpl networkHandler, ResourceLocation id) {
-		return ServerNetworkingImpl.getAddon(networkHandler).unregisterChannel(id);
+		return NeoServerPlayNetworking.unregisterReceiver(networkHandler, id);
 	}
 
 	/**
@@ -159,7 +160,7 @@ public final class ServerPlayNetworking {
 	public static Set<ResourceLocation> getReceived(ServerGamePacketListenerImpl handler) {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getReceivableChannels();
+		return NeoServerPlayNetworking.getReceived(handler);
 	}
 
 	/**
@@ -183,7 +184,7 @@ public final class ServerPlayNetworking {
 	public static Set<ResourceLocation> getSendable(ServerGamePacketListenerImpl handler) {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels();
+		return NeoServerPlayNetworking.getSendable(handler);
 	}
 
 	/**
@@ -223,7 +224,7 @@ public final class ServerPlayNetworking {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 		Objects.requireNonNull(channelName, "Channel name cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels().contains(channelName);
+		return NeoServerPlayNetworking.canSend(handler, channelName);
 	}
 
 	/**
@@ -237,7 +238,7 @@ public final class ServerPlayNetworking {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 		Objects.requireNonNull(type, "Packet type cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels().contains(type.id());
+		return NeoServerPlayNetworking.canSend(handler, type.id());
 	}
 
 	/**
@@ -271,7 +272,7 @@ public final class ServerPlayNetworking {
 	public static PacketSender getSender(ServerGamePacketListenerImpl handler) {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler);
+		return NeoServerPlayNetworking.getSender(handler);
 	}
 
 	/**

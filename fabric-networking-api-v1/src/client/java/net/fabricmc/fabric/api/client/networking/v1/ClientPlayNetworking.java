@@ -25,13 +25,13 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.impl.networking.client.ClientNetworkingImpl;
-import net.fabricmc.fabric.impl.networking.client.ClientPlayNetworkAddon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import org.sinytra.fabric.networking_api.client.NeoClientPlayNetworking;
 
 /**
  * Offers access to play stage client-side networking functionalities.
@@ -67,7 +67,7 @@ public final class ClientPlayNetworking {
 	 * @see ClientPlayNetworking#registerReceiver(CustomPacketPayload.Type, PlayPayloadHandler)
 	 */
 	public static <T extends CustomPacketPayload> boolean registerGlobalReceiver(CustomPacketPayload.Type<T> type, PlayPayloadHandler<T> handler) {
-		return ClientNetworkingImpl.PLAY.registerGlobalReceiver(type.id(), handler);
+		return NeoClientPlayNetworking.registerGlobalReceiver(type, handler);
 	}
 
 	/**
@@ -84,7 +84,7 @@ public final class ClientPlayNetworking {
 	 */
 	@Nullable
 	public static ClientPlayNetworking.PlayPayloadHandler<?> unregisterGlobalReceiver(ResourceLocation id) {
-		return ClientNetworkingImpl.PLAY.unregisterGlobalReceiver(id);
+		return NeoClientPlayNetworking.unregisterGlobalReceiver(id);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public final class ClientPlayNetworking {
 	 * @return all channel names which global receivers are registered for.
 	 */
 	public static Set<ResourceLocation> getGlobalReceivers() {
-		return ClientNetworkingImpl.PLAY.getChannels();
+		return NeoClientPlayNetworking.getGlobalReceivers();
 	}
 
 	/**
@@ -114,13 +114,7 @@ public final class ClientPlayNetworking {
 	 * @see ClientPlayConnectionEvents#INIT
 	 */
 	public static <T extends CustomPacketPayload> boolean registerReceiver(CustomPacketPayload.Type<T> type, PlayPayloadHandler<T> handler) {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
-
-		if (addon != null) {
-			return addon.registerChannel(type.id(), handler);
-		}
-
-		throw new IllegalStateException("Cannot register receiver while not in game!");
+		return NeoClientPlayNetworking.registerReceiver(type, handler);
 	}
 
 	/**
@@ -135,13 +129,7 @@ public final class ClientPlayNetworking {
 	 */
 	@Nullable
 	public static ClientPlayNetworking.PlayPayloadHandler<?> unregisterReceiver(ResourceLocation id) {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
-
-		if (addon != null) {
-			return addon.unregisterChannel(id);
-		}
-
-		throw new IllegalStateException("Cannot unregister receiver while not in game!");
+		return NeoClientPlayNetworking.unregisterReceiver(id);
 	}
 
 	/**
@@ -151,13 +139,7 @@ public final class ClientPlayNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static Set<ResourceLocation> getReceived() throws IllegalStateException {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
-
-		if (addon != null) {
-			return addon.getReceivableChannels();
-		}
-
-		throw new IllegalStateException("Cannot get a list of channels the client can receive packets on while not in game!");
+		return NeoClientPlayNetworking.getReceived();
 	}
 
 	/**
@@ -167,13 +149,7 @@ public final class ClientPlayNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static Set<ResourceLocation> getSendable() throws IllegalStateException {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
-
-		if (addon != null) {
-			return addon.getSendableChannels();
-		}
-
-		throw new IllegalStateException("Cannot get a list of channels the server can receive packets on while not in game!");
+		return NeoClientPlayNetworking.getSendable();
 	}
 
 	/**
@@ -186,7 +162,7 @@ public final class ClientPlayNetworking {
 	public static boolean canSend(ResourceLocation channelName) throws IllegalArgumentException {
 		// You cant send without a client player, so this is fine
 		if (Minecraft.getInstance().getConnection() != null) {
-			return ClientNetworkingImpl.getAddon(Minecraft.getInstance().getConnection()).getSendableChannels().contains(channelName);
+			return NeoClientPlayNetworking.canSend(channelName);
 		}
 
 		return false;
@@ -220,12 +196,7 @@ public final class ClientPlayNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static PacketSender getSender() throws IllegalStateException {
-		// You cant send without a client player, so this is fine
-		if (Minecraft.getInstance().getConnection() != null) {
-			return ClientNetworkingImpl.getAddon(Minecraft.getInstance().getConnection());
-		}
-
-		throw new IllegalStateException("Cannot get payload sender when not in game!");
+		return NeoClientPlayNetworking.getSender();
 	}
 
 	/**

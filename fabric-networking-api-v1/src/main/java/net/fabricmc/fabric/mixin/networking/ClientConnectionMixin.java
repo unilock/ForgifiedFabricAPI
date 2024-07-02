@@ -16,42 +16,25 @@
 
 package net.fabricmc.fabric.mixin.networking;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import io.netty.channel.ChannelHandlerContext;
+import org.sinytra.fabric.networking_api.NeoListenableNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.fabricmc.fabric.impl.networking.ChannelInfoHolder;
 import net.fabricmc.fabric.impl.networking.NetworkHandlerExtensions;
 import net.fabricmc.fabric.impl.networking.PacketCallbackListener;
 import net.minecraft.network.Connection;
-import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.ProtocolInfo;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.resources.ResourceLocation;
 
 @Mixin(Connection.class)
-abstract class ClientConnectionMixin implements ChannelInfoHolder {
+abstract class ClientConnectionMixin {
 	@Shadow
 	private PacketListener packetListener;
-
-	@Unique
-	private Map<ConnectionProtocol, Collection<ResourceLocation>> playChannels;
-
-	@Inject(method = "<init>", at = @At("RETURN"))
-	private void initAddedFields(PacketFlow side, CallbackInfo ci) {
-		this.playChannels = new ConcurrentHashMap<>();
-	}
 
 	@Inject(method = "sendPacket", at = @At(value = "FIELD", target = "Lnet/minecraft/network/Connection;sentPackets:I"))
 	private void checkPacket(Packet<?> packet, PacketSendListener callback, boolean flush, CallbackInfo ci) {
@@ -72,6 +55,9 @@ abstract class ClientConnectionMixin implements ChannelInfoHolder {
 		if (packetListener instanceof NetworkHandlerExtensions extension) {
 			extension.getAddon().handleDisconnect();
 		}
+		if (packetListener instanceof NeoListenableNetworkHandler handler) {
+			handler.handleDisconnect();
+		}
 	}
 
 	@Inject(method = "handleDisconnection", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/PacketListener;onDisconnect(Lnet/minecraft/network/DisconnectionDetails;)V"))
@@ -79,10 +65,8 @@ abstract class ClientConnectionMixin implements ChannelInfoHolder {
 		if (packetListener instanceof NetworkHandlerExtensions extension) {
 			extension.getAddon().handleDisconnect();
 		}
-	}
-
-	@Override
-	public Collection<ResourceLocation> fabric_getPendingChannelsNames(ConnectionProtocol state) {
-		return this.playChannels.computeIfAbsent(state, (key) -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
+		if (packetListener instanceof NeoListenableNetworkHandler handler) {
+			handler.handleDisconnect();
+		}
 	}
 }

@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.api.client.networking.v1;
 
-import java.util.Objects;
 import java.util.Set;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -25,11 +24,10 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.impl.networking.client.ClientConfigurationNetworkAddon;
-import net.fabricmc.fabric.impl.networking.client.ClientNetworkingImpl;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.thread.BlockableEventLoop;
+import org.sinytra.fabric.networking_api.client.NeoClientConfigurationNetworking;
 
 /**
  * Offers access to configuration stage client-side networking functionalities.
@@ -65,7 +63,7 @@ public final class ClientConfigurationNetworking {
 	 * @see ClientConfigurationNetworking#registerReceiver(CustomPacketPayload.Type, ConfigurationPayloadHandler)
 	 */
 	public static <T extends CustomPacketPayload> boolean registerGlobalReceiver(CustomPacketPayload.Type<T> type, ConfigurationPayloadHandler<T> handler) {
-		return ClientNetworkingImpl.CONFIGURATION.registerGlobalReceiver(type.id(), handler);
+		return NeoClientConfigurationNetworking.registerGlobalReceiver(type, handler);
 	}
 
 	/**
@@ -82,7 +80,7 @@ public final class ClientConfigurationNetworking {
 	 */
 	@Nullable
 	public static ClientConfigurationNetworking.ConfigurationPayloadHandler<?> unregisterGlobalReceiver(CustomPacketPayload.Type<?> id) {
-		return ClientNetworkingImpl.CONFIGURATION.unregisterGlobalReceiver(id.id());
+		return NeoClientConfigurationNetworking.unregisterGlobalReceiver(id.id());
 	}
 
 	/**
@@ -92,7 +90,7 @@ public final class ClientConfigurationNetworking {
 	 * @return all channel names which global receivers are registered for.
 	 */
 	public static Set<ResourceLocation> getGlobalReceivers() {
-		return ClientNetworkingImpl.CONFIGURATION.getChannels();
+		return NeoClientConfigurationNetworking.getGlobalReceivers();
 	}
 
 	/**
@@ -112,13 +110,7 @@ public final class ClientConfigurationNetworking {
 	 * @see ClientPlayConnectionEvents#INIT
 	 */
 	public static <T extends CustomPacketPayload> boolean registerReceiver(CustomPacketPayload.Type<T> id, ConfigurationPayloadHandler<T> handler) {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
-
-		if (addon != null) {
-			return addon.registerChannel(id.id(), handler);
-		}
-
-		throw new IllegalStateException("Cannot register receiver while not configuring!");
+		return NeoClientConfigurationNetworking.registerReceiver(id, handler);
 	}
 
 	/**
@@ -133,13 +125,7 @@ public final class ClientConfigurationNetworking {
 	 */
 	@Nullable
 	public static ClientConfigurationNetworking.ConfigurationPayloadHandler<?> unregisterReceiver(ResourceLocation id) {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
-
-		if (addon != null) {
-			return addon.unregisterChannel(id);
-		}
-
-		throw new IllegalStateException("Cannot unregister receiver while not configuring!");
+		return NeoClientConfigurationNetworking.unregisterReceiver(id);
 	}
 
 	/**
@@ -149,13 +135,7 @@ public final class ClientConfigurationNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static Set<ResourceLocation> getReceived() throws IllegalStateException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
-
-		if (addon != null) {
-			return addon.getReceivableChannels();
-		}
-
-		throw new IllegalStateException("Cannot get a list of channels the client can receive packets on while not configuring!");
+		return NeoClientConfigurationNetworking.getReceived();
 	}
 
 	/**
@@ -165,13 +145,7 @@ public final class ClientConfigurationNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static Set<ResourceLocation> getSendable() throws IllegalStateException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
-
-		if (addon != null) {
-			return addon.getSendableChannels();
-		}
-
-		throw new IllegalStateException("Cannot get a list of channels the server can receive packets on while not configuring!");
+		return NeoClientConfigurationNetworking.getSendable();
 	}
 
 	/**
@@ -182,13 +156,7 @@ public final class ClientConfigurationNetworking {
 	 * False if the client is not in game.
 	 */
 	public static boolean canSend(ResourceLocation channelName) throws IllegalArgumentException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
-
-		if (addon != null) {
-			return addon.getSendableChannels().contains(channelName);
-		}
-
-		throw new IllegalStateException("Cannot get a list of channels the server can receive packets on while not configuring!");
+		return NeoClientConfigurationNetworking.canSend(channelName);
 	}
 
 	/**
@@ -209,13 +177,7 @@ public final class ClientConfigurationNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static PacketSender getSender() throws IllegalStateException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
-
-		if (addon != null) {
-			return addon;
-		}
-
-		throw new IllegalStateException("Cannot get PacketSender while not configuring!");
+		return NeoClientConfigurationNetworking.getSender();
 	}
 
 	/**
@@ -227,17 +189,7 @@ public final class ClientConfigurationNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static void send(CustomPacketPayload payload) {
-		Objects.requireNonNull(payload, "Payload cannot be null");
-		Objects.requireNonNull(payload.type(), "CustomPayload#getId() cannot return null for payload class: " + payload.getClass());
-
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
-
-		if (addon != null) {
-			addon.sendPacket(payload);
-			return;
-		}
-
-		throw new IllegalStateException("Cannot send packet while not configuring!");
+		NeoClientConfigurationNetworking.send(payload);
 	}
 
 	private ClientConfigurationNetworking() {

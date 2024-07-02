@@ -30,6 +30,7 @@ import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.fabricmc.fabric.impl.networking.server.ServerNetworkingImpl;
 import net.fabricmc.fabric.mixin.networking.accessor.ServerCommonNetworkHandlerAccessor;
+import org.sinytra.fabric.networking_api.server.NeoServerConfigurationNetworking;
 
 /**
  * Offers access to configuration stage server-side networking functionalities.
@@ -64,7 +65,7 @@ public final class ServerConfigurationNetworking {
 	 * @see ServerConfigurationNetworking#registerReceiver(ServerConfigurationPacketListenerImpl, CustomPacketPayload.Type, ConfigurationPacketHandler)
 	 */
 	public static <T extends CustomPacketPayload> boolean registerGlobalReceiver(CustomPacketPayload.Type<T> type, ConfigurationPacketHandler<T> handler) {
-		return ServerNetworkingImpl.CONFIGURATION.registerGlobalReceiver(type.id(), handler);
+		return NeoServerConfigurationNetworking.registerGlobalReceiver(type, handler);
 	}
 
 	/**
@@ -81,7 +82,7 @@ public final class ServerConfigurationNetworking {
 	 */
 	@Nullable
 	public static ServerConfigurationNetworking.ConfigurationPacketHandler<?> unregisterGlobalReceiver(ResourceLocation id) {
-		return ServerNetworkingImpl.CONFIGURATION.unregisterGlobalReceiver(id);
+		return NeoServerConfigurationNetworking.unregisterGlobalReceiver(id);
 	}
 
 	/**
@@ -91,7 +92,7 @@ public final class ServerConfigurationNetworking {
 	 * @return all channel names which global receivers are registered for.
 	 */
 	public static Set<ResourceLocation> getGlobalReceivers() {
-		return ServerNetworkingImpl.CONFIGURATION.getChannels();
+		return NeoServerConfigurationNetworking.getGlobalReceivers();
 	}
 
 	/**
@@ -110,7 +111,7 @@ public final class ServerConfigurationNetworking {
 	 * @see ServerPlayConnectionEvents#INIT
 	 */
 	public static <T extends CustomPacketPayload> boolean registerReceiver(ServerConfigurationPacketListenerImpl networkHandler, CustomPacketPayload.Type<T> type, ConfigurationPacketHandler<T> handler) {
-		return ServerNetworkingImpl.getAddon(networkHandler).registerChannel(type.id(), handler);
+		return NeoServerConfigurationNetworking.registerReceiver(networkHandler, type, handler);
 	}
 
 	/**
@@ -124,7 +125,7 @@ public final class ServerConfigurationNetworking {
 	 */
 	@Nullable
 	public static ServerConfigurationNetworking.ConfigurationPacketHandler<?> unregisterReceiver(ServerConfigurationPacketListenerImpl networkHandler, ResourceLocation id) {
-		return ServerNetworkingImpl.getAddon(networkHandler).unregisterChannel(id);
+		return NeoServerConfigurationNetworking.unregisterReceiver(networkHandler, id);
 	}
 
 	/**
@@ -136,7 +137,7 @@ public final class ServerConfigurationNetworking {
 	public static Set<ResourceLocation> getReceived(ServerConfigurationPacketListenerImpl handler) {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getReceivableChannels();
+		return NeoServerConfigurationNetworking.getReceived(handler);
 	}
 
 	/**
@@ -148,7 +149,7 @@ public final class ServerConfigurationNetworking {
 	public static Set<ResourceLocation> getSendable(ServerConfigurationPacketListenerImpl handler) {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels();
+		return NeoServerConfigurationNetworking.getSendable(handler);
 	}
 
 	/**
@@ -162,7 +163,7 @@ public final class ServerConfigurationNetworking {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 		Objects.requireNonNull(channelName, "Channel name cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels().contains(channelName);
+		return NeoServerConfigurationNetworking.canSend(handler, channelName);
 	}
 
 	/**
@@ -176,7 +177,7 @@ public final class ServerConfigurationNetworking {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 		Objects.requireNonNull(id, "Payload id cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels().contains(id.id());
+		return NeoServerConfigurationNetworking.canSend(handler, id.id());
 	}
 
 	/**
@@ -201,7 +202,7 @@ public final class ServerConfigurationNetworking {
 	public static PacketSender getSender(ServerConfigurationPacketListenerImpl handler) {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler);
+		return NeoServerConfigurationNetworking.getSender(handler);
 	}
 
 	/**
