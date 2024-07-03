@@ -11,6 +11,7 @@
     "ServerLoginNetworkHandlerMixin",
     "ServerPlayNetworkHandlerMixin",
     "NetworkRegistryMixin",
+    "ServerCommonNetworkHandlerMixin",
     "accessor.EntityTrackerAccessor",
     "accessor.ServerCommonNetworkHandlerAccessor",
     "accessor.ServerLoginNetworkHandlerAccessor",

@@ -6,8 +6,9 @@ import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.ResourceLocation;
 
 public class NeoCommonNetworking {
+    public static final NeoNetworkRegistrar CONFIGURATION_REGISTRY = new NeoNetworkRegistrar(ConnectionProtocol.CONFIGURATION);
     public static final NeoNetworkRegistrar PLAY_REGISTRY = new NeoNetworkRegistrar(ConnectionProtocol.PLAY);
-    
+
     public static final int DEFAULT_CHANNEL_NAME_MAX_LENGTH = 128;
 
     public static void assertPayloadType(PayloadTypeRegistryImpl<?> payloadTypeRegistry, ResourceLocation channelName, PacketFlow side, ConnectionProtocol phase) {

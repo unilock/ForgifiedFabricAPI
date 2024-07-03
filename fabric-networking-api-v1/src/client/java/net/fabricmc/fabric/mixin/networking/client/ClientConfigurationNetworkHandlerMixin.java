@@ -24,6 +24,7 @@ import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.configuration.ClientboundFinishConfigurationPacket;
 import org.sinytra.fabric.networking_api.NeoListenableNetworkHandler;
+import org.sinytra.fabric.networking_api.client.NeoClientConfigurationNetworking;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -38,6 +39,7 @@ public abstract class ClientConfigurationNetworkHandlerMixin extends ClientCommo
 
 	@Inject(method = "<init>", at = @At("RETURN"))
 	private void initAddon(CallbackInfo ci) {
+		NeoClientConfigurationNetworking.setClientConfigurationAddon(this);
 		ClientConfigurationConnectionEvents.INIT.invoker().onConfigurationInit((ClientConfigurationPacketListenerImpl) (Object) this, this.minecraft);
 	}
 
@@ -45,6 +47,7 @@ public abstract class ClientConfigurationNetworkHandlerMixin extends ClientCommo
 	public void handleComplete(ClientboundFinishConfigurationPacket packet, CallbackInfo ci) {
 		ClientConfigurationConnectionEvents.COMPLETE.invoker().onConfigurationComplete((ClientConfigurationPacketListenerImpl) (Object) this, this.minecraft);
 		ClientConfigurationConnectionEvents.READY.invoker().onConfigurationReady((ClientConfigurationPacketListenerImpl) (Object) this, this.minecraft);
+		NeoClientConfigurationNetworking.setClientConfigurationAddon(null);
 	}
 
 	@Override
