@@ -26,13 +26,13 @@ sourceSets {
 }
 
 dependencies {
-//	datagenImplementation project(path: ":fabric-data-generation-api-v1", configuration: 'namedElements')
+	datagenImplementation project(path: ":fabric-data-generation-api-v1", configuration: 'namedElements')
 }
 
 loom {
 	runs {
 		datagen {
-			inherit server
+			data()
 			name "Data Generation"
 			vmArg "-Dfabric-api.datagen"
 			vmArg "-Dfabric-api.datagen.output-dir=${file("src/generated/resources")}"

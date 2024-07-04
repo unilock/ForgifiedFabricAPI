@@ -22,6 +22,7 @@ import java.nio.file.Path
 import java.util.stream.Collectors
 
 task generateAccessWidener {
+	enabled = false
 	doLast {
 		List<String> lines = new ArrayList<>();
 		lines.add("accessWidener v2 named")
