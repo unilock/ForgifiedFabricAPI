@@ -24,8 +24,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(GameRuleCommand.class)
 public interface GameRuleCommandAccessor {
-	@Invoker("queryRule")
-	static <T extends GameRules.Value<T>> int invokeExecuteQuery(CommandSourceStack serverCommandSource, GameRules.Key<T> ruleKey) {
+    @Invoker
+	static <T extends GameRules.Value<T>> int invokeQueryRule(CommandSourceStack serverCommandSource, GameRules.Key<T> ruleKey) {
 		throw new AssertionError("This shouldn't happen!");
 	}
 }
