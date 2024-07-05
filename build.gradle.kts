@@ -1,7 +1,6 @@
 import net.fabricmc.loom.build.nesting.IncludedJarFactory
 import net.fabricmc.loom.build.nesting.JarNester
 import net.fabricmc.loom.util.Constants
-import net.fabricmc.loom.util.GroovyXmlUtil
 import org.apache.commons.codec.digest.DigestUtils
 import org.eclipse.jgit.api.Git
 import java.util.*
@@ -46,7 +45,6 @@ val upstreamVersion = version
 
 ext["upstreamVersion"] = upstreamVersion
 
-group = "org.sinytra"
 version = "$upstreamVersion+$implementationVersion+$versionMc"
 println("Version: $version")
 
@@ -59,6 +57,8 @@ allprojects {
 
     apply(plugin = "java-library")
     apply(plugin = "dev.architectury.loom")
+
+    group = "org.sinytra.forgified-fabric-api"
 
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(21))
@@ -125,7 +125,7 @@ allprojects {
 
 dependencies {
     // Include Forgified Fabric Loader
-    include("org.sinytra:fabric-loader:$versionForgifiedFabricLoader:full")
+    include("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
 }
 
 tasks {
@@ -153,10 +153,6 @@ allprojects {
     apply(plugin = "ffapi.neo-entrypoint")
     apply(plugin = "ffapi.package-info")
 
-    if (!META_PROJECTS.contains(name) && project != rootProject) {
-//        apply(plugin = "ffapi.neo-compat") TODO
-    }
-
     allprojects.forEach { p ->
         if (!META_PROJECTS.contains(p.name)) {
             loom.mods.register(p.name) {
@@ -178,9 +174,7 @@ allprojects {
     publishing {
         publications {
             register<MavenPublication>("mavenJava") {
-                pom {
-//                    addPomMetadataInformation(project, pom) TODO
-                }
+                from(components["java"])
             }
         }
     }
@@ -193,29 +187,10 @@ dependencies {
 				return@forEach
 			}
 
-			api(project(proj.path, "namedElements"))
+			include(api(project(proj.path, "namedElements"))!!)
 			"testmodImplementation"(proj.sourceSets.getByName("testmod").output)
 		}
 	}
-}
-
-publishing {
-    publications {
-        named<MavenPublication>("mavenJava") {
-            from(components["java"])
-
-            pom.withXml {
-                val depsNode = GroovyXmlUtil.getOrCreateNode(asNode(), "dependencies")
-                rootProject.configurations.include.get().dependencies.forEach {
-                    val depNode = depsNode.appendNode("dependency")
-                    depNode.appendNode("groupId", it.group)
-                    depNode.appendNode("artifactId", it.name)
-                    depNode.appendNode("version", it.version)
-                    depNode.appendNode("scope", "compile")
-                }
-            }
-        }
-    }
 }
 
 val git: Git? = runCatching { Git.open(rootDir) }.getOrNull()
@@ -243,24 +218,6 @@ fun moduleDependencies(project: Project, depNames: List<String>) {
     project.dependencies {
         deps.forEach {
             api(it)
-        }
-    }
-
-    // As we manually handle the maven artifacts, we need to also manually specify the deps.
-    project.publishing {
-        publications {
-            named<MavenPublication>("mavenJava") {
-                pom.withXml {
-                    val depsNode = asNode().appendNode("dependencies")
-                    deps.forEach {
-                        val depNode = depsNode.appendNode("dependency")
-                        depNode.appendNode("groupId", it.group)
-                        depNode.appendNode("artifactId", it.name)
-                        depNode.appendNode("version", it.version)
-                        depNode.appendNode("scope", "compile")
-                    }
-                }
-            }
         }
     }
 }

@@ -34,17 +34,10 @@ val testmod: SourceSet by sourceSets.creating {
 }
 
 dependencies {
-    // TODO Update gradle module metadata in FFLoader to avoid this
-    "compileOnly"("org.sinytra:fabric-loader:$versionForgifiedFabricLoader")
-    "runtimeOnly"("org.sinytra:fabric-loader:$versionForgifiedFabricLoader:full") {
-        isTransitive = false
-    }
+    "implementation"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
 
     "testmodImplementation"(mainSourceSet.output)
-    "testmodCompileOnly"("org.sinytra:fabric-loader:$versionForgifiedFabricLoader")
-    "testmodRuntimeOnly"("org.sinytra:fabric-loader:$versionForgifiedFabricLoader:full") {
-        isTransitive = false
-    }
+    "testmodImplementation"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
 
     if (project.name != "fabric-gametest-api-v1") {
         "testmodImplementation"(project(":fabric-gametest-api-v1", "namedElements"))
@@ -68,8 +61,6 @@ loom.apply {
         configureEach {
             isIdeConfigGenerated = project.rootProject == project
             property("mixin.debug", "true")
-            // FIXME Set this from fabric-api-base as ResourcePackProfileMixin fails otherwise
-            property("mixin.initialiserInjectionMode", "safe")
         }
 
         create("gametest") {

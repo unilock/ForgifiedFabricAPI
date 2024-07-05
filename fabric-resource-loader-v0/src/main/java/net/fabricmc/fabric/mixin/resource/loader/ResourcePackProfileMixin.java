@@ -16,14 +16,17 @@
 
 package net.fabricmc.fabric.mixin.resource.loader;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import net.minecraft.server.packs.PackSelectionConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.fabricmc.fabric.impl.resource.loader.FabricResourcePackProfile;
 import net.fabricmc.fabric.impl.resource.loader.ResourcePackSourceTracker;
@@ -44,10 +47,15 @@ abstract class ResourcePackProfileMixin implements FabricResourcePackProfile {
 	@Unique
 	private static final Predicate<Set<String>> DEFAULT_PARENT_PREDICATE = parents -> true;
 	@Unique
-	private Predicate<Set<String>> parentsPredicate = DEFAULT_PARENT_PREDICATE;
+	private Predicate<Set<String>> parentsPredicate;
 
 	@Shadow
 	public abstract PackLocationInfo location();
+
+	@Inject(method = "<init>(Lnet/minecraft/server/packs/PackLocationInfo;Lnet/minecraft/server/packs/repository/Pack$ResourcesSupplier;Lnet/minecraft/server/packs/repository/Pack$Metadata;Lnet/minecraft/server/packs/PackSelectionConfig;Ljava/util/List;)V", at = @At("TAIL"))
+	private void onInit(PackLocationInfo arg, Pack.ResourcesSupplier arg2, Pack.Metadata arg3, PackSelectionConfig arg4, List<Pack> children, CallbackInfo ci) {
+		this.parentsPredicate = DEFAULT_PARENT_PREDICATE;
+	}
 
 	@Inject(method = "open", at = @At("RETURN"))
 	private void onCreateResourcePack(CallbackInfoReturnable<PackResources> info) {

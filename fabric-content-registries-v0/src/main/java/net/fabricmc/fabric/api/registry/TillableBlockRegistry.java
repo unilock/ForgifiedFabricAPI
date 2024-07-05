@@ -23,7 +23,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.mojang.datafixers.util.Pair;
-import net.fabricmc.fabric.mixin.content.registry.HoeItemAccessor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.context.UseOnContext;
@@ -32,7 +31,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.ToolActions;
+import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
 /**
@@ -93,7 +92,7 @@ public final class TillableBlockRegistry {
 
 	@SubscribeEvent
 	static void modify(BlockEvent.BlockToolModificationEvent event) {
-		if (event.getToolAction() == ToolActions.HOE_TILL && event.getHeldItemStack().canPerformAction(ToolActions.HOE_TILL)) {
+		if (event.getItemAbility() == ItemAbilities.HOE_TILL && event.getHeldItemStack().canPerformAction(ItemAbilities.HOE_TILL)) {
 			var modified = TILLABLES.get(event.getState().getBlock());
 			if (modified != null && modified.getFirst().test(event.getContext())) {
 				if (!event.isSimulated() && !event.getLevel().isClientSide()) {

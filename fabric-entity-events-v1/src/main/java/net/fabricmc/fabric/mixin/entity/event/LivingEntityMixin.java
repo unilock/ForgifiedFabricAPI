@@ -74,13 +74,6 @@ abstract class LivingEntityMixin {
 		return isDeadOrDying() && ServerLivingEntityEvents.ALLOW_DEATH.invoker().allowDeath(livingEntity, source, amount);
 	}
 
-	@Inject(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isSleeping()Z"), cancellable = true)
-	private void beforeDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!ServerLivingEntityEvents.ALLOW_DAMAGE.invoker().allowDamage((LivingEntity) (Object) this, source, amount)) {
-			cir.setReturnValue(false);
-		}
-	}
-
 	@Inject(method = "startSleeping", at = @At("RETURN"))
 	private void onSleep(BlockPos pos, CallbackInfo info) {
 		EntitySleepEvents.START_SLEEPING.invoker().onStartSleeping((LivingEntity) (Object) this, pos);

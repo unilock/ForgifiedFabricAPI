@@ -31,7 +31,7 @@ import net.minecraft.world.level.GameRules;
 @Mixin(targets = "net/minecraft/server/commands/GameRuleCommand$1")
 public abstract class GameRuleCommandVisitorMixin {
 	@Final
-	@Shadow
+	@Shadow(aliases = {"val$literalargumentbuilder"})
 	LiteralArgumentBuilder<CommandSourceStack> val$base;
 
 	@Inject(at = @At("HEAD"), method = "visit(Lnet/minecraft/world/level/GameRules$Key;Lnet/minecraft/world/level/GameRules$Type;)V", cancellable = true)
