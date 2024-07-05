@@ -1,24 +1,103 @@
-# Forgified Fabric API
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Sinytra/.github/main/art/ffapi_banner_small.png">
+</p>
+<p align="center">
+ <a href="https://github.com/Sinytra/ForgifiedFabricAPI/actions/workflows/build.yml"><img src="https://github.com/Sinytra/ForgifiedFabricAPI/actions/workflows/build.yml/badge.svg"></a>
+  <a href="https://github.com/Sinytra/ForgifiedFabricAPI/releases/latest"><img src="https://img.shields.io/github/v/release/Sinytra/ForgifiedFabricAPI?style=flat&label=Release&include_prereleases&sort=semver"></a>
+  <a href="https://www.curseforge.com/minecraft/mc-mods/forgified-fabric-api"><img src="https://cf.way2muchnoise.eu/forgified-fabric-api.svg"></a>
+  <a href="https://modrinth.com/mod/forgified-fabric-api"><img src="https://img.shields.io/modrinth/dt/Aqlf1Shp?logo=modrinth&label=Modrinth&color=00AF5C"></a>
+  <a href="https://discord.gg/mamk7z3TKZ"><img src="https://discordapp.com/api/guilds/1141048834177388746/widget.png?style=shield"></a>
+</p>
 
-> [!WARNING]
-> This port of the Forgified Fabric API is a work in progress. Proceed with caution.
+## 📖 About
 
-### Some things might still not work yet
+Essential hooks for modding with Fabric, now available on NeoForge!
 
-- Production
-- Publishing
-- CI
+Fabric API is the library for essential hooks and interoperability mechanisms for mods. Examples include:
 
-### Why
+- Exposing functionality that is useful but difficult to access for many mods such as particles, biomes and dimensions
+- Adding events, hooks and APIs to improve interopability between mods.
+- Essential features such as registry synchronization and adding information to crash reports.
+- An advanced rendering API designed for compatibility with optimization mods and graphics overhaul mods.
 
-- MOJMAP!
-  - By using mojmap, we eliminate any necessary remapping, leading to greatly shorter build times and improved development
-    time efficiency
-  - Improved stability: we no longer need to rely on archloom's "hopes" and "prayers" for neo loom support
-  - Improved dev experience: no more userdev remapping issues
-- Syncing with upstream is (hopefully) made easier via automation scripts
+**📘 The official documentation is available at [sinytra.org](https://sinytra.org/docs).**
 
-### Running the root project
+The Forgified Fabric API (FFAPI) is a direct port of [Fabric API](https://github.com/FabricMC/fabric) for the NeoForge
+modloader, regularly kept up to date with the upstream repository. It is designed to make cross platform mod development
+easier by allowing developers to use Fabric API as a common library to interact with the game's code on both platforms.
+However, it is not an abstraction layer, and loader-specific code still needs to be handled separately for each
+platform.
 
-- Make sure your IDEA Gradle settings are set to "Build and run using IntelliJ IDEA"
-- Use the IDE run to launch the game
+### 💬 Join the Community
+
+We have an official [Discord community](https://discord.gg/mamk7z3TKZ) for our projects. By joining, you can:
+
+- Get help and technical support from our team and community members
+- Keep in touch with the latest development updates and community events
+- Engage in the project's development and collaborate with our team
+- ... and just hang out with the rest of our community.
+
+### Compatibility
+
+The Forgified Fabric API has checks in place to ensure full api compatibility with Fabric API. This usually
+includes `net.fabricmc.*.api` packages and other non-internal code. However, we make no guarantees for implementation
+code and internal APIs, as they are subject to change at any time. For the best results, avoid using internal classes
+and look for native solutions offered by your platform.
+
+Where possible, Fabric APIs such as `FabricItem`, `ItemStorage` and `FluidStorage` are bridged to NeoForge's counterparts.
+More information on how to properly consume bridged APIs can be found in their module's README.
+
+### Design Goals
+
+Our goal is to port as much of Fabric API to use NeoForge's systems as possible and keep modifications to minecraft's code
+at minimum, in order to increase mod compatibility and reduce maintenance costs. On the other hand, it's important that
+using NeoForge's API doesn't come at the expense of preserving intended behavior.
+
+## 📋 Using Forgified Fabric API to play with mods
+
+Make sure you have installed NeoForge first. More information about installing NeoForge can be
+found [here](https://neoforged.net/).
+
+The Forgified Fabric API is available for download on the following platforms:
+
+- [GitHub Releases](https://github.com/Sinytra/ForgifiedFabricAPI/releases)
+- [CurseForge](https://www.curseforge.com/minecraft/mc-mods/forgified-fabric-api)
+- [Modrinth](https://modrinth.com/mod/forgified-fabric-api)
+
+The downloaded jar file should be placed in your `mods` folder.
+
+## 🛠️ Using Forgified Fabric API to develop mods
+
+To set up a NeoForge development environment, please read the [NeoForge docs](https://docs.neoforged.net/) and follow the instructions there.
+
+The Forgified Fabric API is published under the `org.sinytra.forgified-fabric-api` group. To include the full Forgified
+Fabric API with all modules in the development environment, add the following to your `dependencies` block in the gradle
+buildscript:
+
+### Groovy DSL
+
+```groovy
+repositories {
+    maven {
+        url "https://maven.su5ed.dev/releases"
+    }
+}
+dependencies {
+    implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:FABRIC_API_VERSION"
+}
+```
+
+<!--Linked to gradle documentation on properties-->
+Instead of hardcoding version constants all over the build script, Gradle properties may be used to replace these
+constants. Properties are defined in the `gradle.properties` file at the root of a project. More information is
+available [here](https://docs.gradle.org/current/userguide/organizing_gradle_projects.html#declare_properties_in_gradle_properties_file).
+
+## Modules
+
+Fabric API is designed to be modular for ease of updating. This also has the advantage of splitting up the codebase into
+smaller chunks.
+
+Each module contains its own `README.md`* explaining the module's purpose and additional info on using the module.
+
+\* The README for each module is being worked on; not every module has a README at the moment
+

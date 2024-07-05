@@ -54,6 +54,13 @@ tasks.named<Test>("test") {
     enabled = false
 }
 
+tasks.named<ProcessResources>("processResources") {
+    filesMatching("assets/*/icon.png") {
+        exclude()
+        rootProject.file("src/main/resources/assets/fabric/icon.png").copyTo(destinationDir.resolve(path))
+    }
+}
+
 loom.apply {
     runtimeOnlyLog4j = true
 
