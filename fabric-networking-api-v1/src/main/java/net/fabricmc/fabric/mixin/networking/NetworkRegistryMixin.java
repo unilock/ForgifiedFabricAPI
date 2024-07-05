@@ -3,10 +3,7 @@ package net.fabricmc.fabric.mixin.networking;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationConnectionEvents;
 import net.fabricmc.fabric.impl.networking.PayloadTypeRegistryImpl;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -16,10 +13,8 @@ import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
-import net.neoforged.neoforge.network.registration.NetworkPayloadSetup;
 import net.neoforged.neoforge.network.registration.NetworkRegistry;
 import org.sinytra.fabric.networking_api.NeoNetworkRegistrar;
 import org.spongepowered.asm.mixin.Mixin;
@@ -73,10 +68,5 @@ public class NetworkRegistryMixin {
     private static boolean includeFabricChannels(ICommonPacketListener listener, ResourceLocation location, Operation<Boolean> original) {
         // TODO Use original args that include the packet
         return original.call(listener, location) || NeoNetworkRegistrar.hasCodecFor(listener.protocol(), listener.flow() == PacketFlow.SERVERBOUND ? PacketFlow.CLIENTBOUND : PacketFlow.SERVERBOUND, location);
-    }
-
-    @Inject(method = "initializeNeoForgeConnection(Lnet/minecraft/network/protocol/configuration/ClientConfigurationPacketListener;Lnet/neoforged/neoforge/network/registration/NetworkPayloadSetup;)V", at = @At("TAIL"))
-    private static void startConfiguration(ClientConfigurationPacketListener listener, NetworkPayloadSetup setup, CallbackInfo ci) {
-        ClientConfigurationConnectionEvents.START.invoker().onConfigurationStart((ClientConfigurationPacketListenerImpl) listener, Minecraft.getInstance());
     }
 }
