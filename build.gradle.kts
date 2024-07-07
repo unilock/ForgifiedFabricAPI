@@ -199,11 +199,11 @@ allprojects {
 
 publishMods {
     file.set(tasks.jar.flatMap { it.archiveFile })
-    changelog.set(providers.environmentVariable("CHANGELOG").orElse("# $version"))
+    changelog.set(providers.environmentVariable("CHANGELOG").orElse("# ${project.version}"))
     type.set(providers.environmentVariable("PUBLISH_RELEASE_TYPE").orElse("alpha").map(ReleaseType::of))
     modLoaders.add("neoforge")
     dryRun.set(!providers.environmentVariable("CI").isPresent)
-    displayName.set("[$versionMc] Forgified Fabric API $version")
+    displayName.set("[$versionMc] Forgified Fabric API ${project.version}")
 
     github {
         accessToken.set(providers.environmentVariable("GITHUB_TOKEN"))

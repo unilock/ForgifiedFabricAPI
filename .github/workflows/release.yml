@@ -13,6 +13,7 @@ on:
           - ALPHA
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
@@ -21,6 +22,9 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       changelog: ${{ steps.changelog.outputs.changelog }}
+    container:
+      image: mcr.microsoft.com/openjdk/jdk:21-ubuntu
+      options: --user root
     steps:
       - run: apt update && apt install git -y && git --version
       - run: git config --global --add safe.directory /__w/fabric/fabric
@@ -32,15 +36,11 @@ jobs:
         with:
           context: changelog
           workflow_id: release.yml
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'microsoft'
-          java-version: '21'
       - uses: gradle/wrapper-validation-action@v2
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-home-cache-cleanup: true
+          cache-write-only: true
       - name: Build with Gradle
         run: ./gradlew clean build --stacktrace
   publish:
@@ -78,7 +78,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: true
-          gradle-home-cache-cleanup: true
       - name: Publish with Gradle
         run: ./gradlew clean build ${{ matrix.task }} --stacktrace
         env:
