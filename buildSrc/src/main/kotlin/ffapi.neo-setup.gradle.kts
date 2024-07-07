@@ -8,8 +8,6 @@ val versionFabricLoader: String by rootProject
 val loom = extensions.getByType<LoomGradleExtensionAPI>()
 val sourceSets = extensions.getByType<SourceSetContainer>()
 
-val jar = tasks.named<Jar>("jar")
-
 val mainSourceSet = sourceSets.getByName("main")
 
 mainSourceSet.apply {
@@ -49,15 +47,25 @@ dependencies {
     "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-    enabled = false
-}
-
-tasks.named<ProcessResources>("processResources") {
-    filesMatching("assets/*/icon.png") {
-        exclude()
-        rootProject.file("src/main/resources/assets/fabric/icon.png").copyTo(destinationDir.resolve(path))
+tasks {
+    named<Jar>("jar") {
+        manifest { 
+            attributes(
+                "Implementation-Version" to project.version
+            )
+        }
+    }
+    
+    named<Test>("test") {
+        useJUnitPlatform()
+        enabled = false
+    }
+    
+    named<ProcessResources>("processResources") {
+        filesMatching("assets/*/icon.png") {
+            exclude()
+            rootProject.file("src/main/resources/assets/fabric/icon.png").copyTo(destinationDir.resolve(path))
+        }
     }
 }
 

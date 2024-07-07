@@ -1,3 +1,4 @@
+import me.modmuss50.mpp.ReleaseType
 import net.fabricmc.loom.build.nesting.IncludedJarFactory
 import net.fabricmc.loom.build.nesting.JarNester
 import net.fabricmc.loom.util.Constants
@@ -9,12 +10,18 @@ plugins {
     java
     `maven-publish`
     id("dev.architectury.loom") // Version declared in buildSrc
+    id("me.modmuss50.mod-publish-plugin") version "0.5.+"
 }
 
 val implementationVersion: String by project
 val versionMc: String by project
 val versionForge: String by project
 val versionForgifiedFabricLoader: String by project
+
+val curseForgeId: String by project
+val modrinthId: String by project
+val githubRepository: String by project
+val publishBranch: String by project
 
 val META_PROJECTS: List<String> = listOf(
     "deprecated",
@@ -96,27 +103,6 @@ allprojects {
         })
     }
 
-    tasks.named<Jar>("jar") {
-        doLast {
-            val factory = IncludedJarFactory(project)
-            val nestedJars = factory.getNestedJars(configurations.getByName(Constants.Configurations.INCLUDE))
-
-            if (!nestedJars.isPresent) {
-                logger.info("No jars to nest")
-                return@doLast
-            }
-
-            val jars: MutableSet<File> = LinkedHashSet(nestedJars.get().files)
-            JarNester.nestJars(
-                jars,
-                emptyList(),
-                archiveFile.get().asFile,
-                loom.platform.get(),
-                project.logger
-            )
-        }
-    }
-
     // Run this task after updating minecraft to regenerate any required resources
     tasks.register("generateResources") {
 
@@ -129,6 +115,23 @@ dependencies {
 }
 
 tasks {
+    named<Jar>("jar") {
+        doLast {
+            val factory = IncludedJarFactory(project)
+            val config = configurations.getByName(Constants.Configurations.INCLUDE)
+            val nestedJars = factory.getNestedJars(config)
+            val forgeNestedJars = factory.getForgeNestedJars(config)
+
+            JarNester.nestJars(
+                nestedJars.get().files,
+                forgeNestedJars.get().left.map { it.resolve() },
+                archiveFile.get().asFile,
+                loom.platform.get(),
+                project.logger
+            )
+        }
+    }
+    
     withType<JavaCompile> {
         options.release = 21
     }
@@ -177,6 +180,45 @@ allprojects {
                 from(components["java"])
             }
         }
+        repositories {
+            val env = System.getenv()
+            if (env["MAVEN_URL"] != null) {
+                repositories.maven {
+                    url = uri(env["MAVEN_URL"] as String)
+                    if (env["MAVEN_USERNAME"] != null) {
+                        credentials {
+                            username = env["MAVEN_USERNAME"]
+                            password = env["MAVEN_PASSWORD"]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+publishMods {
+    file.set(tasks.jar.flatMap { it.archiveFile })
+    changelog.set(providers.environmentVariable("CHANGELOG").orElse("# $version"))
+    type.set(providers.environmentVariable("PUBLISH_RELEASE_TYPE").orElse("alpha").map(ReleaseType::of))
+    modLoaders.add("neoforge")
+    dryRun.set(!providers.environmentVariable("CI").isPresent)
+    displayName.set("[$versionMc] Forgified Fabric API $version")
+
+    github {
+        accessToken.set(providers.environmentVariable("GITHUB_TOKEN"))
+        repository.set(githubRepository)
+        commitish.set(publishBranch)
+    }
+    curseforge {
+        accessToken.set(providers.environmentVariable("CURSEFORGE_TOKEN"))
+        projectId.set(curseForgeId)
+        minecraftVersions.add(versionMc)
+    }
+    modrinth {
+        accessToken.set(providers.environmentVariable("MODRINTH_TOKEN"))
+        projectId.set(modrinthId)
+        minecraftVersions.add(versionMc)
     }
 }
 

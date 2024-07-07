@@ -44,6 +44,9 @@ extensions.getByType<SourceSetContainer>().configureEach {
     tasks.named("generate") {
         dependsOn(task)
     }
+    tasks.named<Jar>("jar") {
+        exclude("fabric.mod.json")
+    }
 }
 
 afterEvaluate { 
