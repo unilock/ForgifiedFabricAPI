@@ -64,7 +64,7 @@ abstract class ReloadableRegistriesMixin {
 	@Unique
 	private static final WeakHashMap<RegistryOps<JsonElement>, HolderLookup.Provider> WRAPPERS = new WeakHashMap<>();
 
-	@WrapOperation(method = "reload", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/ReloadableServerRegistries$EmptyTagLookupWrapper;getOps(Lcom/mojang/serialization/DynamicOps;)Lnet/minecraft/resources/RegistryOps;"))
+	@WrapOperation(method = "reload", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/ReloadableServerRegistries$EmptyTagLookupWrapper;createSerializationContext(Lcom/mojang/serialization/DynamicOps;)Lnet/minecraft/resources/RegistryOps;"))
 	private static RegistryOps<JsonElement> storeOps(@Coerce HolderLookup.Provider registries, DynamicOps<JsonElement> ops, Operation<RegistryOps<JsonElement>> original) {
 		RegistryOps<JsonElement> created = original.call(registries, ops);
 		WRAPPERS.put(created, registries);
@@ -112,7 +112,12 @@ abstract class ReloadableRegistriesMixin {
 		LootTable.Builder builder = FabricLootTableBuilder.copyOf(table);
 		LootTableEvents.MODIFY.invoker().modifyLootTable(key, builder, source, registries);
 
-		return (T) builder.build();
+		T newTable = (T) builder.build();
+		ResourceLocation lootTableId = table.getLootTableId();
+		if (lootTableId != null) {
+			((LootTable) newTable).setLootTableId(lootTableId);
+		}
+		return newTable;
 	}
 
 	@SuppressWarnings("unchecked")

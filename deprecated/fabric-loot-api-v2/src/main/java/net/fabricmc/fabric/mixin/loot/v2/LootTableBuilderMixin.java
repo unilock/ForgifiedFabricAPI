@@ -16,9 +16,8 @@
 
 package net.fabricmc.fabric.mixin.loot.v2;
 
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.spongepowered.asm.mixin.Mixin;
-
-import net.minecraft.loot.LootTable;
 
 import net.fabricmc.fabric.api.loot.v2.FabricLootTableBuilder;
 

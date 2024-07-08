@@ -53,7 +53,7 @@ include("fabric-item-api-v1")
 include("fabric-item-group-api-v1")
 include("fabric-key-binding-api-v1")
 include("fabric-lifecycle-events-v1")
-include("fabric-loot-api-v2")
+include("fabric-loot-api-v3")
 include("fabric-message-api-v1")
 include("fabric-model-loading-api-v1")
 include("fabric-networking-api-v1")
@@ -73,7 +73,8 @@ include("fabric-sound-api-v1")
 include("fabric-transfer-api-v1")
 include("fabric-transitive-access-wideners-v1")
 
-//include 'deprecated'
+include("deprecated")
+include("deprecated:fabric-loot-api-v2")
 //include 'deprecated:fabric-command-api-v1'
 //include 'deprecated:fabric-commands-v0'
 //include 'deprecated:fabric-containers-v0'
