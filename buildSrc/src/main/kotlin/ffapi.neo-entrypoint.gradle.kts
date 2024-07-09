@@ -26,6 +26,7 @@ masterSourceSets.forEach { sourceSet ->
         outputDir.set(targetDir)
         fabricModJson.set(modMetadataJson)
         testEnvironment = sourceSet.name == "testmod"
+        includeVersion.set(project.parent?.name == "deprecated")
     }
     sourceSet.java.srcDir(task)
     val cleanTask = tasks.register(sourceSet.getTaskName("clean", baseTaskName), Delete::class.java) {
@@ -50,12 +51,16 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
     val fabricModJson: RegularFileProperty = project.objects.fileProperty()
 
     @get:Input
+    val includeVersion: Property<Boolean> = project.objects.property(Boolean::class)
+
+    @get:Input
     val testEnvironment: Property<Boolean> = project.objects.property(Boolean::class)
 
     @get:OutputDirectory
     val outputDir: DirectoryProperty = project.objects.directoryProperty()
 
     private val projectNamePattern = "^fabric_(.+?)(?:_v\\d)?\$".toRegex()
+    private val projectVersionNamePattern = "^fabric_(.+?_v\\d)?\$".toRegex()
 
     @TaskAction
     fun run() {
@@ -63,7 +68,7 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
         val modid = normalizeModid(modMetadata.id)
 
         val className = "GeneratedEntryPoint"
-        val packageName = packageNameForEntryPoint(modid)
+        val packageName = packageNameForEntryPoint(modid, includeVersion.get())
         val packagePath = packageName.replace('/', '.')
         val packageDir = outputDir.file(packagePath).get().asFile.toPath()
         packageDir.createDirectories()
@@ -141,8 +146,8 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
         }
     }
 
-    private fun packageNameForEntryPoint(modid: String): String {
-        val uniqueName = projectNamePattern.find(modid)?.groups?.get(1)?.value
+    private fun packageNameForEntryPoint(modid: String, includeVersion: Boolean): String {
+        val uniqueName = (if (includeVersion) projectVersionNamePattern else projectNamePattern).find(modid)?.groups?.get(1)?.value
             ?: throw RuntimeException("Unable to determine generated package name for mod $modid")
         return "org.sinytra.fabric.$uniqueName.generated"
     }
