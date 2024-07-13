@@ -51,15 +51,15 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 		AbstractBlockSettingsAccessor otherAccessor = (AbstractBlockSettingsAccessor) settings;
 
 		// Copied in vanilla: sorted by vanilla copy order
-		this.destroyTime(otherAccessor.getDestroyTime());
-		this.explosionResistance(otherAccessor.getExplosionResistance());
+		this.hardness(otherAccessor.getDestroyTime());
+		this.resistance(otherAccessor.getExplosionResistance());
 		this.collidable(otherAccessor.getHasCollision());
 		thisAccessor.setIsRandomlyTicking(otherAccessor.getIsRandomlyTicking());
 		this.lightLevel(otherAccessor.getLuminance());
 		thisAccessor.setMapColor(otherAccessor.getMapColor());
-		this.sound(otherAccessor.getSoundType());
-		this.friction(otherAccessor.getFriction());
-		this.speedFactor(otherAccessor.getSpeedFactor());
+		this.sounds(otherAccessor.getSoundType());
+		this.slipperiness(otherAccessor.getFriction());
+		this.velocityMultiplier(otherAccessor.getSpeedFactor());
 		thisAccessor.setDynamicShape(otherAccessor.getDynamicShape());
 		thisAccessor.setCanOcclude(otherAccessor.getCanOcclude());
 		thisAccessor.setIsAir(otherAccessor.getIsAir());
@@ -67,12 +67,12 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 		thisAccessor.setLiquid(otherAccessor.getLiquid());
 		thisAccessor.setForceSolidOff(otherAccessor.getForceSolidOff());
 		thisAccessor.setForceSolidOn(otherAccessor.getForceSolidOn());
-		this.pushReaction(otherAccessor.getPushReaction());
+		this.pistonBehavior(otherAccessor.getPushReaction());
 		thisAccessor.setRequiresCorrectToolForDrops(otherAccessor.isRequiresCorrectToolForDrops());
 		thisAccessor.setOffsetFunction(otherAccessor.getOffsetFunction());
 		thisAccessor.setSpawnTerrainParticles(otherAccessor.getSpawnTerrainParticles());
 		thisAccessor.setRequiredFeatures(otherAccessor.getRequiredFeatures());
-		this.emissiveRendering(otherAccessor.getEmissiveRendering());
+		this.emissiveLighting(otherAccessor.getEmissiveRendering());
 		this.instrument(otherAccessor.getInstrument());
 		thisAccessor.setReplaceable(otherAccessor.getReplaceable());
 
@@ -82,13 +82,13 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 		// deprecated. To maintain compatibility and since this behavior seems to be the
 		// more proper way, this copies all the fields, not just the shallow ones.
 		// Fields are added by field definition order.
-		this.jumpFactor(otherAccessor.getJumpFactor());
+		this.jumpVelocityMultiplier(otherAccessor.getJumpFactor());
 		this.drops(otherAccessor.getDrops());
-		this.isValidSpawn(otherAccessor.getIsValidSpawn());
-		this.isRedstoneConductor(otherAccessor.getIsRedstoneConductor());
-		this.isSuffocating(otherAccessor.getIsSuffocating());
-		this.isViewBlocking(otherAccessor.getIsViewBlocking());
-		this.hasPostProcess(otherAccessor.getHasPostProcess());
+		this.allowsSpawning(otherAccessor.getIsValidSpawn());
+		this.solidBlock(otherAccessor.getIsRedstoneConductor());
+		this.suffocates(otherAccessor.getIsSuffocating());
+		this.blockVision(otherAccessor.getIsViewBlocking());
+		this.postProcess(otherAccessor.getHasPostProcess());
 	}
 
 	/**
@@ -123,36 +123,31 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings noOcclusion() {
+	public FabricBlockSettings nonOpaque() {
 		super.noOcclusion();
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings friction(float value) {
+	public FabricBlockSettings slipperiness(float value) {
 		super.friction(value);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings speedFactor(float velocityMultiplier) {
+	public FabricBlockSettings velocityMultiplier(float velocityMultiplier) {
 		super.speedFactor(velocityMultiplier);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings jumpFactor(float jumpVelocityMultiplier) {
+	public FabricBlockSettings jumpVelocityMultiplier(float jumpVelocityMultiplier) {
 		super.jumpFactor(jumpVelocityMultiplier);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings sound(SoundType group) {
+	public FabricBlockSettings sounds(SoundType group) {
 		super.sound(group);
 		return this;
 	}
@@ -172,8 +167,7 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings instabreak() {
+	public FabricBlockSettings breakInstantly() {
 		super.instabreak();
 		return this;
 	}
@@ -186,22 +180,19 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings randomTicks() {
+	public FabricBlockSettings ticksRandomly() {
 		super.randomTicks();
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings dynamicShape() {
+	public FabricBlockSettings dynamicBounds() {
 		super.dynamicShape();
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings noLootTable() {
+	public FabricBlockSettings dropsNothing() {
 		super.noLootTable();
 		return this;
 	}
@@ -221,43 +212,37 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings isValidSpawn(BlockBehaviour.StateArgumentPredicate<EntityType<?>> predicate) {
+	public FabricBlockSettings allowsSpawning(BlockBehaviour.StateArgumentPredicate<EntityType<?>> predicate) {
 		super.isValidSpawn(predicate);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings isRedstoneConductor(BlockBehaviour.StatePredicate predicate) {
+	public FabricBlockSettings solidBlock(BlockBehaviour.StatePredicate predicate) {
 		super.isRedstoneConductor(predicate);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings isSuffocating(BlockBehaviour.StatePredicate predicate) {
+	public FabricBlockSettings suffocates(BlockBehaviour.StatePredicate predicate) {
 		super.isSuffocating(predicate);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings isViewBlocking(BlockBehaviour.StatePredicate predicate) {
+	public FabricBlockSettings blockVision(BlockBehaviour.StatePredicate predicate) {
 		super.isViewBlocking(predicate);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings hasPostProcess(BlockBehaviour.StatePredicate predicate) {
+	public FabricBlockSettings postProcess(BlockBehaviour.StatePredicate predicate) {
 		super.hasPostProcess(predicate);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings emissiveRendering(BlockBehaviour.StatePredicate predicate) {
+	public FabricBlockSettings emissiveLighting(BlockBehaviour.StatePredicate predicate) {
 		super.emissiveRendering(predicate);
 		return this;
 	}
@@ -266,8 +251,7 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	 * Make the block require tool to drop and slows down mining speed if the incorrect tool is used.
 	 */
 	@Deprecated
-	@Override
-	public FabricBlockSettings requiresCorrectToolForDrops() {
+	public FabricBlockSettings requiresTool() {
 		super.requiresCorrectToolForDrops();
 		return this;
 	}
@@ -280,36 +264,31 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings destroyTime(float hardness) {
+	public FabricBlockSettings hardness(float hardness) {
 		super.destroyTime(hardness);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings explosionResistance(float resistance) {
+	public FabricBlockSettings resistance(float resistance) {
 		super.explosionResistance(resistance);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings offsetType(BlockBehaviour.OffsetType offsetType) {
+	public FabricBlockSettings offset(BlockBehaviour.OffsetType offsetType) {
 		super.offsetType(offsetType);
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings noTerrainParticles() {
+	public FabricBlockSettings noBlockBreakParticles() {
 		super.noTerrainParticles();
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings requiredFeatures(FeatureFlag... features) {
+	public FabricBlockSettings requires(FeatureFlag... features) {
 		super.requiredFeatures(features);
 		return this;
 	}
@@ -322,8 +301,7 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings ignitedByLava() {
+	public FabricBlockSettings burnable() {
 		super.ignitedByLava();
 		return this;
 	}
@@ -336,22 +314,19 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings forceSolidOn() {
+	public FabricBlockSettings solid() {
 		super.forceSolidOn();
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings forceSolidOff() {
+	public FabricBlockSettings notSolid() {
 		super.forceSolidOff();
 		return this;
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings pushReaction(PushReaction pistonBehavior) {
+	public FabricBlockSettings pistonBehavior(PushReaction pistonBehavior) {
 		super.pushReaction(pistonBehavior);
 		return this;
 	}

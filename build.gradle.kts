@@ -52,7 +52,7 @@ val upstreamVersion = version
 
 ext["upstreamVersion"] = upstreamVersion
 
-version = "$upstreamVersion+$implementationVersion+$versionMc"
+version = "$upstreamVersion+$implementationVersion+$versionMc${(if (System.getenv("GITHUB_RUN_NUMBER") == null) "+local" else "")}"
 println("Version: $version")
 
 allprojects {
