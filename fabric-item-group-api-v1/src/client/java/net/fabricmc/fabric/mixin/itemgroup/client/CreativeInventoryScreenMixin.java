@@ -27,6 +27,7 @@ import net.neoforged.neoforge.client.gui.CreativeTabsScreenPage;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,10 +37,13 @@ public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMe
 	@Shadow
 	@Final
 	private List<CreativeTabsScreenPage> pages;
-	@Shadow
-	private CreativeTabsScreenPage currentPage;
+	@Shadow(aliases = "currentPage")
+	private CreativeTabsScreenPage currentSelectedPage;
 	@Shadow
 	private static CreativeModeTab selectedTab;
+
+	@Unique // Kept for mod internal usage
+	private static int currentPage;
 
 	@Shadow
 	abstract void setCurrentPage(CreativeTabsScreenPage currentPage);
@@ -63,7 +67,7 @@ public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMe
 	@Override
 	public boolean switchToNextPage() {
 		if (hasAdditionalPages()) {
-			this.setCurrentPage(this.pages.get(this.pages.indexOf(this.currentPage) + 1));
+			this.setCurrentPage(this.pages.get(this.pages.indexOf(this.currentSelectedPage) + 1));
 			return true;
 		}
 		return false;
@@ -71,8 +75,8 @@ public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMe
 
 	@Override
 	public boolean switchToPreviousPage() {
-		if (this.pages.indexOf(this.currentPage) > 0) {
-			this.setCurrentPage(this.pages.get(this.pages.indexOf(this.currentPage) - 1));
+		if (this.pages.indexOf(this.currentSelectedPage) > 0) {
+			this.setCurrentPage(this.pages.get(this.pages.indexOf(this.currentSelectedPage) - 1));
 			return true;
 		}
 		return false;
@@ -80,7 +84,7 @@ public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMe
 
 	@Override
 	public int getCurrentPage() {
-		return this.pages.indexOf(this.currentPage);
+		return this.pages.indexOf(this.currentSelectedPage);
 	}
 
 	@Override
@@ -102,7 +106,7 @@ public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMe
 
 	@Override
 	public boolean hasAdditionalPages() {
-		return this.pages.indexOf(this.currentPage) < this.pages.size() - 1;
+		return this.pages.indexOf(this.currentSelectedPage) < this.pages.size() - 1;
 	}
 
 	@Override
@@ -118,7 +122,7 @@ public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMe
 			return false;
 		}
 
-		if (pages.indexOf(currentPage) != getPage(itemGroup)) {
+		if (pages.indexOf(currentSelectedPage) != getPage(itemGroup)) {
 			if (!switchToPage(getPage(itemGroup))) {
 				return false;
 			}
@@ -127,4 +131,14 @@ public abstract class CreativeInventoryScreenMixin<T extends AbstractContainerMe
 		selectTab(itemGroup);
 		return true;
 	}
+
+	@Unique
+	@Deprecated // Kept for mod internals
+	private boolean isGroupVisible(CreativeModeTab tab) {
+		return tab.shouldDisplay() && getCurrentPage() == getPage(tab);
+	}
+
+	@Unique
+	@Deprecated // Kept for mod internals
+	private void updateSelection() {}
 }
