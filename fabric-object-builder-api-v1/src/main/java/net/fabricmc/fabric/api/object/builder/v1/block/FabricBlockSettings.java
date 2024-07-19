@@ -55,7 +55,7 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 		this.resistance(otherAccessor.getExplosionResistance());
 		this.collidable(otherAccessor.getHasCollision());
 		thisAccessor.setIsRandomlyTicking(otherAccessor.getIsRandomlyTicking());
-		this.lightLevel(otherAccessor.getLuminance());
+		this.luminance(otherAccessor.getLuminance());
 		thisAccessor.setMapColor(otherAccessor.getMapColor());
 		this.sounds(otherAccessor.getSoundType());
 		this.slipperiness(otherAccessor.getFriction());
@@ -116,8 +116,7 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	}
 
 	@Deprecated
-	@Override
-	public FabricBlockSettings noCollission() {
+	public FabricBlockSettings noCollision() {
 		super.noCollission();
 		return this;
 	}
@@ -154,7 +153,12 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 
 	@Deprecated
 	@Override
-	public FabricBlockSettings lightLevel(ToIntFunction<BlockState> luminanceFunction) {
+	public FabricBlockSettings lightLevel(ToIntFunction<BlockState> levelFunction) {
+		return this.luminance(levelFunction);
+	}
+
+	@Deprecated
+	public FabricBlockSettings luminance(ToIntFunction<BlockState> luminanceFunction) {
 		super.lightLevel(luminanceFunction);
 		return this;
 	}

@@ -195,6 +195,17 @@ allprojects {
             }
         }
     }
+    
+    if (project != rootProject) {
+        configurations {
+            apiElements {
+                setExtendsFrom(emptySet())
+            }
+            runtimeElements {
+                setExtendsFrom(emptySet())
+            }
+        }
+    }
 }
 
 publishMods {
