@@ -4,7 +4,6 @@ import net.fabricmc.loom.build.nesting.JarNester
 import net.fabricmc.loom.util.Constants
 import org.apache.commons.codec.digest.DigestUtils
 import org.eclipse.jgit.api.Git
-import java.util.*
 
 plugins {
     java
@@ -58,14 +57,31 @@ println("Version: $version")
 allprojects {
     apply(plugin = "maven-publish")
 
+    publishing {
+        repositories {
+            val env = System.getenv()
+            if (env["MAVEN_URL"] != null) {
+                repositories.maven {
+                    url = uri(env["MAVEN_URL"] as String)
+                    if (env["MAVEN_USERNAME"] != null) {
+                        credentials {
+                            username = env["MAVEN_USERNAME"]
+                            password = env["MAVEN_PASSWORD"]
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    group = "org.sinytra.forgified-fabric-api"
+
     if (project.name in META_PROJECTS) {
         return@allprojects
     }
 
     apply(plugin = "java-library")
     apply(plugin = "dev.architectury.loom")
-
-    group = "org.sinytra.forgified-fabric-api"
 
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(21))
@@ -131,7 +147,7 @@ tasks {
             )
         }
     }
-    
+
     withType<JavaCompile> {
         options.release = 21
     }
@@ -180,22 +196,8 @@ allprojects {
                 from(components["java"])
             }
         }
-        repositories {
-            val env = System.getenv()
-            if (env["MAVEN_URL"] != null) {
-                repositories.maven {
-                    url = uri(env["MAVEN_URL"] as String)
-                    if (env["MAVEN_USERNAME"] != null) {
-                        credentials {
-                            username = env["MAVEN_USERNAME"]
-                            password = env["MAVEN_PASSWORD"]
-                        }
-                    }
-                }
-            }
-        }
     }
-    
+
     if (project != rootProject) {
         configurations {
             apiElements {

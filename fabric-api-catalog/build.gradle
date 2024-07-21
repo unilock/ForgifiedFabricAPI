@@ -50,7 +50,7 @@ def doConfigureCatalog() {
 
 		catalog {
 			versionCatalog {
-				library(catalogName, "net.fabricmc.fabric-api:${proj.name}:${proj.version}")
+				library(catalogName, "org.sinytra.forgified-fabric-api:${proj.name}:${proj.version}")
 			}
 		}
 	}
