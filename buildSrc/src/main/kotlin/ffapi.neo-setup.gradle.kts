@@ -48,19 +48,21 @@ dependencies {
 }
 
 tasks {
-    named<Jar>("jar") {
-        manifest { 
-            attributes(
-                "Implementation-Version" to project.version
-            )
+    afterEvaluate { 
+        named<Jar>("jar") {
+            manifest { 
+                attributes(
+                    "Implementation-Version" to project.version
+                )
+            }
         }
     }
-    
+
     named<Test>("test") {
         useJUnitPlatform()
         enabled = false
     }
-    
+
     named<ProcessResources>("processResources") {
         filesMatching("assets/*/icon.png") {
             exclude()
