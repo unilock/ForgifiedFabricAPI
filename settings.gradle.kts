@@ -78,6 +78,7 @@ include("deprecated:fabric-loot-api-v2")
 //include 'deprecated:fabric-command-api-v1'
 //include 'deprecated:fabric-commands-v0'
 //include 'deprecated:fabric-containers-v0'
+include("deprecated:fabric-convention-tags-v1")
 //include 'deprecated:fabric-events-lifecycle-v0'
 //include 'deprecated:fabric-keybindings-v0'
 //include 'deprecated:fabric-models-v0'
