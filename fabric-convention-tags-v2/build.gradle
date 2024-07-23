@@ -12,9 +12,7 @@ testDependencies(project, [
 sourceSets {
 	main {
 		resources {
-			srcDirs += [
-				'src/generated/resources'
-			]
+			srcDirs 'src/generated/resources'
 		}
 	}
 	datagen {
