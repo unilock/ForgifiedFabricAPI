@@ -128,6 +128,7 @@ allprojects {
 dependencies {
     // Include Forgified Fabric Loader
     include("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
+    api("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
 }
 
 tasks {
