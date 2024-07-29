@@ -23,11 +23,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public final class RegistryAttributeImpl implements RegistryAttributeHolder {
-	private static final Map<ResourceKey<?>, RegistryAttributeHolder> HOLDER_MAP = new HashMap<>();
+	private static final Map<ResourceKey<?>, RegistryAttributeHolder> HOLDER_MAP = new ConcurrentHashMap<>();
 
 	public static RegistryAttributeHolder getHolder(ResourceKey<?> registryKey) {
 		return HOLDER_MAP.computeIfAbsent(registryKey, RegistryAttributeImpl::new);
