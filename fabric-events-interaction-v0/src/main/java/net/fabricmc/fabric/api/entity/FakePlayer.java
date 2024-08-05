@@ -22,7 +22,6 @@ import java.util.UUID;
 
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
-import net.fabricmc.fabric.impl.event.interaction.FakePlayerNetworkHandler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -89,7 +88,5 @@ public class FakePlayer extends net.neoforged.neoforge.common.util.FakePlayer {
 
 	protected FakePlayer(ServerLevel world, GameProfile profile) {
 		super(world, profile);
-
-		this.connection = new FakePlayerNetworkHandler(this);
 	}
 }
