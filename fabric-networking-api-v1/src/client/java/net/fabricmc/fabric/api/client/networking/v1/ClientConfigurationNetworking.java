@@ -18,6 +18,7 @@ package net.fabricmc.fabric.api.client.networking.v1;
 
 import java.util.Set;
 
+import net.minecraft.network.ConnectionProtocol;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -157,7 +158,11 @@ public final class ClientConfigurationNetworking {
 	 * False if the client is not in game.
 	 */
 	public static boolean canSend(ResourceLocation channelName) throws IllegalArgumentException {
-		return NeoClientConfigurationNetworking.canSend(channelName);
+		if (Minecraft.getInstance().getConnection() != null && Minecraft.getInstance().getConnection().protocol() == ConnectionProtocol.CONFIGURATION) {
+			return NeoClientConfigurationNetworking.canSend(channelName);
+		}
+
+		return false;
 	}
 
 	/**

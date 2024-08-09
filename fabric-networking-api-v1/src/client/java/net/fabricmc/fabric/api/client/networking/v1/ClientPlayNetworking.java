@@ -19,6 +19,7 @@ package net.fabricmc.fabric.api.client.networking.v1;
 import java.util.Objects;
 import java.util.Set;
 
+import net.minecraft.network.ConnectionProtocol;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -161,7 +162,7 @@ public final class ClientPlayNetworking {
 	 */
 	public static boolean canSend(ResourceLocation channelName) throws IllegalArgumentException {
 		// You cant send without a client player, so this is fine
-		if (Minecraft.getInstance().getConnection() != null) {
+		if (Minecraft.getInstance().getConnection() != null && Minecraft.getInstance().getConnection().protocol() == ConnectionProtocol.PLAY) {
 			return NeoClientPlayNetworking.canSend(channelName);
 		}
 
