@@ -16,22 +16,23 @@
 
 package net.fabricmc.fabric.mixin.item;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.storage.loot.functions.EnchantRandomlyFunction;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(EnchantRandomlyFunction.class)
 abstract class EnchantRandomlyLootFunctionMixin {
-	@Redirect(
+	@WrapOperation(
 			method = "lambda$run$4",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/enchantment/Enchantment;canEnchant(Lnet/minecraft/world/item/ItemStack;)Z")
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;supportsEnchantment(Lnet/minecraft/core/Holder;)Z")
 	)
-	private static boolean callAllowEnchantingEvent(Enchantment enchantment, ItemStack stack, boolean bl, ItemStack itemStack, Holder<Enchantment> registryEntry) {
-		return stack.canBeEnchantedWith(registryEntry, EnchantingContext.ACCEPTABLE);
+	private static boolean callAllowEnchantingEvent(ItemStack stack, Holder<Enchantment> registryEntry, Operation<Boolean> original) {
+		return stack.canBeEnchantedWith(registryEntry, EnchantingContext.ACCEPTABLE) || original.call(stack, registryEntry);
 	}
 }
