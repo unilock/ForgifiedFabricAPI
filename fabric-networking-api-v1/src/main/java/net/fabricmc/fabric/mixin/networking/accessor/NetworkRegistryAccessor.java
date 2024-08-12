@@ -18,11 +18,6 @@ public interface NetworkRegistryAccessor {
         throw new UnsupportedOperationException();
     }
 
-    @Accessor("ATTRIBUTE_PAYLOAD_SETUP")
-    static AttributeKey<NetworkPayloadSetup> getAttributePayloadSetup() {
-        throw new UnsupportedOperationException();
-    }
-
     @Accessor
     static boolean getSetup() {
         throw new UnsupportedOperationException();

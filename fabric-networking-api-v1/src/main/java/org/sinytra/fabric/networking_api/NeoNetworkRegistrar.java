@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import net.neoforged.neoforge.network.registration.ChannelAttributes;
 import net.neoforged.neoforge.network.registration.NetworkPayloadSetup;
 import net.neoforged.neoforge.network.registration.NetworkRegistry;
 import org.apache.commons.lang3.function.TriConsumer;
@@ -86,7 +87,7 @@ public class NeoNetworkRegistrar {
     }
 
     public Set<ResourceLocation> getLocalSendable(ICommonPacketListener listener) {
-        NetworkPayloadSetup payloadSetup = listener.getConnection().channel().attr(NetworkRegistryAccessor.getAttributePayloadSetup()).get();
+        NetworkPayloadSetup payloadSetup = ChannelAttributes.getPayloadSetup(listener.getConnection());
         if (payloadSetup == null) {
             return Set.of();
         }
