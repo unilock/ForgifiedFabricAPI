@@ -27,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.CanContinueSleepingEvent;
 import net.neoforged.neoforge.event.entity.player.CanPlayerSleepEvent;
@@ -40,6 +41,13 @@ public final class EntityEventHooks {
         LivingEntity entity = event.getEntity();
         if (!entity.level().isClientSide() && !ServerLivingEntityEvents.ALLOW_DAMAGE.invoker().allowDamage(entity, event.getSource(), event.getAmount())) {
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void afterLivingDamage(LivingDamageEvent.Post event) {
+        if (!event.getEntity().isDeadOrDying()) {
+            ServerLivingEntityEvents.AFTER_DAMAGE.invoker().afterDamage(event.getEntity(), event.getSource(), event.getOriginalDamage(), event.getNewDamage(), event.getBlockedDamage() > 0);
         }
     }
 
