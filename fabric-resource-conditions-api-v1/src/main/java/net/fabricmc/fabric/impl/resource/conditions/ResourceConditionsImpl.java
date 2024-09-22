@@ -26,6 +26,7 @@ import java.util.Set;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+import net.neoforged.neoforge.common.conditions.ConditionalOps;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public final class ResourceConditionsImpl implements ModInitializer {
 	public static boolean applyResourceConditions(JsonObject obj, String dataType, ResourceLocation key, @Nullable HolderLookup.Provider registryLookup) {
 		boolean debugLogEnabled = ResourceConditionsImpl.LOGGER.isDebugEnabled();
 
-		if (obj.has(ResourceConditions.CONDITIONS_KEY)) {
+		if (obj.has(ResourceConditions.CONDITIONS_KEY) && !obj.has(ConditionalOps.DEFAULT_CONDITIONS_KEY)) {
 			DataResult<ResourceCondition> conditions = ResourceCondition.CONDITION_CODEC.parse(JsonOps.INSTANCE, obj.get(ResourceConditions.CONDITIONS_KEY));
 
 			if (conditions.isSuccess()) {

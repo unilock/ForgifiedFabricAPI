@@ -37,7 +37,8 @@ public class FabricRecipeApiV1 implements ModInitializer {
                 CustomIngredientImpl.CODEC,
                 CustomIngredient::getSerializer,
                 s -> s.getCodec(true),
-                original
+                original,
+                "type" // NeoForge ingredient type spec
             )
             .xmap(
                 e -> e.map(c -> new NeoCustomIngredientWrapper(c).toVanilla(), Function.identity()),
@@ -46,7 +47,7 @@ public class FabricRecipeApiV1 implements ModInitializer {
     }
 
     // Stolen from NeoForgeExtraCodecs because they don't support custom type keys
-    public static <A, E, B> MapCodec<Either<E, B>> dispatchMapOrElse(String typeKey, Codec<A> typeCodec, Function<? super E, ? extends A> type, Function<? super A, ? extends MapCodec<? extends E>> codec, MapCodec<B> fallbackCodec) {
+    public static <A, E, B> MapCodec<Either<E, B>> dispatchMapOrElse(String typeKey, Codec<A> typeCodec, Function<? super E, ? extends A> type, Function<? super A, ? extends MapCodec<? extends E>> codec, MapCodec<B> fallbackCodec, String ignoreKey) {
         var dispatchCodec = typeCodec.dispatchMap(typeKey, type, codec);
         return new MapCodec<>() {
             @Override
@@ -56,7 +57,7 @@ public class FabricRecipeApiV1 implements ModInitializer {
 
             @Override
             public <T> DataResult<Either<E, B>> decode(DynamicOps<T> ops, MapLike<T> input) {
-                if (input.get(typeKey) != null) {
+                if (input.get(typeKey) != null && input.get(ignoreKey) == null) {
                     return dispatchCodec.decode(ops, input).map(Either::left);
                 } else {
                     return fallbackCodec.decode(ops, input).map(Either::right);
