@@ -1,9 +1,7 @@
 package net.fabricmc.fabric.mixin.networking.accessor;
 
-import io.netty.util.AttributeKey;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.registration.NetworkPayloadSetup;
 import net.neoforged.neoforge.network.registration.NetworkRegistry;
 import net.neoforged.neoforge.network.registration.PayloadRegistration;
 import org.spongepowered.asm.mixin.Mixin;
