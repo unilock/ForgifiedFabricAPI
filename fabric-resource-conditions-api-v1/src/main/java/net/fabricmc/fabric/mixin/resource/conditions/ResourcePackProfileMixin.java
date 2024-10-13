@@ -30,7 +30,7 @@ import net.minecraft.server.packs.repository.Pack;
 
 @Mixin(Pack.class)
 public class ResourcePackProfileMixin {
-	@ModifyVariable(method = "readPackMetadata", at = @At("STORE"))
+	@ModifyVariable(method = "readPackMetadata", at = @At(value = "STORE", ordinal = 0))
 	private static List<String> applyOverlayConditions(List<String> overlays, @Local PackResources resourcePack) throws IOException {
 		List<String> appliedOverlays = new ArrayList<>(overlays);
 		OverlayConditionsMetadata overlayMetadata = resourcePack.getMetadataSection(OverlayConditionsMetadata.SERIALIZER);
