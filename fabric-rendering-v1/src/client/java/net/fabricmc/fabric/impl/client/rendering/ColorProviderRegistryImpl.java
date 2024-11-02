@@ -18,6 +18,8 @@ package net.fabricmc.fabric.impl.client.rendering;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.item.ItemColor;
@@ -25,8 +27,11 @@ import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import org.slf4j.Logger;
 
 public abstract class ColorProviderRegistryImpl<T, Provider, Underlying> implements ColorProviderRegistry<T, Provider> {
+	private static final Logger LOGGER = LogUtils.getLogger();
+
 	public static final ColorProviderRegistryImpl<Block, BlockColor, BlockColors> BLOCK = new ColorProviderRegistryImpl<Block, BlockColor, BlockColors>() {
 		@Override
 		void registerUnderlying(BlockColors map, BlockColor mapper, Block block) {
@@ -48,7 +53,9 @@ public abstract class ColorProviderRegistryImpl<T, Provider, Underlying> impleme
 
 	public void initialize(Underlying colorMap) {
 		if (this.colorMap != null) {
-			if (this.colorMap != colorMap) throw new IllegalStateException("Cannot set colorMap twice");
+			if (this.colorMap != colorMap) {
+				LOGGER.warn("Tried to set colorMap twice in {}", getClass().getName());
+			}
 			return;
 		}
 
