@@ -13,23 +13,36 @@ import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
+import net.neoforged.neoforge.network.negotiation.NegotiatedNetworkComponent;
+import net.neoforged.neoforge.network.negotiation.NegotiationResult;
+import net.neoforged.neoforge.network.payload.ModdedNetworkQueryComponent;
 import net.neoforged.neoforge.network.registration.NetworkRegistry;
 import org.sinytra.fabric.networking_api.NeoNetworkRegistrar;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Mixin(NetworkRegistry.class)
 public class NetworkRegistryMixin {
 
-    @ModifyReturnValue(method = "getCodec", at = @At(value = "RETURN", ordinal = 1))
-    private static StreamCodec<? super FriendlyByteBuf, ? extends CustomPacketPayload> getCodec(StreamCodec<? super FriendlyByteBuf, ? extends CustomPacketPayload> codec, ResourceLocation id, ConnectionProtocol protocol, PacketFlow flow) {
+    @Inject(method = "getCodec", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V", ordinal = 0), cancellable = true)
+    private static void getCodec(ResourceLocation id, ConnectionProtocol protocol, PacketFlow flow, CallbackInfoReturnable<StreamCodec<? super FriendlyByteBuf, ? extends CustomPacketPayload>> cir) {
         PayloadTypeRegistryImpl<? extends FriendlyByteBuf> registry = NeoNetworkRegistrar.getPayloadRegistry(protocol, flow);
         CustomPacketPayload.TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> fabricCodec = registry.get(id);
-        return fabricCodec != null ? (StreamCodec) fabricCodec.codec() : codec;
+        if (fabricCodec != null) {
+            cir.setReturnValue((StreamCodec) fabricCodec.codec());
+        }
     }
 
     @ModifyReturnValue(method = "getCodec", at = @At(value = "RETURN", ordinal = 3))
@@ -68,5 +81,19 @@ public class NetworkRegistryMixin {
     private static boolean includeFabricChannels(ICommonPacketListener listener, ResourceLocation location, Operation<Boolean> original) {
         // TODO Use original args that include the packet
         return original.call(listener, location) || NeoNetworkRegistrar.hasCodecFor(listener.protocol(), listener.flow() == PacketFlow.SERVERBOUND ? PacketFlow.CLIENTBOUND : PacketFlow.SERVERBOUND, location);
+    }
+
+    @ModifyVariable(method = "initializeNeoForgeConnection", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/network/registration/NetworkPayloadSetup;from(Ljava/util/Map;)Lnet/neoforged/neoforge/network/registration/NetworkPayloadSetup;"), ordinal = 1)
+    private static Map<ConnectionProtocol, NegotiationResult> preserveSendableChannels(Map<ConnectionProtocol, NegotiationResult> results, ServerConfigurationPacketListener listener, Map<ConnectionProtocol, Set<ModdedNetworkQueryComponent>> clientChannels) {
+        Set<ModdedNetworkQueryComponent> channels = clientChannels.get(ConnectionProtocol.PLAY);
+        if (channels != null && !channels.isEmpty()) {
+            NegotiationResult negotiation = results.get(ConnectionProtocol.PLAY);
+            List<NegotiatedNetworkComponent> components = new ArrayList<>(negotiation.components());
+            channels.stream()
+                .filter(c -> PayloadTypeRegistryImpl.PLAY_S2C.get(c.id()) != null)
+                .forEach(c -> components.add(new NegotiatedNetworkComponent(c.id(), c.version())));
+            results.put(ConnectionProtocol.PLAY, new NegotiationResult(components, negotiation.success(), negotiation.failureReasons()));
+        }
+        return results;
     }
 }
