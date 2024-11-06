@@ -90,7 +90,7 @@ public class NetworkRegistryMixin {
             NegotiationResult negotiation = results.get(ConnectionProtocol.PLAY);
             List<NegotiatedNetworkComponent> components = new ArrayList<>(negotiation.components());
             channels.stream()
-                .filter(c -> PayloadTypeRegistryImpl.PLAY_S2C.get(c.id()) != null)
+                .filter(c -> components.stream().noneMatch(d -> c.id().equals(d.id())) && PayloadTypeRegistryImpl.PLAY_S2C.get(c.id()) != null)
                 .forEach(c -> components.add(new NegotiatedNetworkComponent(c.id(), c.version())));
             results.put(ConnectionProtocol.PLAY, new NegotiationResult(components, negotiation.success(), negotiation.failureReasons()));
         }
