@@ -14,6 +14,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.payload.MinecraftRegisterPayload;
 import net.neoforged.neoforge.network.registration.NetworkRegistry;
 import org.jetbrains.annotations.Nullable;
 import org.sinytra.fabric.networking_api.NeoCommonNetworking;
@@ -70,11 +71,15 @@ public class NeoClientPlayNetworking {
     }
 
     public static void onServerReady(ClientPacketListener handler, Minecraft client) {
+        NeoClientPacketSender packetSender = new NeoClientPacketSender(handler.getConnection());
         try {
-            ClientPlayConnectionEvents.JOIN.invoker().onPlayReady(handler, new NeoClientPacketSender(handler.getConnection()), client);
+            ClientPlayConnectionEvents.JOIN.invoker().onPlayReady(handler, packetSender, client);
         } catch (RuntimeException e) {
             LOGGER.error("Exception thrown while invoking ClientPlayConnectionEvents.JOIN", e);
         }
+
+        MinecraftRegisterPayload registerPacket = new MinecraftRegisterPayload(NeoCommonNetworking.PLAY_REGISTRY.getGlobalReceivers(PacketFlow.CLIENTBOUND));
+        packetSender.sendPacket(registerPacket);
     }
 
     @Nullable

@@ -5,18 +5,19 @@
   "mixins": [
     "ClientConnectionMixin",
     "EntityTrackerEntryMixin",
+    "GenericPacketSplitterMixin",
     "LoginQueryRequestS2CPacketMixin",
     "LoginQueryResponseC2SPacketMixin",
+    "NetworkRegistryMixin",
+    "ServerCommonNetworkHandlerMixin",
     "ServerConfigurationNetworkHandlerMixin",
     "ServerLoginNetworkHandlerMixin",
     "ServerPlayNetworkHandlerMixin",
-    "NetworkRegistryMixin",
-    "ServerCommonNetworkHandlerMixin",
     "accessor.EntityTrackerAccessor",
-    "accessor.ServerCommonNetworkHandlerAccessor",
-    "accessor.ServerLoginNetworkHandlerAccessor",
+    "accessor.NetworkRegistryAccessor",
     "accessor.ServerChunkLoadingManagerAccessor",
-    "accessor.NetworkRegistryAccessor"
+    "accessor.ServerCommonNetworkHandlerAccessor",
+    "accessor.ServerLoginNetworkHandlerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
